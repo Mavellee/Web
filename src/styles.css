@@ -1,0 +1,59 @@
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/manrope";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-ivory font-sans text-ink antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-serif tracking-tight text-ink;
+    font-variation-settings: "opsz" 96, "SOFT" 50;
+  }
+  ::selection {
+    @apply bg-lavender text-ink;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-plum ring-offset-2 ring-offset-ivory;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-plum;
+  }
+  .prose-knot p {
+    @apply mb-4 leading-relaxed text-ink-soft;
+  }
+  .prose-knot h2 {
+    @apply mb-3 mt-10 text-2xl;
+  }
+  .prose-knot h3 {
+    @apply mb-2 mt-6 text-lg font-sans font-semibold;
+  }
+  .prose-knot ul {
+    @apply mb-4 list-disc space-y-1 pl-6 text-ink-soft;
+  }
+  .hairline {
+    @apply border-[#EADFD4];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
