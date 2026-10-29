@@ -26,8 +26,8 @@ function Toggle({ label, description, checked, onChange }: { label: string; desc
       </span>
       <span className="relative mt-1 inline-flex shrink-0">
         <input type="checkbox" role="switch" className="peer sr-only" checked={checked} onChange={(e) => onChange(e.target.checked)} />
-        <span className="h-7 w-12 rounded-full bg-[#E4D8CD] transition peer-checked:bg-plum peer-focus-visible:ring-2 peer-focus-visible:ring-plum peer-focus-visible:ring-offset-2" />
-        <span className="absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-5" />
+        <span className="h-7 w-12 rounded-full bg-line transition peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2" />
+        <span className="absolute left-1 top-1 h-5 w-5 rounded-full bg-surface shadow transition peer-checked:translate-x-5" />
       </span>
     </label>
   );
@@ -127,7 +127,7 @@ export function Settings() {
                     <span className="text-xs text-ink-muted">Last active {timeAgo(x.lastUsedAt)}</span>
                   </span>
                   {x.current ? (
-                    <span className="text-xs font-semibold text-sage-ink">This device</span>
+                    <span className="text-xs font-semibold text-success">This device</span>
                   ) : (
                     <Button
                       variant="quiet"
@@ -150,10 +150,10 @@ export function Settings() {
               <Button variant="secondary" size="sm" onClick={() => setDialog("password")}>
                 Change password
               </Button>
-              <a href="/api/settings/export" className="inline-flex h-9 items-center rounded-full border border-plum/25 bg-white/70 px-4 text-sm font-semibold text-plum hover:border-plum/50" download="knot-data.json">
+              <a href="/api/settings/export" className="inline-flex h-9 items-center rounded-full border border-primary/25 bg-surface/70 px-4 text-sm font-semibold text-primary hover:border-primary/50" download="knot-data.json">
                 Download my data
               </a>
-              <Button variant="quiet" size="sm" className="text-rose-ink" onClick={() => setDialog("delete")}>
+              <Button variant="quiet" size="sm" className="text-accent" onClick={() => setDialog("delete")}>
                 Delete account
               </Button>
             </div>
@@ -201,7 +201,7 @@ function PasswordDialog({ open, onClose }: { open: boolean; onClose: () => void 
         <Input label="Current password" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} />
         <Input label="New password" type="password" autoComplete="new-password" hint="At least 10 characters, with a letter and a number." value={next} onChange={(e) => setNext(e.target.value)} />
         {error && (
-          <p role="alert" className="text-sm text-rose-ink">
+          <p role="alert" className="text-sm text-error">
             {error}
           </p>
         )}
@@ -237,7 +237,7 @@ function DeleteDialog({ open, onClose, onDeleted }: { open: boolean; onClose: ()
       >
         <Input label="Confirm with your password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && (
-          <p role="alert" className="text-sm text-rose-ink">
+          <p role="alert" className="text-sm text-error">
             {error}
           </p>
         )}

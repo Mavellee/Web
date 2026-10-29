@@ -47,14 +47,14 @@ export function HowItWorks() {
       <section className="container-page">
         <ol className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {steps.map(([t, d], i) => (
-            <li key={t} className="rounded-4xl border hairline bg-white/70 p-7 shadow-soft">
-              <span className="font-serif text-4xl text-plum-300">{String(i + 1).padStart(2, "0")}</span>
+            <li key={t} className="rounded-4xl border hairline bg-surface/70 p-7 shadow-soft">
+              <span className="font-serif text-4xl text-accent">{String(i + 1).padStart(2, "0")}</span>
               <h2 className="mt-4 text-2xl">{t}</h2>
               <p className="mt-2 leading-relaxed text-ink-soft">{d}</p>
             </li>
           ))}
         </ol>
-        <div className="mt-16 rounded-4xl bg-lavender-soft p-8 sm:p-12">
+        <div className="mt-16 rounded-4xl bg-rose-mist p-8 sm:p-12">
           <h2 className="text-3xl">About compatibility scores</h2>
           <p className="mt-3 max-w-3xl leading-relaxed text-ink-soft">
             Scores compare only what both people chose to share: intentions, interests and optional answers, weighted by how important each person said a question is. We show what lines up, what differs, and what's missing. A score describes overlap in stated preferences; it can't predict whether a relationship will work, and we never use your photos or private messages to calculate it.
@@ -78,9 +78,9 @@ export function Intentions() {
       </PageIntro>
       <section className="container-page space-y-6">
         {INTENTIONS.map((i, idx) => (
-          <article key={i.value} id={i.value.toLowerCase()} className="scroll-mt-28 grid gap-6 rounded-4xl border hairline bg-white/70 p-8 shadow-soft md:grid-cols-[14rem_1fr] md:p-10">
+          <article key={i.value} id={i.value.toLowerCase()} className="scroll-mt-28 grid gap-6 rounded-4xl border hairline bg-surface/70 p-8 shadow-soft md:grid-cols-[14rem_1fr] md:p-10">
             <div>
-              <span className={["inline-block rounded-full px-3 py-1 text-xs font-semibold", idx === 0 ? "bg-sage text-sage-ink" : idx === 1 ? "bg-rose-soft text-rose-ink" : "bg-lavender-soft text-plum-700"].join(" ")}>{i.short}</span>
+              <span className={["inline-block rounded-full px-3 py-1 text-xs font-semibold", idx === 0 ? "bg-rose-soft text-accent" : idx === 1 ? "bg-gold-soft text-gold-ink" : "bg-primary-50 text-primary-700"].join(" ")}>{i.short}</span>
               <h2 className="mt-4 text-3xl">{i.title}</h2>
             </div>
             <div className="space-y-3 leading-relaxed text-ink-soft">
@@ -115,20 +115,20 @@ export function Safety() {
       </PageIntro>
       <section className="container-page grid gap-5 md:grid-cols-2">
         {items.map(([t, d]) => (
-          <div key={t} className="rounded-4xl border hairline bg-white/70 p-7 shadow-soft">
-            <Icon name="shield" className="h-6 w-6 text-plum" />
+          <div key={t} className="rounded-4xl border hairline bg-surface/70 p-7 shadow-soft">
+            <Icon name="shield" className="h-6 w-6 text-primary" />
             <h2 className="mt-4 text-2xl">{t}</h2>
             <p className="mt-2 leading-relaxed text-ink-soft">{d}</p>
           </div>
         ))}
       </section>
       <section className="container-page mt-14">
-        <div className="rounded-4xl bg-sage/70 p-8 sm:p-10">
+        <div className="rounded-4xl border hairline bg-surface p-8 sm:p-10">
           <h2 className="text-3xl">Meeting in person</h2>
           <ul className="mt-4 grid gap-3 text-ink-soft sm:grid-cols-2">
             {["Meet somewhere public for the first few dates.", "Tell a friend where you're going and when.", "Arrange your own transport.", "Never send money to someone you haven't met.", "Trust your instincts — it's okay to leave.", "Report anyone who makes you feel unsafe."].map((t) => (
               <li key={t} className="flex gap-2">
-                <Icon name="check" className="mt-0.5 h-5 w-5 shrink-0 text-sage-ink" /> {t}
+                <Icon name="check" className="mt-0.5 h-5 w-5 shrink-0 text-success" /> {t}
               </li>
             ))}
           </ul>
@@ -159,7 +159,7 @@ export function About() {
           ["Respectful", "Every intention is valid. Every boundary matters."],
           ["Transparent", "Readable compatibility and clearly labelled AI."],
         ].map(([t, d]) => (
-          <div key={t} className="rounded-4xl bg-lavender-soft p-7">
+          <div key={t} className="rounded-4xl bg-rose-mist p-7">
             <h2 className="text-2xl">{t}</h2>
             <p className="mt-2 text-ink-soft">{d}</p>
           </div>
@@ -213,7 +213,7 @@ export function Terms() {
         <h2>Your content</h2>
         <p>You keep ownership of what you post. You give Knot permission to store and display it to other members as needed to run the service. You confirm you have the right to share any photos you upload.</p>
         <h2>Acceptable use</h2>
-        <p>You agree to follow the <Link className="text-plum underline" to="/guidelines">community guidelines</Link>. We may restrict or close accounts that break them.</p>
+        <p>You agree to follow the <Link className="text-primary underline" to="/guidelines">community guidelines</Link>. We may restrict or close accounts that break them.</p>
         <h2>Compatibility, experts and AI</h2>
         <p>Compatibility scores, expert reviews and AI suggestions are informational only. They do not predict relationship outcomes and are not professional, medical, psychological or legal advice.</p>
         <h2>Ending your account</h2>
@@ -267,10 +267,10 @@ export function Contact() {
           ["Safety concerns", "safety@knot.example", "Anything that made you feel unsafe on or off Knot."],
           ["Privacy requests", "privacy@knot.example", "Questions about your data or this policy."],
         ].map(([t, email, d]) => (
-          <div key={t} className="rounded-4xl border hairline bg-white/70 p-7 shadow-soft">
+          <div key={t} className="rounded-4xl border hairline bg-surface/70 p-7 shadow-soft">
             <h2 className="text-2xl">{t}</h2>
             <p className="mt-2 text-ink-soft">{d}</p>
-            <a href={`mailto:${email}`} className="mt-5 inline-flex items-center gap-2 font-semibold text-plum underline-offset-4 hover:underline">
+            <a href={`mailto:${email}`} className="mt-5 inline-flex items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline">
               {email}
             </a>
           </div>
@@ -279,7 +279,7 @@ export function Contact() {
       <p className="container-page mt-6 text-sm text-ink-muted">These addresses are placeholders for this preview build and will be replaced with monitored inboxes before launch.</p>
       <section className="container-page mt-14">
         <h2 className="text-3xl">Common questions</h2>
-        <dl className="mt-6 divide-y hairline rounded-4xl border hairline bg-white/60">
+        <dl className="mt-6 divide-y hairline rounded-4xl border hairline bg-surface/60">
           {[
             ["I didn't get my verification email.", "Check spam, then use “Resend email” on the verification screen. Links expire after 24 hours."],
             ["How do I hide my profile?", "Settings → Visibility. Pausing Discover keeps your matches and conversations."],

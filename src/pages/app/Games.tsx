@@ -55,7 +55,7 @@ export function Games() {
               const st = deckStyle(s.game.category);
               return (
                 <li key={s.id}>
-                  <Link to={`/app/games/${s.id}`} className="flex items-center gap-4 rounded-3xl border hairline bg-white p-4 transition hover:shadow-soft">
+                  <Link to={`/app/games/${s.id}`} className="flex items-center gap-4 rounded-3xl border hairline bg-surface p-4 transition hover:shadow-soft">
                     <span className={cx("flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl", st.surface, st.ink)}>
                       <Icon name={st.icon} />
                     </span>
@@ -65,7 +65,7 @@ export function Games() {
                         Solo · {s.progress.current}/{s.progress.total}
                       </span>
                     </span>
-                    <Icon name="arrow" className="h-5 w-5 text-plum" />
+                    <Icon name="arrow" className="h-5 w-5 text-primary" />
                   </Link>
                 </li>
               );
@@ -148,7 +148,7 @@ export function Games() {
             </div>
           </fieldset>
           {error && (
-            <p role="alert" className="text-sm text-rose-ink">
+            <p role="alert" className="text-sm text-error">
               {error}
             </p>
           )}

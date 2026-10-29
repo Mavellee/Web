@@ -28,7 +28,7 @@ export function Messages() {
 
   return (
     <div className="mx-auto grid h-[calc(100dvh-7.5rem)] max-w-6xl md:h-dvh md:px-6 md:py-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
-      <section aria-label="Conversations" className={cx("flex min-h-0 flex-col md:rounded-4xl md:border md:hairline md:bg-white/60 lg:rounded-r-none", id && "hidden lg:flex")}>
+      <section aria-label="Conversations" className={cx("flex min-h-0 flex-col md:rounded-4xl md:border md:hairline md:bg-surface/60 lg:rounded-r-none", id && "hidden lg:flex")}>
         <div className="px-5 pb-3 pt-6 md:pt-7">
           <h1 className="text-3xl">Messages</h1>
         </div>
@@ -54,7 +54,7 @@ export function Messages() {
                   <Link
                     to={`/app/messages/${c.id}`}
                     aria-current={c.id === id ? "page" : undefined}
-                    className={cx("flex items-center gap-3 rounded-2xl px-3 py-3 transition", c.id === id ? "bg-plum-50" : "hover:bg-white")}
+                    className={cx("flex items-center gap-3 rounded-2xl px-3 py-3 transition", c.id === id ? "bg-primary-50" : "hover:bg-surface")}
                   >
                     <Avatar id={c.other.photoIds[0]} name={c.other.displayName} />
                     <div className="min-w-0 flex-1">
@@ -65,7 +65,7 @@ export function Messages() {
                       <p className={cx("truncate text-sm", c.unread ? "font-semibold text-ink" : "text-ink-muted")}>{c.lastMessage ? c.lastMessage.body : "New match — say hello"}</p>
                     </div>
                     {c.unread > 0 && (
-                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-plum px-1.5 text-xs font-bold text-ivory" aria-label={`${c.unread} unread`}>
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-surface" aria-label={`${c.unread} unread`}>
                         {c.unread}
                       </span>
                     )}
@@ -76,7 +76,7 @@ export function Messages() {
           )}
         </div>
       </section>
-      <section aria-label="Conversation" className={cx("min-h-0 md:rounded-4xl md:border md:hairline md:bg-white/80 lg:rounded-l-none lg:border-l-0", !id && "hidden lg:block")}>
+      <section aria-label="Conversation" className={cx("min-h-0 md:rounded-4xl md:border md:hairline md:bg-surface/80 lg:rounded-l-none lg:border-l-0", !id && "hidden lg:block")}>
         {id ? (
           <Conversation key={id} id={id} onActivity={reload} />
         ) : (
@@ -336,7 +336,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
         aria-live="polite"
       >
         {loading ? (
-          <div className="flex justify-center py-10 text-plum">
+          <div className="flex justify-center py-10 text-primary">
             <Spinner label="Loading messages" />
           </div>
         ) : loadError ? (
@@ -376,16 +376,16 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                     ) : (
                     <li className={cx("group flex items-end gap-2", mine ? "justify-end" : "justify-start")}>
                       {!mine && !m.pending && (
-                        <button type="button" onClick={() => setReporting(m)} className="order-last rounded-full p-1 text-ink-muted opacity-0 transition hover:text-rose-ink focus:opacity-100 group-hover:opacity-100" aria-label="Report this message">
+                        <button type="button" onClick={() => setReporting(m)} className="order-last rounded-full p-1 text-ink-muted opacity-0 transition hover:text-accent focus:opacity-100 group-hover:opacity-100" aria-label="Report this message">
                           <Icon name="flag" className="h-4 w-4" />
                         </button>
                       )}
-                      <div className={cx("max-w-[80%] rounded-3xl px-4 py-2.5 sm:max-w-[65%]", mine ? "rounded-br-lg bg-plum text-ivory" : "rounded-bl-lg bg-white text-ink shadow-soft", m.pending && "opacity-70")}>
+                      <div className={cx("max-w-[80%] rounded-3xl px-4 py-2.5 sm:max-w-[65%]", mine ? "rounded-br-lg bg-primary text-surface" : "rounded-bl-lg bg-surface text-ink shadow-soft", m.pending && "opacity-70")}>
                         {(() => {
                           // A first message that started from a profile detail quotes it.
                           const d = m.metadata?.detail as { label: string; quote: string; kind: string } | undefined;
                           return d ? (
-                            <figure className={cx("mb-2 rounded-2xl px-3 py-2 text-xs", mine ? "bg-ivory/15 text-ivory/90" : "bg-ivory-deep text-ink-soft")}>
+                            <figure className={cx("mb-2 rounded-2xl px-3 py-2 text-xs", mine ? "bg-parchment/15 text-surface/90" : "bg-parchment-deep text-ink-soft")}>
                               <figcaption className="font-semibold">{d.kind === "PROMPT" ? d.label : "Interest"}</figcaption>
                               <blockquote className="mt-0.5 font-serif text-sm">{d.quote}</blockquote>
                             </figure>
@@ -393,7 +393,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                         })()}
                         {m.hasAttachment && <img src={`/api/conversations/${id}/attachments/${m.id}`} alt="Shared photo" className="mb-1 max-h-72 rounded-2xl object-cover" loading="lazy" />}
                         {m.body && <p className="whitespace-pre-wrap break-words leading-relaxed">{m.body}</p>}
-                        <p className={cx("mt-0.5 text-right text-[0.68rem]", mine ? "text-ivory/70" : "text-ink-muted")}>
+                        <p className={cx("mt-0.5 text-right text-[0.68rem]", mine ? "text-surface/70" : "text-ink-muted")}>
                           {m.pending ? "Sending…" : m.failed ? "" : clockTime(m.createdAt)}
                         </p>
                       </div>
@@ -401,7 +401,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                     )}
                     {m.failed && (
                       <li className="flex justify-end">
-                        <button type="button" onClick={() => retry(m)} className="text-xs font-semibold text-rose-ink underline">
+                        <button type="button" onClick={() => retry(m)} className="text-xs font-semibold text-accent underline">
                           Not sent — tap to retry
                         </button>
                       </li>
@@ -412,9 +412,9 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
             </ol>
             {seen && <p className="mt-1 text-right text-xs text-ink-muted">Seen</p>}
             {theyTyping && (
-              <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 shadow-soft" aria-label={`${other?.displayName} is typing`}>
+              <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-surface px-3 py-2 shadow-soft" aria-label={`${other?.displayName} is typing`}>
                 {[0, 1, 2].map((d) => (
-                  <span key={d} className="h-1.5 w-1.5 animate-bounce rounded-full bg-plum-300" style={{ animationDelay: `${d * 120}ms` }} />
+                  <span key={d} className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-300" style={{ animationDelay: `${d * 120}ms` }} />
                 ))}
               </p>
             )}
@@ -453,7 +453,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                 void send();
               }
             }}
-            className="max-h-36 min-h-11 flex-1 resize-none rounded-3xl border border-[#E4D8CD] bg-white px-4 py-2.5 focus:border-plum focus:outline-none focus:ring-4 focus:ring-plum/10"
+            className="max-h-36 min-h-11 flex-1 resize-none rounded-3xl border border-line bg-surface px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
           />
           <Button type="submit" className="mb-0.5 h-11 w-11 !px-0" disabled={!text.trim()} aria-label="Send message">
             <Icon name="send" />

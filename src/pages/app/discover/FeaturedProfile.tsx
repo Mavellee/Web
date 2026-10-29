@@ -13,10 +13,10 @@ export function FeaturedProfile({ profile: p, onOpen, onLike, onPass, onRespond,
   const prompt = p.prompts?.[0];
   const shared = sharedSentence(p);
   return (
-    <article aria-label={`${p.displayName}${p.age ? `, ${p.age}` : ""}`} className={cx("grid overflow-hidden rounded-[2rem] border hairline bg-white shadow-soft transition duration-500 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]", leaving && "pointer-events-none translate-y-2 opacity-0")}>
+    <article aria-label={`${p.displayName}${p.age ? `, ${p.age}` : ""}`} className={cx("grid overflow-hidden rounded-[2rem] border hairline bg-surface shadow-soft transition duration-500 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]", leaving && "pointer-events-none translate-y-2 opacity-0")}>
       <button type="button" onClick={onOpen} className="relative block" aria-label={`View ${p.displayName}'s full profile`}>
         <Photo id={first?.id} focus={first} alt="" className="aspect-[4/5] h-full w-full md:aspect-auto md:min-h-[30rem]" rounded="rounded-none" />
-        {p.isDemo && <span className="absolute left-4 top-4 rounded-full bg-ivory/95 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink">Demo profile</span>}
+        {p.isDemo && <span className="absolute left-4 top-4 rounded-full bg-parchment/95 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink">Demo profile</span>}
       </button>
       <div className="flex flex-col p-6 sm:p-8">
         <p className="eyebrow">Someone to get to know</p>
@@ -39,7 +39,7 @@ export function FeaturedProfile({ profile: p, onOpen, onLike, onPass, onRespond,
         ) : (
           p.bio && <p className="mt-6 text-lg leading-relaxed text-ink-soft">{p.bio}</p>
         )}
-        {shared && <p className="mt-5 text-sm font-semibold text-sage-ink">{shared}</p>}
+        {shared && <p className="mt-5 text-sm font-semibold text-accent">{shared}</p>}
         {second && (
           <div className="mt-6 hidden gap-3 lg:flex">
             <Photo id={second.id} focus={second} alt={`Another photo of ${p.displayName}`} className="h-28 w-24" rounded="rounded-2xl" />

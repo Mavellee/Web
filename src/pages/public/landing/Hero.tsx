@@ -9,7 +9,7 @@ export function Hero() {
           <p className="eyebrow">Intentional dating for adults · 18+</p>
           <h1 id="hero-title" className="mt-6 text-[2.6rem] leading-[1.04] sm:text-[3.4rem] lg:text-[3.75rem]">
             Not just a match.
-            <span className="block italic text-plum">A connection that makes sense.</span>
+            <span className="block italic text-primary">A connection that makes sense.</span>
           </h1>
           <p className="mt-7 text-lg leading-relaxed text-ink-soft">
             Knot begins with what you're looking for — something open, something undefined, or something for life — and shows you why someone might fit, using only what you both chose to share.
@@ -47,17 +47,17 @@ function HeroComposition() {
       {/* Main portrait */}
       <div className="absolute left-0 top-[6%] h-[78%] w-[60%] overflow-hidden rounded-[2rem] shadow-lift">
         <img src="/images/people/p13.jpg" alt="Illustrative portrait of a woman in a patterned collar" className="h-full w-full object-cover object-top" fetchPriority="high" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/70 to-transparent p-4 pt-16 text-ivory">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/70 to-transparent p-4 pt-16 text-surface">
           <p className="font-serif text-xl">Amara, 29</p>
-          <p className="text-xs text-ivory/80">Data scientist · Bengaluru</p>
+          <p className="text-xs text-surface/80">Data scientist · Bengaluru</p>
         </div>
       </div>
       {/* Secondary portrait, offset */}
-      <div className="absolute right-0 top-0 h-[46%] w-[40%] overflow-hidden rounded-[1.75rem] border-4 border-ivory shadow-lift">
+      <div className="absolute right-0 top-0 h-[46%] w-[40%] overflow-hidden rounded-[1.75rem] border-4 border-surface shadow-lift">
         <img src="/images/people/p11.jpg" alt="Illustrative portrait of a smiling man" className="h-full w-full object-cover object-top" />
       </div>
       {/* Compatibility note: what Knot actually shows, in miniature */}
-      <div className="absolute bottom-[4%] right-0 w-[62%] rounded-3xl border hairline bg-ivory p-5 shadow-lift sm:right-[2%]">
+      <div className="absolute bottom-[4%] right-0 w-[62%] rounded-3xl border hairline bg-parchment p-5 shadow-lift sm:right-[2%]">
         <div className="flex items-center justify-between">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-ink-muted">Why you might connect</p>
           <Icon name="spark" className="h-4 w-4 text-gold" />
@@ -65,11 +65,11 @@ function HeroComposition() {
         <ul className="mt-3 space-y-2 text-sm">
           <li className="flex items-center justify-between gap-3">
             <span>Long-term commitment</span>
-            <span className="rounded-full bg-sage px-2 py-0.5 text-xs font-semibold text-sage-ink">Both</span>
+            <span className="rounded-full bg-primary-50 text-primary-700 px-2 py-0.5 text-xs font-semibold">Both</span>
           </li>
           <li className="flex items-center justify-between gap-3">
             <span>How you handle conflict</span>
-            <span className="rounded-full bg-sage px-2 py-0.5 text-xs font-semibold text-sage-ink">Aligned</span>
+            <span className="rounded-full bg-primary-50 text-primary-700 px-2 py-0.5 text-xs font-semibold">Aligned</span>
           </li>
           <li className="flex items-center justify-between gap-3">
             <span>Weekends</span>
@@ -78,7 +78,7 @@ function HeroComposition() {
         </ul>
       </div>
       {/* Intention chip */}
-      <div className="absolute right-[6%] top-[50%] hidden rounded-full bg-plum px-4 py-2 text-sm font-semibold text-ivory shadow-lift sm:block">
+      <div className="absolute right-[6%] top-[50%] hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-surface shadow-lift sm:block">
         Mutual like
       </div>
       <figcaption className="absolute -bottom-8 left-0 text-xs text-ink-muted">Illustration with stock photography — not real members.</figcaption>

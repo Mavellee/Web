@@ -47,12 +47,12 @@ export function GameSessionPanel({ v, games }: { v: GameView; games: Conversatio
   const act = (action: string, body: object = {}) => games.act(v.id, action, body);
 
   return (
-    <article id={`game-card-${v.id}`} aria-label={`${v.game.name} game`} className={cx("mx-auto my-3 w-full max-w-md rounded-[1.75rem] border bg-white/95 p-4 shadow-soft transition", live ? "border-plum/25" : "hairline")}>
+    <article id={`game-card-${v.id}`} aria-label={`${v.game.name} game`} className={cx("mx-auto my-3 w-full max-w-md rounded-[1.75rem] border bg-surface/95 p-4 shadow-soft transition", live ? "border-primary/25" : "hairline")}>
       <GameRoundHeader
         v={v}
         right={
           !live && (
-            <button type="button" onClick={() => setExpanded((e) => !e)} aria-expanded={expanded} className="rounded-full px-3 py-1.5 text-xs font-semibold text-plum hover:bg-plum-50">
+            <button type="button" onClick={() => setExpanded((e) => !e)} aria-expanded={expanded} className="rounded-full px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary-50">
               {expanded ? "Hide" : "View cards"}
             </button>
           )
@@ -87,8 +87,8 @@ export function GameSessionPanel({ v, games }: { v: GameView; games: Conversatio
             ))}
 
           {v.status === "PAUSED" && (
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-lavender-soft/70 p-3">
-              <p className="text-sm text-plum-700">The game is paused.</p>
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-rose-mist/70 p-3">
+              <p className="text-sm text-primary-700">The game is paused.</p>
               <Button size="sm" onClick={() => act("resume")}>
                 Resume
               </Button>
@@ -106,7 +106,7 @@ export function GameSessionPanel({ v, games }: { v: GameView; games: Conversatio
                   Pause
                 </Button>
               )}
-              <Button size="sm" variant="quiet" className="text-rose-ink" onClick={() => setConfirmEnd(true)}>
+              <Button size="sm" variant="quiet" className="text-accent" onClick={() => setConfirmEnd(true)}>
                 End game
               </Button>
             </footer>
@@ -142,7 +142,7 @@ function CurrentRound({ v, r, act }: { v: GameView; r: RoundView; act: (a: strin
       <ParticipantProgress v={v} />
       {r.status === "OPEN" &&
         (r.you.answered ? (
-          <p className="rounded-2xl bg-sage/60 px-3 py-2 text-sm text-sage-ink">Your answer is locked in. Waiting for {partner?.displayName}…</p>
+          <p className="rounded-2xl bg-success-soft/60 px-3 py-2 text-sm text-success">Your answer is locked in. Waiting for {partner?.displayName}…</p>
         ) : (
           <PrivateAnswerForm
             key={r.index}
@@ -159,7 +159,7 @@ function CurrentRound({ v, r, act }: { v: GameView; r: RoundView; act: (a: strin
           <AnswerReveal v={v} r={r} />
           {v.rules.notes && r.you.answer && !r.you.answer.skipped && !r.you.answer.note && <NoteForm onSave={(note) => act("note", { roundIndex: r.index, note })} />}
           {v.rules.mode === "guess" && r.subjectUserId === me.userId && r.partner.answer && !r.partner.answer.skipped && r.partner.answer.correct === null && (
-            <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-ivory-deep/70 p-3">
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-parchment-deep/70 p-3">
               <p className="flex-1 text-sm">Did {partner?.displayName} get it?</p>
               <Button size="sm" onClick={() => act("verdict", { roundIndex: r.index, correct: true })}>
                 They got it
@@ -173,7 +173,7 @@ function CurrentRound({ v, r, act }: { v: GameView; r: RoundView; act: (a: strin
             <p className="text-center text-xs text-ink-muted">{r.partner.answer?.correct ? `${partner?.displayName} got it right.` : "Not this time."}</p>
           )}
           {v.rules.mode === "guess" && r.subjectUserId !== me.userId && r.you.answer?.correct != null && (
-            <p className="text-center text-xs font-semibold text-sage-ink">{r.you.answer.correct ? "You got it right!" : `${partner?.displayName} says not quite.`}</p>
+            <p className="text-center text-xs font-semibold text-success">{r.you.answer.correct ? "You got it right!" : `${partner?.displayName} says not quite.`}</p>
           )}
           <Button size="sm" className="w-full" onClick={() => act("next", { roundIndex: r.index })} icon={<Icon name="arrow" className="h-4 w-4" />}>
             {v.currentRound + 1 >= v.totalRounds ? "See the summary" : "Next card"}
@@ -190,7 +190,7 @@ function NoteForm({ onSave }: { onSave: (note: string) => Promise<boolean> }) {
   const [busy, setBusy] = useState(false);
   if (!open)
     return (
-      <button type="button" onClick={() => setOpen(true)} className="text-xs font-semibold text-plum hover:underline">
+      <button type="button" onClick={() => setOpen(true)} className="text-xs font-semibold text-primary hover:underline">
         Explain your choice
       </button>
     );
@@ -207,7 +207,7 @@ function NoteForm({ onSave }: { onSave: (note: string) => Promise<boolean> }) {
       <label className="sr-only" htmlFor="game-note">
         Explain your choice
       </label>
-      <input id="game-note" value={note} maxLength={280} onChange={(e) => setNote(e.target.value)} placeholder="Because…" className="min-w-0 flex-1 rounded-full border border-[#E4D8CD] bg-white px-3.5 py-2 text-sm focus:border-plum focus:outline-none focus:ring-4 focus:ring-plum/10" />
+      <input id="game-note" value={note} maxLength={280} onChange={(e) => setNote(e.target.value)} placeholder="Because…" className="min-w-0 flex-1 rounded-full border border-line bg-surface px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10" />
       <Button type="submit" size="sm" loading={busy} disabled={!note.trim()}>
         Share
       </Button>

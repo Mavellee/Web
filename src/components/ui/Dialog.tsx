@@ -15,7 +15,7 @@ export function Dialog({ open, onClose, title, children, description }: { open: 
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
       aria-labelledby="dialog-title"
-      className="w-[min(92vw,30rem)] rounded-4xl border border-[#EFE4DA] bg-ivory p-0 text-ink shadow-lift backdrop:bg-ink/30 backdrop:backdrop-blur-[2px]"
+      className="w-[min(92vw,30rem)] rounded-4xl border border-line bg-parchment p-0 text-ink shadow-lift backdrop:bg-ink/30 backdrop:backdrop-blur-[2px]"
     >
       {open && (
         <div className="p-6 sm:p-8">

@@ -100,14 +100,14 @@ export function GameSession() {
           <h1 className="mt-2 text-4xl">{data.game.name}</h1>
         </div>
         {data.isShared && !finished && (
-          <p className="rounded-full bg-white px-3 py-1.5 text-sm shadow-soft">{data.turnUserId === account?.id ? "You lead this card" : `${partner?.displayName} leads this card`}</p>
+          <p className="rounded-full bg-surface px-3 py-1.5 text-sm shadow-soft">{data.turnUserId === account?.id ? "You lead this card" : `${partner?.displayName} leads this card`}</p>
         )}
       </header>
 
       {/* Segmented progress: one segment per card. */}
       <ol className="mt-6 flex gap-1.5" aria-label={`Card ${Math.min(data.progress.index + 1, data.progress.total)} of ${data.progress.total}`}>
         {Array.from({ length: data.progress.total }, (_, i) => (
-          <li key={i} className={cx("h-1.5 flex-1 rounded-full transition-colors duration-500", i < data.progress.index ? "bg-plum" : i === data.progress.index && !finished ? "bg-plum-300" : "bg-ivory-deep")} />
+          <li key={i} className={cx("h-1.5 flex-1 rounded-full transition-colors duration-500", i < data.progress.index ? "bg-primary" : i === data.progress.index && !finished ? "bg-primary-300" : "bg-parchment-deep")} />
         ))}
       </ol>
 
@@ -120,7 +120,7 @@ export function GameSession() {
               {data.recap
                 .filter((r) => r.isYou)
                 .map((r, i) => (
-                  <li key={i} className="rounded-3xl border hairline bg-white p-5">
+                  <li key={i} className="rounded-3xl border hairline bg-surface p-5">
                     <p className="font-serif text-lg">{r.prompt}</p>
                     <p className="mt-1 text-sm text-ink-soft">{r.skipped ? <em>Skipped</em> : r.answer}</p>
                   </li>
@@ -172,8 +172,8 @@ export function GameSession() {
                 (data.partnerAnswer ? (
                   <Reveal label={partner?.displayName ?? "Partner"} a={data.partnerAnswer} />
                 ) : (
-                  <div className="flex items-center gap-3 rounded-3xl border border-dashed border-plum/30 p-5 text-sm text-ink-muted">
-                    <span className="h-2 w-2 animate-pulse rounded-full bg-plum-300" aria-hidden="true" /> Waiting for {partner?.displayName} to answer…
+                  <div className="flex items-center gap-3 rounded-3xl border border-dashed border-primary/30 p-5 text-sm text-ink-muted">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-primary-300" aria-hidden="true" /> Waiting for {partner?.displayName} to answer…
                   </div>
                 ))}
               {data.isShared && bothDone && (
@@ -203,7 +203,7 @@ export function GameSession() {
 
 function Reveal({ label, a }: { label: string; a: Answer }) {
   return (
-    <div className="animate-rise rounded-3xl border hairline bg-white p-5">
+    <div className="animate-rise rounded-3xl border hairline bg-surface p-5">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">{label}</p>
       <p className="mt-2 text-lg">{a.skipped ? <em className="text-ink-muted">Skipped</em> : a.answer}</p>
     </div>

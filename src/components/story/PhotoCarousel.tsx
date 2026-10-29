@@ -27,7 +27,7 @@ export function PhotoCarousel({ photos, name, overlay, className }: { photos: Ph
         if (Math.abs(dx) > 40) go(dx < 0 ? i + 1 : i - 1);
         start.current = null;
       }}
-      className={cx("relative touch-pan-y select-none overflow-hidden rounded-[2rem] bg-[#EFE4DA]", className)}
+      className={cx("relative touch-pan-y select-none overflow-hidden rounded-[2rem] bg-parchment-deep", className)}
     >
       {photos.length ? (
         <Photo key={current.id} id={current.id} focus={current} alt={`Photo ${i + 1} of ${photos.length} of ${name}`} className="h-full w-full animate-[rise_350ms_ease-out_both]" rounded="rounded-none" />
@@ -38,7 +38,7 @@ export function PhotoCarousel({ photos, name, overlay, className }: { photos: Ph
         <>
           <ol className="absolute inset-x-5 top-4 flex gap-1.5" aria-hidden="true">
             {photos.map((p, k) => (
-              <li key={p.id} className={cx("h-1 flex-1 rounded-full transition-colors", k === i ? "bg-white" : "bg-white/45")} />
+              <li key={p.id} className={cx("h-1 flex-1 rounded-full transition-colors", k === i ? "bg-surface" : "bg-surface/45")} />
             ))}
           </ol>
           <div className="absolute right-4 top-9 flex gap-1.5">

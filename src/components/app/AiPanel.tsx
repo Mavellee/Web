@@ -33,9 +33,9 @@ export function AiPanel({ request, title, onUse, className, autoLoad = false }: 
     );
 
   return (
-    <section aria-label={title} className={cx("rounded-3xl border border-lavender bg-lavender-soft/70 p-4", className)}>
+    <section aria-label={title} className={cx("rounded-3xl border border-rose/50 bg-rose-mist/70 p-4", className)}>
       <div className="flex items-start justify-between gap-3">
-        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-plum-700">
+        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary-700">
           <Icon name="spark" className="h-4 w-4" />
           {data?.label ?? title}
         </p>
@@ -45,7 +45,7 @@ export function AiPanel({ request, title, onUse, className, autoLoad = false }: 
       </div>
       {loading && <p className="mt-3 text-sm text-ink-muted">Thinking of a few ideas…</p>}
       {error && (
-        <p role="alert" className="mt-3 text-sm text-rose-ink">
+        <p role="alert" className="mt-3 text-sm text-error">
           {error}
         </p>
       )}
@@ -53,10 +53,10 @@ export function AiPanel({ request, title, onUse, className, autoLoad = false }: 
         <>
           <ul className="mt-3 space-y-2">
             {data.suggestions.map((s) => (
-              <li key={s} className="flex items-start justify-between gap-3 rounded-2xl bg-white/80 px-3.5 py-2.5 text-sm text-ink">
+              <li key={s} className="flex items-start justify-between gap-3 rounded-2xl bg-surface/80 px-3.5 py-2.5 text-sm text-ink">
                 <span>{s}</span>
                 {onUse && (
-                  <button type="button" onClick={() => onUse(s)} className="shrink-0 text-xs font-semibold text-plum hover:underline">
+                  <button type="button" onClick={() => onUse(s)} className="shrink-0 text-xs font-semibold text-primary hover:underline">
                     Use
                   </button>
                 )}
@@ -64,7 +64,7 @@ export function AiPanel({ request, title, onUse, className, autoLoad = false }: 
             ))}
           </ul>
           {data.note && <p className="mt-3 text-xs text-ink-muted">{data.note}</p>}
-          <button type="button" onClick={load} className="mt-2 text-xs font-semibold text-plum hover:underline">
+          <button type="button" onClick={load} className="mt-2 text-xs font-semibold text-primary hover:underline">
             Show different ideas
           </button>
         </>

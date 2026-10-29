@@ -29,15 +29,15 @@ export function PublicLayout() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-plum focus:px-4 focus:py-2 focus:text-ivory">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-surface">
         Skip to content
       </a>
-      <header className="sticky top-0 z-30 border-b border-transparent bg-ivory/85 backdrop-blur supports-[backdrop-filter]:bg-ivory/75">
+      <header className="sticky top-0 z-30 border-b border-transparent bg-parchment/85 backdrop-blur supports-[backdrop-filter]:bg-parchment/75">
         <div className="container-page flex h-[4.5rem] items-center justify-between py-3">
           <Logo />
           <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
             {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} className={({ isActive }) => cx("rounded-full px-4 py-2 text-sm font-medium transition", isActive ? "text-plum" : "text-ink-soft hover:text-ink")}>
+              <NavLink key={n.to} to={n.to} className={({ isActive }) => cx("rounded-full px-4 py-2 text-sm font-medium transition", isActive ? "text-primary" : "text-ink-soft hover:text-ink")}>
                 {n.label}
               </NavLink>
             ))}
@@ -101,20 +101,20 @@ function Footer() {
     { title: "Legal", links: [["Terms of service", "/terms"], ["Privacy policy", "/privacy"]] },
   ];
   return (
-    <footer className="mt-24 border-t hairline bg-ivory-deep/60">
+    <footer className="mt-24 bg-primary text-surface/80">
       <div className="container-page grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div className="max-w-xs">
-          <Logo />
-          <p className="mt-4 font-serif text-lg italic text-ink-soft">Find your kind of connection.</p>
-          <p className="mt-3 text-sm text-ink-muted">For adults aged 18 and over.</p>
+          <Logo tone="light" />
+          <p className="mt-4 font-serif text-lg italic text-surface">Find your kind of connection.</p>
+          <p className="mt-3 text-sm text-surface/75">For adults aged 18 and over.</p>
         </div>
         {cols.map((c) => (
           <div key={c.title}>
-            <h2 className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-ink-muted">{c.title}</h2>
+            <h2 className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-gold">{c.title}</h2>
             <ul className="mt-4 space-y-2.5">
               {c.links.map(([label, to]) => (
                 <li key={to}>
-                  <Link to={to} className="text-sm text-ink-soft transition hover:text-plum">
+                  <Link to={to} className="text-sm text-surface/80 transition hover:text-surface focus-visible:ring-gold focus-visible:ring-offset-primary">
                     {label}
                   </Link>
                 </li>
@@ -123,7 +123,7 @@ function Footer() {
           </div>
         ))}
       </div>
-      <div className="container-page flex flex-col gap-2 border-t hairline py-6 text-xs text-ink-muted sm:flex-row sm:justify-between">
+      <div className="container-page flex flex-col gap-2 border-t border-surface/15 py-6 text-xs text-surface/70 sm:flex-row sm:justify-between">
         <p>© {new Date().getFullYear()} Knot. All rights reserved.</p>
         <p>Legal pages are drafts pending professional legal review.</p>
       </div>

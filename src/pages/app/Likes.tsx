@@ -58,10 +58,10 @@ export function Likes() {
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {data.map(({ profile: p, likedAt, detail, comment }) => (
-            <li key={p.id} className="flex flex-col overflow-hidden rounded-[1.75rem] border hairline bg-white shadow-soft">
+            <li key={p.id} className="flex flex-col overflow-hidden rounded-[1.75rem] border hairline bg-surface shadow-soft">
               <Link to={`/app/people/${p.id}`} className="relative block" aria-label={`View ${p.displayName}'s profile`}>
                 <Photo id={p.photoIds[0]} alt="" className="aspect-[4/5] w-full" rounded="rounded-none" position="object-top" />
-                <span className="absolute left-3 top-3 rounded-full bg-ivory/95 px-3 py-1 text-xs font-semibold text-ink shadow-soft">
+                <span className="absolute left-3 top-3 rounded-full bg-parchment/95 px-3 py-1 text-xs font-semibold text-ink shadow-soft">
                   {tab === "received" ? "Liked you" : "You liked"} · {timeAgo(likedAt)}
                 </span>
               </Link>
@@ -75,12 +75,12 @@ export function Likes() {
                   <IntentionBadges intentions={p.intentions} />
                 </div>
                 {detail && (
-                  <figure className="mt-4 rounded-2xl bg-lavender-soft/60 p-3">
+                  <figure className="mt-4 rounded-2xl bg-rose-mist/60 p-3">
                     <figcaption className="text-xs text-ink-muted">
                       {tab === "received" ? "Responded to your" : "You responded to their"} {detail.kind === "PROMPT" ? `answer: ${detail.label}` : "interest"}
                     </figcaption>
                     <blockquote className="mt-0.5 font-serif leading-snug">{detail.quote}</blockquote>
-                    {comment && <p className="mt-2 border-t border-plum/10 pt-2 text-sm text-ink">“{comment}”</p>}
+                    {comment && <p className="mt-2 border-t border-primary/10 pt-2 text-sm text-ink">“{comment}”</p>}
                   </figure>
                 )}
                 {tab === "received" ? (

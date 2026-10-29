@@ -2,7 +2,7 @@ import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type Selec
 import { cx } from "../../lib/format";
 
 const control =
-  "block w-full rounded-2xl border border-[#E4D8CD] bg-white/80 px-4 py-3 text-ink placeholder:text-ink-muted/70 shadow-[inset_0_1px_0_rgba(255,255,255,.6)] transition focus:border-plum focus:bg-white focus:outline-none focus:ring-4 focus:ring-plum/10 aria-[invalid=true]:border-rose-ink aria-[invalid=true]:ring-rose/40 disabled:opacity-60";
+  "block w-full rounded-2xl border border-line bg-surface/80 px-4 py-3 text-ink placeholder:text-ink-muted/70 shadow-[inset_0_1px_0_rgba(255,255,255,.6)] transition focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/10 aria-[invalid=true]:border-accent aria-[invalid=true]:ring-rose/40 disabled:opacity-60";
 
 interface FieldShellProps {
   label: ReactNode;
@@ -22,7 +22,7 @@ export function FieldShell({ label, hint, error, id, children, optional }: Field
       </label>
       {children}
       {error ? (
-        <p id={`${id}-error`} role="alert" className="text-sm text-rose-ink">
+        <p id={`${id}-error`} role="alert" className="text-sm text-error">
           {error}
         </p>
       ) : hint ? (
@@ -73,11 +73,11 @@ export function Checkbox({ label, error, className, ...rest }: InputHTMLAttribut
   return (
     <div className={className}>
       <label htmlFor={id} className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-soft">
-        <input id={id} type="checkbox" aria-invalid={!!error} className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-md border-[#D9CCC0] text-plum accent-plum focus-visible:ring-2 focus-visible:ring-plum" {...rest} />
+        <input id={id} type="checkbox" aria-invalid={!!error} className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-md border-line-strong text-primary accent-primary focus-visible:ring-2 focus-visible:ring-primary" {...rest} />
         <span>{label}</span>
       </label>
       {error && (
-        <p role="alert" className="mt-1 pl-8 text-sm text-rose-ink">
+        <p role="alert" className="mt-1 pl-8 text-sm text-error">
           {error}
         </p>
       )}

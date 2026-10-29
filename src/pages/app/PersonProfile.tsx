@@ -54,7 +54,7 @@ export function PersonProfile() {
       Message {data.displayName}
     </ButtonLink>
   ) : liked ? (
-    <p className="text-sm font-semibold text-sage-ink">You liked {data.displayName}. If they like you too, you'll match.</p>
+    <p className="text-sm font-semibold text-success">You liked {data.displayName}. If they like you too, you'll match.</p>
   ) : (
     <div className="flex flex-wrap justify-center gap-3">
       <Button size="lg" variant="secondary" onClick={async () => (await act(data, "pass")) && navigate("/app/discover")} disabled={!!busy}>
@@ -80,13 +80,13 @@ export function PersonProfile() {
           <SafetyMenu userId={data.id} name={data.displayName} matchId={match?.id} onEnded={() => navigate("/app/discover")} />
         )}
       </div>
-      {isMe && <p className="mb-6 rounded-2xl bg-lavender-soft px-4 py-3 text-sm text-plum-700">This is how your profile appears to other members.</p>}
+      {isMe && <p className="mb-6 rounded-2xl bg-rose-mist px-4 py-3 text-sm text-primary-700">This is how your profile appears to other members.</p>}
       <EditorialProfile profile={data} onRespond={canAct ? setDetail : undefined} actions={cta} />
 
       {/* Restrained sticky actions on phones, above the app's bottom navigation. */}
       {canAct && (
         <div className="fixed inset-x-0 bottom-[4.5rem] z-20 px-4 md:hidden">
-          <div className="mx-auto flex max-w-sm gap-2 rounded-full border hairline bg-ivory/95 p-1.5 shadow-lift backdrop-blur">
+          <div className="mx-auto flex max-w-sm gap-2 rounded-full border hairline bg-parchment/95 p-1.5 shadow-lift backdrop-blur">
             <Button variant="quiet" className="flex-1" onClick={async () => (await act(data, "pass")) && navigate("/app/discover")} disabled={!!busy}>
               Pass
             </Button>

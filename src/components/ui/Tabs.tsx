@@ -13,7 +13,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, label, className
     onChange(tabs[next].value);
   };
   return (
-    <div role="tablist" aria-label={label} className={cx("inline-flex max-w-full gap-1 overflow-x-auto rounded-full border hairline bg-white/60 p-1", className)}>
+    <div role="tablist" aria-label={label} className={cx("inline-flex max-w-full gap-1 overflow-x-auto rounded-full border hairline bg-surface/60 p-1", className)}>
       {tabs.map((t, i) => {
         const active = t.value === value;
         return (
@@ -28,10 +28,10 @@ export function Tabs<T extends string>({ tabs, value, onChange, label, className
             tabIndex={active ? 0 : -1}
             onKeyDown={(e) => onKey(e, i)}
             onClick={() => onChange(t.value)}
-            className={cx("inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition duration-200", active ? "bg-ink text-ivory shadow-soft" : "text-ink-soft hover:text-ink")}
+            className={cx("inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition duration-200", active ? "bg-primary text-surface shadow-soft" : "text-ink-soft hover:text-ink")}
           >
             {t.label}
-            {t.count !== undefined && <span className={cx("rounded-full px-1.5 text-xs", active ? "bg-ivory/20" : "bg-ink/5")}>{t.count}</span>}
+            {t.count !== undefined && <span className={cx("rounded-full px-1.5 text-xs", active ? "bg-parchment/20" : "bg-ink/5")}>{t.count}</span>}
           </button>
         );
       })}

@@ -17,8 +17,8 @@ export function promptFor(v: GameView, r: RoundView) {
 
 const STATUS_LABEL: Record<SessionStatus, { label: string; cls: string }> = {
   WAITING: { label: "Waiting to start", cls: "bg-gold-soft text-gold-ink" },
-  ACTIVE: { label: "In progress", cls: "bg-sage text-sage-ink" },
-  PAUSED: { label: "Paused", cls: "bg-lavender-soft text-plum-700" },
+  ACTIVE: { label: "In progress", cls: "bg-success-soft text-success" },
+  PAUSED: { label: "Paused", cls: "bg-rose-mist text-primary-700" },
   COMPLETED: { label: "Finished", cls: "bg-ink/5 text-ink-soft" },
   CANCELLED: { label: "Ended", cls: "bg-ink/5 text-ink-soft" },
   ENDED: { label: "Ended", cls: "bg-ink/5 text-ink-soft" },
@@ -55,7 +55,7 @@ export function GameProgressIndicator({ v }: { v: GameView }) {
       {Array.from({ length: v.totalRounds }, (_, i) => {
         const done = finished.includes(i);
         const current = i === v.currentRound && (v.status === "ACTIVE" || v.status === "PAUSED") && !done;
-        return <li key={i} className={cx("h-1 flex-1 rounded-full transition-colors duration-500", done ? "bg-plum" : current ? "bg-plum-300" : "bg-ivory-deep")} />;
+        return <li key={i} className={cx("h-1 flex-1 rounded-full transition-colors duration-500", done ? "bg-primary" : current ? "bg-primary-300" : "bg-parchment-deep")} />;
       })}
     </ol>
   );
@@ -70,7 +70,7 @@ export function ParticipantProgress({ v }: { v: GameView }) {
       {v.participants.map((p) => {
         const answered = p.isYou ? r.you.answered : r.partner.answered;
         return (
-          <li key={p.userId} className={cx("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1", answered ? "bg-sage text-sage-ink" : "bg-ivory-deep text-ink-muted")}>
+          <li key={p.userId} className={cx("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1", answered ? "bg-success-soft text-success" : "bg-parchment-deep text-ink-muted")}>
             {answered ? <Icon name="check" className="h-3.5 w-3.5" /> : <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" aria-hidden="true" />}
             {p.isYou ? "You" : p.displayName} {answered ? "answered" : "thinking…"}
           </li>
@@ -91,7 +91,7 @@ export function GameReconnectBanner({ v, selfStatus }: { v: GameView; selfStatus
     );
   if (partner && !partner.online)
     return (
-      <p role="status" className="rounded-2xl bg-ivory-deep px-3 py-2 text-xs text-ink-soft">
+      <p role="status" className="rounded-2xl bg-parchment-deep px-3 py-2 text-xs text-ink-soft">
         {partner.displayName} is offline right now. The game is saved — they can pick up where they left off.
       </p>
     );
@@ -120,14 +120,14 @@ export function AnswerReveal({ v, r }: { v: GameView; r: RoundView }) {
     <div className="space-y-2" aria-live="polite">
       <div className="grid grid-cols-2 gap-2">
         {cells.map(([who, a], i) => (
-          <div key={who} className="animate-rise rounded-2xl border hairline bg-white p-3" style={{ animationDelay: `${i * 90}ms` }}>
+          <div key={who} className="animate-rise rounded-2xl border hairline bg-surface p-3" style={{ animationDelay: `${i * 90}ms` }}>
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-ink-muted">{who}</p>
             <p className="mt-1 break-words text-[0.95rem]">{answerText(a)}</p>
-            {a?.note && <p className="mt-1.5 border-l-2 border-plum-200 pl-2 text-xs text-ink-soft">{a.note}</p>}
+            {a?.note && <p className="mt-1.5 border-l-2 border-primary-200 pl-2 text-xs text-ink-soft">{a.note}</p>}
           </div>
         ))}
       </div>
-      {r.agreed !== null && <p className={cx("text-center text-xs font-semibold", r.agreed ? "text-sage-ink" : "text-plum-700")}>{agreementLabel(v, r.agreed)}</p>}
+      {r.agreed !== null && <p className={cx("text-center text-xs font-semibold", r.agreed ? "text-success" : "text-primary-700")}>{agreementLabel(v, r.agreed)}</p>}
     </div>
   );
 }
@@ -148,7 +148,7 @@ export function GameResultSummary({ metadata, v }: { metadata: Record<string, un
 
   const title = event === "completed" ? `${name} finished` : event === "declined" ? `${by?.isYou ? "You" : (by?.displayName ?? "Your match")} passed on ${name}` : `${name} ended${by ? ` by ${by.isYou ? "you" : by.displayName}` : ""}`;
   return (
-    <div className="mx-auto w-full max-w-sm rounded-3xl border hairline bg-white/90 px-4 py-3 text-center">
+    <div className="mx-auto w-full max-w-sm rounded-3xl border hairline bg-surface/90 px-4 py-3 text-center">
       <p className="text-sm font-semibold">{title}</p>
       {lines.map((l) => (
         <p key={l} className="text-sm text-ink-soft">

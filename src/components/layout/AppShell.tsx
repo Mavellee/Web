@@ -79,13 +79,13 @@ export function AppShell() {
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[17rem_1fr]">
-      <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-plum focus:px-4 focus:py-2 focus:text-ivory">
+      <a href="#app-main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-surface">
         Skip to content
       </a>
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r hairline bg-ivory-deep/50 px-4 py-6 md:flex">
+      <aside className="sticky top-0 hidden h-dvh flex-col bg-primary px-4 py-6 text-surface md:flex">
         <div className="px-3">
-          <Logo to="/app/discover" />
+          <Logo to="/app/discover" tone="light" />
         </div>
         <nav aria-label="App" className="mt-8 flex-1 space-y-0.5 overflow-y-auto">
           {items.map((i) => (
@@ -93,21 +93,21 @@ export function AppShell() {
               key={i.to}
               to={i.to}
               className={({ isActive }) =>
-                cx("group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-[0.95rem] font-medium transition", isActive ? "bg-white text-plum shadow-soft" : "text-ink-soft hover:bg-white/60 hover:text-ink")
+                cx("group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-[0.95rem] font-medium transition", isActive ? "bg-surface text-primary shadow-soft" : "text-surface/80 hover:bg-surface/10 hover:text-surface", ONDARK)
               }
             >
               <Icon name={i.icon} className="h-5 w-5" />
               <span className="flex-1">{i.label}</span>
               {!!i.badge && (
-                <span className="rounded-full bg-plum px-2 py-0.5 text-xs font-bold text-ivory" aria-label={`${i.badge} unread`}>
+                <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-primary-800" aria-label={`${i.badge} unread`}>
                   {i.badge}
                 </span>
               )}
             </NavLink>
           ))}
         </nav>
-        <div className="mt-4 space-y-2 border-t hairline pt-4">
-          <Link to="/app/notifications" className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-ink-soft hover:bg-white/60 hover:text-ink">
+        <div className="mt-4 space-y-2 border-t border-surface/15 pt-4">
+          <Link to="/app/notifications" className={cx("flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-surface/80 hover:bg-surface/10 hover:text-surface", ONDARK)}>
             <Icon name="bell" />
             <span className="flex-1">Notifications</span>
             {!!unreadNotes && <span className="h-2 w-2 rounded-full bg-gold" aria-label={`${unreadNotes} unread`} />}
@@ -116,9 +116,9 @@ export function AppShell() {
             <Avatar id={account?.avatarPhotoId} name={account?.displayName ?? "You"} size="h-9 w-9" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{account?.displayName ?? "You"}</p>
-              <ConnectionDot status={status} />
+              <ConnectionDot status={status} onDark />
             </div>
-            <button type="button" onClick={onLogout} className="rounded-full p-2 text-ink-muted hover:bg-ink/5 hover:text-ink" aria-label="Log out">
+            <button type="button" onClick={onLogout} className={cx("rounded-full p-2 text-surface/75 hover:bg-surface/10 hover:text-surface", ONDARK)} aria-label="Log out">
               <Icon name="logout" />
             </button>
           </div>
@@ -126,7 +126,7 @@ export function AppShell() {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b hairline bg-ivory/90 px-4 py-3 backdrop-blur md:hidden">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b hairline bg-parchment/90 px-4 py-3 backdrop-blur md:hidden">
         <Logo to="/app/discover" />
         <div className="flex items-center gap-1">
           <Link to="/app/matches" className="rounded-full p-2.5 text-ink-soft" aria-label="Matches">
@@ -152,18 +152,18 @@ export function AppShell() {
       </main>
 
       {/* Mobile bottom navigation */}
-      <nav aria-label="App" className="fixed inset-x-0 bottom-0 z-30 border-t hairline bg-ivory/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <nav aria-label="App" className="fixed inset-x-0 bottom-0 z-30 border-t hairline bg-parchment/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         <ul className="mx-auto grid max-w-md grid-cols-5">
           {items
             .filter((i) => i.mobile)
             .map((i) => (
               <li key={i.to}>
-                <NavLink to={i.to} className={({ isActive }) => cx("relative flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-semibold", isActive ? "text-plum" : "text-ink-muted")}>
+                <NavLink to={i.to} className={({ isActive }) => cx("relative flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-semibold", isActive ? "text-primary before:absolute before:inset-x-[30%] before:top-0 before:h-0.5 before:rounded-full before:bg-primary" : "text-ink-muted")}>
                   {({ isActive }) => (
                     <>
                       <Icon name={i.icon} className="h-6 w-6" filled={isActive && i.icon === "heart"} />
                       {i.label}
-                      {!!i.badge && <span className="absolute right-[30%] top-1.5 h-2 w-2 rounded-full bg-plum" aria-label={`${i.badge} unread`} />}
+                      {!!i.badge && <span className="absolute right-[30%] top-1.5 h-2 w-2 rounded-full bg-primary" aria-label={`${i.badge} unread`} />}
                     </>
                   )}
                 </NavLink>
@@ -175,11 +175,14 @@ export function AppShell() {
   );
 }
 
-function ConnectionDot({ status }: { status: string }) {
+// Focus rings that stay visible on the burgundy sidebar.
+const ONDARK = "focus-visible:ring-gold focus-visible:ring-offset-primary";
+
+function ConnectionDot({ status, onDark }: { status: string; onDark?: boolean }) {
   const label = status === "connected" ? "Live" : status === "offline" ? "Offline" : "Connecting";
   return (
-    <p className="flex items-center gap-1.5 text-xs text-ink-muted">
-      <span className={cx("h-1.5 w-1.5 rounded-full", status === "connected" ? "bg-sage-ink" : "bg-gold")} aria-hidden="true" />
+    <p className={cx("flex items-center gap-1.5 text-xs", onDark ? "text-surface/75" : "text-ink-muted")}>
+      <span className={cx("h-1.5 w-1.5 rounded-full", status === "connected" ? (onDark ? "bg-rose" : "bg-success") : "bg-gold")} aria-hidden="true" />
       {label}
     </p>
   );
@@ -191,7 +194,7 @@ export function RequireAuth({ children, allowUnverified, allowNotOnboarded }: { 
   const location = useLocation();
   if (loading)
     return (
-      <div className="flex min-h-dvh items-center justify-center text-plum">
+      <div className="flex min-h-dvh items-center justify-center text-primary">
         <Spinner label="Loading your account" className="h-8 w-8" />
       </div>
     );

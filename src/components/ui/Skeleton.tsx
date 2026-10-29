@@ -2,8 +2,8 @@ import { cx } from "../../lib/format";
 
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={cx("relative overflow-hidden rounded-2xl bg-[#F1E7DE]", className)}>
-      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+    <div aria-hidden="true" className={cx("relative overflow-hidden rounded-2xl bg-parchment-deep", className)}>
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-surface/50 to-transparent" />
     </div>
   );
 }

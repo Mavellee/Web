@@ -77,9 +77,9 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
                 type="button"
                 onClick={() => setActiveKey(p.key)}
                 aria-current={p.key === activeKey}
-                className={cx("flex w-full items-start gap-2 rounded-2xl px-3 py-2.5 text-left text-sm transition", p.key === activeKey ? "bg-ink text-ivory" : "text-ink-soft hover:bg-white")}
+                className={cx("flex w-full items-start gap-2 rounded-2xl px-3 py-2.5 text-left text-sm transition", p.key === activeKey ? "bg-primary text-surface" : "text-ink-soft hover:bg-surface")}
               >
-                <span className={cx("mt-1 h-2 w-2 shrink-0 rounded-full", answeredKeys.has(p.key) ? "bg-sage-ink" : "bg-transparent ring-1 ring-current")} aria-hidden="true" />
+                <span className={cx("mt-1 h-2 w-2 shrink-0 rounded-full", answeredKeys.has(p.key) ? "bg-accent" : "bg-transparent ring-1 ring-current")} aria-hidden="true" />
                 <span>
                   {p.text}
                   {answeredKeys.has(p.key) && <span className="sr-only"> (answered)</span>}
@@ -92,7 +92,7 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
 
       <div className="space-y-6">
         {active ? (
-          <section aria-label="Write your answer" className="rounded-[2rem] border hairline bg-white p-6 sm:p-8">
+          <section aria-label="Write your answer" className="rounded-[2rem] border hairline bg-surface p-6 sm:p-8">
             <label htmlFor="prompt-answer" className="font-serif text-2xl leading-snug">
               {active.text}
             </label>
@@ -104,10 +104,10 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
               disabled={full}
               onChange={(e) => setDraft(e.target.value)}
               placeholder={full ? `You've answered ${MAX} prompts — remove one to add another.` : "In your own words…"}
-              className="mt-4 block w-full resize-none border-0 border-b border-[#E4D8CD] bg-transparent px-0 py-2 font-serif text-xl leading-relaxed placeholder:font-sans placeholder:text-base placeholder:text-ink-muted/70 focus:border-plum focus:outline-none focus:ring-0"
+              className="mt-4 block w-full resize-none border-0 border-b border-line bg-transparent px-0 py-2 font-serif text-xl leading-relaxed placeholder:font-sans placeholder:text-base placeholder:text-ink-muted/70 focus:border-primary focus:outline-none focus:ring-0"
             />
             <div className="mt-2 flex items-center justify-between text-xs text-ink-muted">
-              <button type="button" onClick={() => setShowIdeas((s) => !s)} aria-expanded={showIdeas} className="font-semibold text-plum">
+              <button type="button" onClick={() => setShowIdeas((s) => !s)} aria-expanded={showIdeas} className="font-semibold text-primary">
                 {showIdeas ? "Hide ideas" : "Need an idea?"}
               </button>
               <span>
@@ -118,7 +118,7 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
               <ul className="mt-3 flex flex-wrap gap-2" aria-label="Ideas — use them as a starting point">
                 {active.ideas.map((idea) => (
                   <li key={idea}>
-                    <button type="button" onClick={() => setDraft(idea)} className="rounded-full bg-ivory-deep px-3 py-1 text-sm text-ink-soft hover:bg-lavender-soft">
+                    <button type="button" onClick={() => setDraft(idea)} className="rounded-full bg-parchment-deep px-3 py-1 text-sm text-ink-soft hover:bg-rose-mist">
                       {idea}
                     </button>
                   </li>
@@ -126,7 +126,7 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
               </ul>
             )}
             {error && (
-              <p role="alert" className="mt-3 text-sm text-rose-ink">
+              <p role="alert" className="mt-3 text-sm text-error">
                 {error}
               </p>
             )}
@@ -150,7 +150,7 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">On your profile</p>
             <ol className="mt-3 space-y-3">
               {list.map((x, i) => (
-                <li key={x.key} className="flex gap-3 rounded-3xl bg-lavender-soft/50 p-5">
+                <li key={x.key} className="flex gap-3 rounded-3xl bg-rose-mist/50 p-5">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-ink-muted">{x.text}</p>
                     <p className="mt-1 font-serif text-lg leading-snug">{x.answer}</p>

@@ -52,7 +52,7 @@ function ChipGroup<T extends string>({ label, options, value, onChange, hint, er
         ))}
       </div>
       {error && (
-        <p role="alert" className="mt-2 text-sm text-rose-ink">
+        <p role="alert" className="mt-2 text-sm text-error">
           {error}
         </p>
       )}
@@ -146,7 +146,7 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
         ) : (
           <Skeleton className="h-20" />
         )}
-        <button type="button" onClick={useLocation} className="inline-flex items-center gap-1.5 text-sm font-semibold text-plum">
+        <button type="button" onClick={useLocation} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
           <Icon name="location" className="h-4 w-4" /> Use my approximate location for distance instead
         </button>
         {locState && (
@@ -170,7 +170,7 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
             <legend className="text-sm font-semibold">Interests</legend>
             <p className="mt-0.5 text-sm text-ink-muted">Pick up to 12. Shared interests are highlighted on profiles.</p>
             {fieldState.error && (
-              <p role="alert" className="mt-2 text-sm text-rose-ink">
+              <p role="alert" className="mt-2 text-sm text-error">
                 {fieldState.error.message}
               </p>
             )}
@@ -228,9 +228,9 @@ export function IntentionSection({ profile, onSaved, submitLabel = "Save", secon
                 role="checkbox"
                 aria-checked={on}
                 onClick={() => toggle(i.value)}
-                className={cx("flex items-start gap-4 rounded-3xl border-2 p-5 text-left transition", on ? "border-plum bg-plum-50" : "border-[#EADFD4] bg-white/70 hover:border-plum/40")}
+                className={cx("flex items-start gap-4 rounded-3xl border-2 p-5 text-left transition", on ? "border-primary bg-primary-50" : "border-line bg-surface/70 hover:border-primary/40")}
               >
-                <span className={cx("mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", on ? "border-plum bg-plum text-ivory" : "border-[#D9CCC0]")}>{on && <Icon name="check" className="h-4 w-4" />}</span>
+                <span className={cx("mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", on ? "border-primary bg-primary text-surface" : "border-line-strong")}>{on && <Icon name="check" className="h-4 w-4" />}</span>
                 <span>
                   <span className="block font-serif text-xl text-ink">{i.title}</span>
                   <span className="mt-1 block text-ink-soft">{i.description}</span>
@@ -306,7 +306,7 @@ function FormFooter({ error, submitting, submitLabel, secondary }: { error: stri
   return (
     <div className="space-y-3 border-t hairline pt-6">
       {error && (
-        <p role="alert" className="rounded-2xl bg-rose-soft px-4 py-3 text-sm text-rose-ink">
+        <p role="alert" className="rounded-2xl bg-error-soft px-4 py-3 text-sm text-error">
           {error}
         </p>
       )}

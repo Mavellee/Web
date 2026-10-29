@@ -30,7 +30,7 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
 
   const respond = (d: DetailTarget) =>
     onRespond && (
-      <button type="button" onClick={() => onRespond(d)} className="inline-flex items-center gap-1.5 rounded-full border border-plum/25 px-3.5 py-1.5 text-sm font-semibold text-plum transition hover:border-plum hover:bg-plum-50">
+      <button type="button" onClick={() => onRespond(d)} className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 px-3.5 py-1.5 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary-50">
         <Icon name="chat" className="h-4 w-4" /> Respond
       </button>
     );
@@ -44,13 +44,13 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
           name={p.displayName}
           className="aspect-[4/5] w-full"
           overlay={
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent px-6 pb-6 pt-28 text-ivory">
-              {p.isDemo && <span className="mb-2 inline-block rounded-full bg-ivory/90 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink">Demo profile</span>}
-              <h2 className="font-serif text-4xl leading-none text-ivory sm:text-5xl">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent px-6 pb-6 pt-28 text-surface">
+              {p.isDemo && <span className="mb-2 inline-block rounded-full bg-parchment/90 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink">Demo profile</span>}
+              <h2 className="font-serif text-4xl leading-none text-surface sm:text-5xl">
                 {p.displayName}
                 {p.age != null && <span className="font-normal">, {p.age}</span>}
               </h2>
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-ivory/90">
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-surface/90">
                 <Icon name="location" className="h-4 w-4" />
                 {[p.city, p.distance].filter(Boolean).join(" · ") || "Location hidden"}
               </p>
@@ -80,7 +80,7 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
             {genderLabel(p.gender)}
             {p.languages.length > 0 && <> · Speaks {p.languages.join(", ")}</>}
           </p>
-          {shared && <p className="rounded-2xl bg-sage/70 px-4 py-3 text-sm font-semibold text-sage-ink">{shared}</p>}
+          {shared && <p className="rounded-2xl bg-rose-soft px-4 py-3 text-sm font-semibold text-primary-700">{shared}</p>}
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
 
       {/* E. Their world, with genuine overlaps called out */}
       {p.interests.length > 0 && (
-        <section aria-labelledby="interests-h" className="grid gap-6 rounded-[2rem] border hairline bg-white/70 p-6 sm:grid-cols-[14rem_1fr] sm:p-8">
+        <section aria-labelledby="interests-h" className="grid gap-6 rounded-[2rem] border hairline bg-surface/70 p-6 sm:grid-cols-[14rem_1fr] sm:p-8">
           <div>
             <h3 id="interests-h" className="font-serif text-2xl">
               {p.displayName}'s world
@@ -106,7 +106,7 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
                   type="button"
                   disabled={!onRespond}
                   onClick={() => onRespond?.({ kind: "INTEREST", ref: i.slug, label: "Interest", quote: i.name })}
-                  className={cx("rounded-full px-3.5 py-1.5 text-sm transition disabled:cursor-default", i.shared ? "bg-plum text-ivory" : "border hairline bg-white text-ink-soft", onRespond && "hover:-translate-y-0.5 hover:shadow-soft")}
+                  className={cx("rounded-full px-3.5 py-1.5 text-sm transition disabled:cursor-default", i.shared ? "bg-primary text-surface" : "border hairline bg-surface text-ink-soft", onRespond && "hover:-translate-y-0.5 hover:shadow-soft")}
                   aria-label={onRespond ? `Respond about ${i.name}${i.shared ? " (shared)" : ""}` : undefined}
                 >
                   {i.name}
@@ -122,7 +122,7 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
         <div className={cx("grid gap-6", rest.length > 1 ? "md:grid-cols-2" : "md:ml-auto md:w-2/3")}>
           {rest.map((pr, k) => (
             <Fragment key={pr.key}>
-              <PromptBlock text={pr.text} answer={pr.answer} tone={k % 2 ? "rose" : "lavender"} action={respond({ kind: "PROMPT", ref: pr.key, label: pr.text, quote: pr.answer })} />
+              <PromptBlock text={pr.text} answer={pr.answer} tone={k % 2 ? "parchment" : "rose"} action={respond({ kind: "PROMPT", ref: pr.key, label: pr.text, quote: pr.answer })} />
             </Fragment>
           ))}
         </div>
@@ -139,10 +139,10 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
       {/* F. Compatibility, only when it was actually calculated */}
       {compat &&
         (compat.score === null ? (
-          <p className="rounded-3xl border border-dashed border-plum/30 p-5 text-sm text-ink-soft">
+          <p className="rounded-3xl border border-dashed border-primary/30 p-5 text-sm text-ink-soft">
             There isn't enough shared information to compare yet.{" "}
             {!preview && (
-              <Link to="/app/compatibility" className="font-semibold text-plum">
+              <Link to="/app/compatibility" className="font-semibold text-primary">
                 Answer a few questions
               </Link>
             )}
@@ -156,7 +156,7 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
               <ul className="space-y-1.5 text-ink-soft">
                 {aligned.map((a) => (
                   <li key={a.key} className="flex gap-2">
-                    <Icon name="check" className="mt-0.5 h-5 w-5 shrink-0 text-sage-ink" /> {a.label}
+                    <Icon name="check" className="mt-0.5 h-5 w-5 shrink-0 text-accent" /> {a.label}
                   </li>
                 ))}
               </ul>
@@ -168,7 +168,12 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
 
       {/* G. A natural next step */}
       {actions && (
-        <section aria-label="Next step" className="rounded-[2rem] bg-ivory-deep/70 p-6 text-center sm:p-10">
+        <div className="ornament" aria-hidden="true">
+          <span className="text-[0.55rem]">&#9670;</span>
+        </div>
+      )}
+      {actions && (
+        <section aria-label="Next step" className="rounded-[2rem] bg-parchment-deep/70 p-6 text-center sm:p-10">
           <p className="font-serif text-2xl">Something here you'd like to ask {p.displayName} about?</p>
           <p className="mt-1 text-sm text-ink-muted">Respond to a detail above, or simply like their profile.</p>
           <div className="mt-6">{actions}</div>
@@ -178,11 +183,12 @@ export function EditorialProfile({ profile: p, onRespond, actions, preview }: { 
   );
 }
 
-function PromptBlock({ text, answer, action, size = "md", tone }: { text: string; answer: string; action?: ReactNode; size?: "md" | "lg"; tone?: "lavender" | "rose" }) {
+function PromptBlock({ text, answer, action, size = "md", tone }: { text: string; answer: string; action?: ReactNode; size?: "md" | "lg"; tone?: "rose" | "parchment" }) {
   return (
-    <section className={cx("rounded-[2rem]", size === "lg" ? "px-1 py-2 sm:px-8" : "p-6 sm:p-8", tone === "lavender" && "bg-lavender-soft/70", tone === "rose" && "bg-rose-soft/70")}>
+    <section className={cx("rounded-[2rem]", size === "lg" ? "px-1 py-2 sm:px-8" : "p-6 sm:p-8", tone === "parchment" && "border hairline bg-parchment-deep/60", tone === "rose" && "bg-rose-soft/70")}>
       <p className="text-sm font-semibold text-ink-muted">{text}</p>
-      <p className={cx("mt-3 font-serif leading-snug text-ink", size === "lg" ? "text-3xl sm:text-4xl" : "text-2xl")}>{answer}</p>
+      <span aria-hidden="true" className="mt-2 block h-6 font-serif text-5xl leading-none text-rose">&ldquo;</span>
+      <p className={cx("mt-1 font-serif leading-snug text-ink", size === "lg" ? "text-3xl sm:text-4xl" : "text-2xl")}>{answer}</p>
       {action && <div className="mt-5">{action}</div>}
     </section>
   );

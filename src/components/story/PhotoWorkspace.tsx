@@ -103,7 +103,7 @@ export function PhotoWorkspace({ photos, onChange }: { photos: P[]; onChange: ()
           disabled={!next}
           className={cx(
             "flex h-full w-full flex-col items-center justify-center gap-2 rounded-[1.5rem] border-2 border-dashed text-sm transition",
-            next ? "border-plum/30 bg-white/60 font-semibold text-plum hover:border-plum hover:bg-white" : "border-[#E7DCD1] bg-transparent text-ink-muted",
+            next ? "border-primary/30 bg-surface/60 font-semibold text-primary hover:border-primary hover:bg-surface" : "border-line bg-transparent text-ink-muted",
           )}
           aria-label={next ? (primary ? "Add your main photo" : "Add a photo") : `Empty photo slot ${i + 1}`}
         >
@@ -131,10 +131,10 @@ export function PhotoWorkspace({ photos, onChange }: { photos: P[]; onChange: ()
           setDragFrom(null);
           setDragOver(null);
         }}
-        className={cx("group relative h-full w-full cursor-grab overflow-hidden rounded-[1.5rem] transition active:cursor-grabbing", dragOver === i && dragFrom !== i && "ring-4 ring-plum/40", dragFrom === i && "opacity-50")}
+        className={cx("group relative h-full w-full cursor-grab overflow-hidden rounded-[1.5rem] transition active:cursor-grabbing", dragOver === i && dragFrom !== i && "ring-4 ring-primary/40", dragFrom === i && "opacity-50")}
       >
         <Photo id={p.id} focus={p} alt={primary ? "Your main photo" : `Your photo ${i + 1}`} className="h-full w-full" rounded="rounded-[1.5rem]" />
-        <span className="absolute left-2.5 top-2.5 rounded-full bg-ivory/95 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink shadow-soft">{primary ? "Main photo" : i + 1}</span>
+        <span className="absolute left-2.5 top-2.5 rounded-full bg-parchment/95 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink shadow-soft">{primary ? "Main photo" : i + 1}</span>
         <div className="absolute inset-x-2 bottom-2 flex items-center justify-between gap-1">
           <div className="flex gap-1">
             <IconButton icon="chevronLeft" size="sm" tone="soft" label={`Move photo ${i + 1} earlier`} disabled={i === 0} onClick={() => reorder(i, i - 1)} />
@@ -142,7 +142,7 @@ export function PhotoWorkspace({ photos, onChange }: { photos: P[]; onChange: ()
           </div>
           <div className="flex gap-1">
             <IconButton icon="edit" size="sm" tone="soft" label={`Adjust framing of photo ${i + 1}`} onClick={() => setFraming(p)} />
-            <IconButton icon="close" size="sm" tone="soft" className="!text-rose-ink" label={`Remove photo ${i + 1}`} onClick={() => remove(p.id)} />
+            <IconButton icon="close" size="sm" tone="soft" className="!text-accent" label={`Remove photo ${i + 1}`} onClick={() => remove(p.id)} />
           </div>
         </div>
       </div>
@@ -173,18 +173,18 @@ export function PhotoWorkspace({ photos, onChange }: { photos: P[]; onChange: ()
         {uploads.length > 0 && (
           <ul className="mt-4 space-y-2" aria-label="Uploads">
             {uploads.map((u) => (
-              <li key={u.name} className="rounded-2xl border hairline bg-white p-3 text-sm">
+              <li key={u.name} className="rounded-2xl border hairline bg-surface p-3 text-sm">
                 <div className="flex justify-between gap-3">
                   <span className="truncate">{u.name}</span>
-                  <span className={u.error ? "text-rose-ink" : "text-ink-muted"}>{u.error ?? `${u.pct}%`}</span>
+                  <span className={u.error ? "text-error" : "text-ink-muted"}>{u.error ?? `${u.pct}%`}</span>
                 </div>
                 {!u.error && (
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ivory-deep" role="progressbar" aria-valuenow={u.pct} aria-valuemin={0} aria-valuemax={100} aria-label={`Uploading ${u.name}`}>
-                    <div className="h-full rounded-full bg-plum transition-all" style={{ width: `${u.pct}%` }} />
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-parchment-deep" role="progressbar" aria-valuenow={u.pct} aria-valuemin={0} aria-valuemax={100} aria-label={`Uploading ${u.name}`}>
+                    <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${u.pct}%` }} />
                   </div>
                 )}
                 {u.error && (
-                  <button type="button" className="mt-1 text-xs font-semibold text-plum" onClick={() => setUploads((x) => x.filter((y) => y.name !== u.name))}>
+                  <button type="button" className="mt-1 text-xs font-semibold text-primary" onClick={() => setUploads((x) => x.filter((y) => y.name !== u.name))}>
                     Dismiss
                   </button>
                 )}
@@ -202,7 +202,7 @@ export function PhotoWorkspace({ photos, onChange }: { photos: P[]; onChange: ()
         <ul className="space-y-2">
           {["Recent, and clearly you — your face visible in the first one", "Natural light beats filters", "One doing something you love", "Avoid group shots as your main photo"].map((t) => (
             <li key={t} className="flex gap-2">
-              <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-sage-ink" />
+              <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-success" />
               {t}
             </li>
           ))}
@@ -248,7 +248,7 @@ function FocusEditor({ photo, onClose, onSaved }: { photo: P | null; onClose: ()
             className="relative cursor-crosshair overflow-hidden rounded-2xl"
           >
             <img src={photoUrl(photo.id)} alt="" className="max-h-[50vh] w-full object-contain" draggable={false} />
-            <span className="pointer-events-none absolute h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_0_2px_rgba(48,40,50,.6)]" style={{ left: `${f.x}%`, top: `${f.y}%` }} />
+            <span className="pointer-events-none absolute h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface shadow-[0_0_0_2px_rgba(48,35,42,.6)]" style={{ left: `${f.x}%`, top: `${f.y}%` }} />
           </div>
           <div className="flex items-end gap-3" aria-label="Crop previews">
             <img src={photoUrl(photo.id)} alt="" className="aspect-[4/5] w-24 rounded-xl object-cover" style={{ objectPosition: `${f.x}% ${f.y}%` }} />

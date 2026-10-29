@@ -23,7 +23,7 @@ export function Drawer({ open, onClose, title, children, footer, variant = "side
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
       aria-labelledby="drawer-title"
-      className={`m-0 mt-auto max-h-[92dvh] w-full max-w-none rounded-t-4xl bg-ivory p-0 text-ink shadow-lift backdrop:bg-ink/35 ${variant === "side" ? "h-[92dvh]" : ""} ${VARIANTS[variant]}`}
+      className={`m-0 mt-auto max-h-[92dvh] w-full max-w-none rounded-t-4xl bg-parchment p-0 text-ink shadow-lift backdrop:bg-ink/35 ${variant === "side" ? "h-[92dvh]" : ""} ${VARIANTS[variant]}`}
     >
       {open && (
         <div className="flex h-full max-h-[inherit] flex-col">
@@ -37,7 +37,7 @@ export function Drawer({ open, onClose, title, children, footer, variant = "side
             <IconButton icon="close" label="Close" onClick={onClose} />
           </header>
           <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
-          {footer && <footer className="border-t hairline bg-ivory px-6 py-4">{footer}</footer>}
+          {footer && <footer className="border-t hairline bg-parchment px-6 py-4">{footer}</footer>}
         </div>
       )}
     </dialog>

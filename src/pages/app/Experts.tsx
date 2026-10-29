@@ -18,9 +18,9 @@ type MyRequest = { id: string; topic: string; question: string; status: string; 
 
 const REQUEST_STATUS: Record<string, { label: string; cls: string }> = {
   PENDING: { label: "Waiting for an expert", cls: "bg-gold-soft text-gold-ink" },
-  IN_REVIEW: { label: "In review", cls: "bg-lavender-soft text-plum-700" },
-  INFO_REQUESTED: { label: "Expert has a question", cls: "bg-rose-soft text-rose-ink" },
-  COMPLETED: { label: "Review ready", cls: "bg-sage text-sage-ink" },
+  IN_REVIEW: { label: "In review", cls: "bg-rose-mist text-primary-700" },
+  INFO_REQUESTED: { label: "Expert has a question", cls: "bg-rose-soft text-accent" },
+  COMPLETED: { label: "Review ready", cls: "bg-success-soft text-success" },
   DECLINED: { label: "Declined", cls: "bg-ink/5 text-ink-soft" },
   CANCELLED: { label: "Cancelled", cls: "bg-ink/5 text-ink-soft" },
 };
@@ -48,7 +48,7 @@ export function Experts() {
           {requests.loading ? (
             <LoadingBlock />
           ) : !requests.data?.length ? (
-            <p className="mt-4 rounded-3xl bg-white/60 p-6 text-ink-soft">You haven't asked for a review yet. It's completely optional.</p>
+            <p className="mt-4 rounded-3xl bg-surface/60 p-6 text-ink-soft">You haven't asked for a review yet. It's completely optional.</p>
           ) : (
             <ul className="mt-4 space-y-4">
               {requests.data.map((r) => (
@@ -63,7 +63,7 @@ export function Experts() {
           </h2>
           <ul className="mt-4 space-y-4">
             {experts.data?.map((e) => (
-              <li key={e.userId} className="rounded-3xl border hairline bg-white/75 p-5 shadow-soft">
+              <li key={e.userId} className="rounded-3xl border hairline bg-surface/75 p-5 shadow-soft">
                 <p className="font-serif text-xl">{e.displayName}</p>
                 <p className="text-sm text-ink-soft">{e.headline}</p>
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">{e.bio}</p>
@@ -76,7 +76,7 @@ export function Experts() {
             {experts.data?.length === 0 && <p className="text-ink-soft">No experts are available right now.</p>}
           </ul>
           {account?.role === "USER" && (
-            <div className="mt-6 rounded-3xl bg-lavender-soft/70 p-5">
+            <div className="mt-6 rounded-3xl bg-rose-mist/70 p-5">
               <p className="font-semibold">Are you a relationship professional?</p>
               {account.expertStatus === "PENDING" ? (
                 <p className="mt-1 text-sm text-ink-soft">Your application is with our team.</p>
@@ -103,7 +103,7 @@ function RequestItem({ r, onChange }: { r: MyRequest; onChange: () => void }) {
   const toast = useToast();
   const st = REQUEST_STATUS[r.status];
   return (
-    <li className="rounded-3xl border hairline bg-white/75 p-5 shadow-soft">
+    <li className="rounded-3xl border hairline bg-surface/75 p-5 shadow-soft">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="font-semibold">{r.topic}</p>
@@ -115,7 +115,7 @@ function RequestItem({ r, onChange }: { r: MyRequest; onChange: () => void }) {
       </div>
       <p className="mt-3 text-sm text-ink-soft">“{r.question}”</p>
       {r.reviews.length > 0 && (
-        <ol className="mt-4 space-y-2 border-l-2 border-plum-100 pl-4">
+        <ol className="mt-4 space-y-2 border-l-2 border-primary-100 pl-4">
           {r.reviews.map((e) => (
             <li key={e.id} className="text-sm">
               <p className="text-xs font-semibold text-ink-muted">
@@ -198,11 +198,11 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
           ))}
         </Select>
         <Textarea label="What would you like help thinking through?" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={1500} />
-        <fieldset className="space-y-2 rounded-3xl bg-white/60 p-4">
+        <fieldset className="space-y-2 rounded-3xl bg-surface/60 p-4">
           <legend className="mb-1 text-sm font-semibold">Share with the expert</legend>
           {items.map(([k, label]) => (
             <label key={k} className="flex items-center gap-3 text-sm">
-              <input type="checkbox" className="h-5 w-5 accent-plum" checked={share[k]} onChange={(e) => setShare((s) => ({ ...s, [k]: e.target.checked }))} />
+              <input type="checkbox" className="h-5 w-5 accent-primary" checked={share[k]} onChange={(e) => setShare((s) => ({ ...s, [k]: e.target.checked }))} />
               {label}
             </label>
           ))}
@@ -219,10 +219,10 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
           <p className="pt-1 text-xs text-ink-muted">Your private messages are never shared.</p>
         </fieldset>
         <label className="flex items-start gap-3 text-sm">
-          <input type="checkbox" className="mt-0.5 h-5 w-5 accent-plum" checked={consent} onChange={(e) => setConsent(e.target.checked)} />I understand an approved expert will see the information I've selected, and that their review is guidance only.
+          <input type="checkbox" className="mt-0.5 h-5 w-5 accent-primary" checked={consent} onChange={(e) => setConsent(e.target.checked)} />I understand an approved expert will see the information I've selected, and that their review is guidance only.
         </label>
         {error && (
-          <p role="alert" className="text-sm text-rose-ink">
+          <p role="alert" className="text-sm text-error">
             {error}
           </p>
         )}
@@ -270,7 +270,7 @@ function ApplyDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
         <InputLike label="Credentials" value={form.credentials} onChange={set("credentials")} optional />
         <InputLike label="Specialties (comma separated)" value={form.specialties} onChange={set("specialties")} />
         {error && (
-          <p role="alert" className="text-sm text-rose-ink">
+          <p role="alert" className="text-sm text-error">
             {error}
           </p>
         )}
@@ -289,7 +289,7 @@ function InputLike(props: { label: string; value: string; onChange: (e: React.Ch
         {props.label}
         {props.optional && <span className="font-normal text-ink-muted">Optional</span>}
       </span>
-      <input type={props.type ?? "text"} value={props.value} onChange={props.onChange} className="block w-full rounded-2xl border border-[#E4D8CD] bg-white/80 px-4 py-3 focus:border-plum focus:outline-none focus:ring-4 focus:ring-plum/10" />
+      <input type={props.type ?? "text"} value={props.value} onChange={props.onChange} className="block w-full rounded-2xl border border-line bg-surface/80 px-4 py-3 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10" />
     </label>
   );
 }

@@ -29,22 +29,22 @@ export function StoryPreviewCard({ profile: p }: { profile: Omit<PublicProfile, 
   const photo = p.photos?.[0];
   const prompt = p.prompts?.[0];
   return (
-    <article className="overflow-hidden rounded-[1.75rem] border hairline bg-white shadow-soft" aria-label="Preview of your profile">
+    <article className="overflow-hidden rounded-[1.75rem] border hairline bg-surface shadow-soft" aria-label="Preview of your profile">
       <div className="relative">
         {photo ? (
           <Photo id={photo.id} focus={photo} alt="Your main photo" className="aspect-[4/5] w-full" rounded="rounded-none" />
         ) : (
-          <div className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 bg-ivory-deep text-ink-muted">
+          <div className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-2 bg-parchment-deep text-ink-muted">
             <Icon name="image" className="h-8 w-8" />
             <span className="text-xs font-semibold uppercase tracking-[0.14em]">Placeholder — your photo goes here</span>
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 to-transparent px-5 pb-4 pt-16 text-ivory">
-          <p className="font-serif text-2xl text-ivory">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 to-transparent px-5 pb-4 pt-16 text-surface">
+          <p className="font-serif text-2xl text-surface">
             {p.displayName}
             {p.age != null && <span className="font-normal">, {p.age}</span>}
           </p>
-          <p className="text-xs text-ivory/85">{p.city ?? "Your city"}</p>
+          <p className="text-xs text-surface/85">{p.city ?? "Your city"}</p>
         </div>
       </div>
       <div className="space-y-3 p-5">
@@ -59,7 +59,7 @@ export function StoryPreviewCard({ profile: p }: { profile: Omit<PublicProfile, 
             <p className="mt-1 font-serif text-lg leading-snug">{prompt.answer}</p>
           </div>
         ) : (
-          <p className="rounded-2xl border border-dashed border-[#E4D8CD] p-3 text-xs text-ink-muted">Your prompt answers will appear here.</p>
+          <p className="rounded-2xl border border-dashed border-line p-3 text-xs text-ink-muted">Your prompt answers will appear here.</p>
         )}
         {p.interests.length > 0 && <p className="text-xs text-ink-muted">{p.interests.slice(0, 5).map((i) => i.name).join(" · ")}</p>}
       </div>

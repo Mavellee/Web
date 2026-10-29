@@ -115,22 +115,22 @@ export function Discover() {
         lede="People whose intentions and preferences fit with yours — in both directions."
         actions={
           <Button variant="secondary" size="sm" onClick={() => setFiltersOpen(true)} icon={<Icon name="sliders" className="h-4 w-4" />} disabled={!me.data}>
-            Filters{count > 0 && <span className="rounded-full bg-plum px-1.5 text-xs text-ivory">{count}</span>}
+            Filters{count > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-surface">{count}</span>}
           </Button>
         }
       />
       {count > 0 && (
         <div className="-mt-4 mb-6 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-ink-muted">Filtered:</span>
-          {filters.intentions.length > 0 && <span className="rounded-full bg-white px-3 py-1 shadow-soft">{filters.intentions.map(intentionLabel).join(", ")}</span>}
+          {filters.intentions.length > 0 && <span className="rounded-full bg-surface px-3 py-1 shadow-soft">{filters.intentions.map(intentionLabel).join(", ")}</span>}
           {(filters.ageMin || filters.ageMax) && (
-            <span className="rounded-full bg-white px-3 py-1 shadow-soft">
+            <span className="rounded-full bg-surface px-3 py-1 shadow-soft">
               Age {filters.ageMin ?? me.data?.ageMin}–{filters.ageMax ?? me.data?.ageMax}
             </span>
           )}
-          {filters.maxDistanceKm && <span className="rounded-full bg-white px-3 py-1 shadow-soft">Within {filters.maxDistanceKm} km</span>}
-          {filters.interests.length > 0 && <span className="rounded-full bg-white px-3 py-1 shadow-soft">{filters.interests.map((s) => interestNames.get(s) ?? s).join(", ")}</span>}
-          <button type="button" onClick={() => applyFilters({ intentions: [], interests: [] })} className="font-semibold text-plum underline-offset-4 hover:underline">
+          {filters.maxDistanceKm && <span className="rounded-full bg-surface px-3 py-1 shadow-soft">Within {filters.maxDistanceKm} km</span>}
+          {filters.interests.length > 0 && <span className="rounded-full bg-surface px-3 py-1 shadow-soft">{filters.interests.map((s) => interestNames.get(s) ?? s).join(", ")}</span>}
+          <button type="button" onClick={() => applyFilters({ intentions: [], interests: [] })} className="font-semibold text-primary underline-offset-4 hover:underline">
             Clear all
           </button>
         </div>
@@ -139,7 +139,7 @@ export function Discover() {
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3" role="status" aria-label="Loading profiles">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="overflow-hidden rounded-[1.75rem] border hairline bg-white">
+            <div key={i} className="overflow-hidden rounded-[1.75rem] border hairline bg-surface">
               <Skeleton className="aspect-[4/5] rounded-none" />
               <div className="space-y-3 p-5">
                 <Skeleton className="h-5 w-1/2" />

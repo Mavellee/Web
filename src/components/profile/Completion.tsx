@@ -29,15 +29,15 @@ export function CompletionMeter({ items, onGo }: { items: CompletionItem[]; onGo
   const pct = Math.round((done / items.length) * 100);
   const todo = items.filter((i) => !i.done);
   return (
-    <section aria-labelledby="completion-title" className="rounded-3xl border hairline bg-white/80 p-5">
+    <section aria-labelledby="completion-title" className="rounded-3xl border hairline bg-surface/80 p-5">
       <div className="flex items-baseline justify-between">
         <h2 id="completion-title" className="font-sans text-sm font-semibold">
           Profile completeness
         </h2>
-        <span className="font-serif text-2xl text-plum">{pct}%</span>
+        <span className="font-serif text-2xl text-primary">{pct}%</span>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-ivory-deep" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
-        <div className="h-full rounded-full bg-sage-ink transition-all duration-700" style={{ width: `${pct}%` }} />
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-parchment-deep" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
+        <div className="h-full rounded-full bg-gradient-to-r from-accent to-primary transition-all duration-700" style={{ width: `${pct}%` }} />
       </div>
       {todo.length ? (
         <ul className="mt-4 space-y-1">
@@ -54,7 +54,7 @@ export function CompletionMeter({ items, onGo }: { items: CompletionItem[]; onGo
           ))}
         </ul>
       ) : (
-        <p className={cx("mt-3 text-sm text-sage-ink")}>Your profile is complete. Nice.</p>
+        <p className={cx("mt-3 text-sm text-success")}>Your profile is complete. Nice.</p>
       )}
     </section>
   );

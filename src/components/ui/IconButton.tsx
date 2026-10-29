@@ -5,9 +5,9 @@ import { Icon, type IconName } from "./Icon";
 type Tone = "plain" | "soft" | "solid" | "danger";
 const tones: Record<Tone, string> = {
   plain: "text-ink-soft hover:bg-ink/5 hover:text-ink",
-  soft: "border border-[#E6DACE] bg-white text-ink hover:border-plum/40 hover:text-plum",
-  solid: "bg-plum text-ivory shadow-soft hover:bg-plum-600",
-  danger: "text-rose-ink hover:bg-rose-soft",
+  soft: "border border-line bg-surface text-ink hover:border-primary/40 hover:text-primary",
+  solid: "bg-primary text-surface shadow-soft hover:bg-primary-hover",
+  danger: "text-error hover:bg-error-soft",
 };
 
 /** Icon-only button. `label` is required so every icon button has an accessible name. */

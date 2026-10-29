@@ -45,7 +45,7 @@ export function InterestPicker({ selected, onSaved, submitLabel = "Save", second
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block sm:w-80">
           <span className="sr-only">Search interests</span>
-          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search music, food, travel…" className="block w-full rounded-full border border-[#E4D8CD] bg-white px-4 py-2.5 focus:border-plum focus:outline-none focus:ring-4 focus:ring-plum/10" />
+          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search music, food, travel…" className="block w-full rounded-full border border-line bg-surface px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10" />
         </label>
         <p className="text-sm text-ink-muted" aria-live="polite">
           {picked.length}/{MAX} chosen{picked.length >= MAX && " — remove one to add another"}
@@ -67,7 +67,7 @@ export function InterestPicker({ selected, onSaved, submitLabel = "Save", second
         ))}
       </div>
       {error && (
-        <p role="alert" className="text-sm text-rose-ink">
+        <p role="alert" className="text-sm text-error">
           {error}
         </p>
       )}

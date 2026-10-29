@@ -25,8 +25,8 @@ function AuthLayout({ title, subtitle, children, footer }: { title: string; subt
       </div>
       <div className="relative hidden overflow-hidden lg:block">
         <img src="/images/evening.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-plum-800/80 via-plum/20 to-transparent" />
-        <p className="absolute bottom-12 left-12 right-12 font-serif text-4xl leading-tight text-ivory">Find your kind of connection.</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-800/80 via-primary/20 to-transparent" />
+        <p className="absolute bottom-12 left-12 right-12 font-serif text-4xl leading-tight text-surface">Find your kind of connection.</p>
       </div>
     </div>
   );
@@ -45,7 +45,7 @@ function applyServerErrors<T extends FieldValues>(e: unknown, setError: UseFormS
 function FormError({ message }: { message: string | null }) {
   if (!message) return null;
   return (
-    <p role="alert" className="mb-5 rounded-2xl bg-rose-soft px-4 py-3 text-sm text-rose-ink">
+    <p role="alert" className="mb-5 rounded-2xl bg-error-soft px-4 py-3 text-sm text-error">
       {message}
     </p>
   );
@@ -102,7 +102,7 @@ export function Signup() {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-plum underline-offset-4 hover:underline">
+          <Link to="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
             Log in
           </Link>
         </>
@@ -113,21 +113,21 @@ export function Signup() {
         <Input label="Email" type="email" autoComplete="email" error={errors.email?.message} {...register("email")} />
         <Input label="Password" type="password" autoComplete="new-password" hint="At least 10 characters, with a letter and a number." error={errors.password?.message} {...register("password")} />
         <Input label="Date of birth" type="date" autoComplete="bday" hint="Kept private. Others only see your age." error={errors.dateOfBirth?.message} {...register("dateOfBirth")} />
-        <div className="space-y-3 rounded-3xl bg-white/60 p-4">
+        <div className="space-y-3 rounded-3xl bg-surface/60 p-4">
           <Checkbox label="I confirm I am 18 years of age or older." error={errors.ageConfirmed?.message} {...register("ageConfirmed")} />
           <Checkbox
             label={
               <>
                 I agree to the{" "}
-                <Link to="/terms" target="_blank" className="text-plum underline">
+                <Link to="/terms" target="_blank" className="text-primary underline">
                   terms
                 </Link>
                 ,{" "}
-                <Link to="/privacy" target="_blank" className="text-plum underline">
+                <Link to="/privacy" target="_blank" className="text-primary underline">
                   privacy policy
                 </Link>{" "}
                 and{" "}
-                <Link to="/guidelines" target="_blank" className="text-plum underline">
+                <Link to="/guidelines" target="_blank" className="text-primary underline">
                   community guidelines
                 </Link>
                 .
@@ -174,7 +174,7 @@ export function Login() {
       footer={
         <>
           New to Knot?{" "}
-          <Link to="/signup" className="font-semibold text-plum underline-offset-4 hover:underline">
+          <Link to="/signup" className="font-semibold text-primary underline-offset-4 hover:underline">
             Create an account
           </Link>
         </>
@@ -185,7 +185,7 @@ export function Login() {
         <Input label="Email" type="email" autoComplete="email" error={formState.errors.email?.message} {...register("email")} />
         <Input label="Password" type="password" autoComplete="current-password" error={formState.errors.password?.message} {...register("password")} />
         <div className="flex justify-end">
-          <Link to="/forgot-password" className="text-sm font-semibold text-plum underline-offset-4 hover:underline">
+          <Link to="/forgot-password" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
             Forgot password?
           </Link>
         </div>
@@ -213,7 +213,7 @@ export function ForgotPassword() {
   return (
     <AuthLayout title="Reset your password" subtitle="We'll email you a link to choose a new one.">
       {sent ? (
-        <div role="status" className="rounded-3xl bg-sage/70 p-6">
+        <div role="status" className="rounded-3xl bg-success-soft/70 p-6">
           <p className="font-serif text-xl">Check your inbox</p>
           <p className="mt-2 text-ink-soft">If an account exists for that email, a reset link is on its way. It expires in one hour.</p>
           <ButtonLink to="/login" variant="secondary" className="mt-5">
@@ -228,7 +228,7 @@ export function ForgotPassword() {
             Send reset link
           </Button>
           <p className="text-center text-sm">
-            <Link to="/login" className="font-semibold text-plum">
+            <Link to="/login" className="font-semibold text-primary">
               Back to log in
             </Link>
           </p>
@@ -309,7 +309,7 @@ export function VerifyEmail() {
   if (state === "verifying")
     return (
       <AuthLayout title="Verifying…">
-        <Spinner label="Verifying your email" className="h-8 w-8 text-plum" />
+        <Spinner label="Verifying your email" className="h-8 w-8 text-primary" />
       </AuthLayout>
     );
   if (state === "done")
@@ -324,7 +324,7 @@ export function VerifyEmail() {
   return (
     <AuthLayout title="Check your email" subtitle={account ? <>We sent a confirmation link to <strong className="text-ink">{account.email}</strong>.</> : "Open the link we sent to confirm your address."}>
       {state === "error" && <FormError message={message} />}
-      <div className="space-y-4 rounded-3xl bg-white/60 p-6">
+      <div className="space-y-4 rounded-3xl bg-surface/60 p-6">
         <p className="text-ink-soft">The link expires in 24 hours. Once confirmed, you'll set up your profile.</p>
         {account && account.status === "PENDING_VERIFICATION" && (
           <Button variant="secondary" onClick={resend} disabled={resent}>
@@ -333,7 +333,7 @@ export function VerifyEmail() {
         )}
         {account?.status === "ACTIVE" && <ButtonLink to="/onboarding">Continue</ButtonLink>}
       </div>
-      {message && state !== "error" && <p className="mt-4 text-sm text-rose-ink">{message}</p>}
+      {message && state !== "error" && <p className="mt-4 text-sm text-error">{message}</p>}
     </AuthLayout>
   );
 }

@@ -72,7 +72,7 @@ export function Onboarding() {
 
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-20 border-b hairline bg-ivory/90 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b hairline bg-parchment/90 backdrop-blur">
         <div className="container-page flex items-center justify-between gap-4 py-4">
           <Logo />
           <div className="flex items-center gap-3 text-sm">
@@ -95,8 +95,8 @@ export function Onboarding() {
                   aria-current={s.key === step ? "step" : undefined}
                   className="group block w-full text-left disabled:cursor-default"
                 >
-                  <span className={cx("block h-1 rounded-full transition-colors duration-500", i <= index ? "bg-plum" : i <= reachable ? "bg-plum-200" : "bg-[#EADFD4]")} />
-                  <span className={cx("mt-1.5 hidden truncate text-xs font-semibold md:block", s.key === step ? "text-plum" : "text-ink-muted")}>{s.short}</span>
+                  <span className={cx("block h-1 rounded-full transition-colors duration-500", i <= index ? "bg-primary" : i <= reachable ? "bg-primary-200" : "bg-line")} />
+                  <span className={cx("mt-1.5 hidden truncate text-xs font-semibold md:block", s.key === step ? "text-primary" : "text-ink-muted")}>{s.short}</span>
                 </button>
               </li>
             ))}
@@ -201,7 +201,7 @@ function SaveIndicator({ at }: { at: Date | null }) {
   if (!at) return <span className="hidden text-ink-muted sm:inline">Progress saves as you go</span>;
   const secs = Math.round((Date.now() - at.getTime()) / 1000);
   return (
-    <span role="status" className="inline-flex items-center gap-1.5 text-sage-ink">
+    <span role="status" className="inline-flex items-center gap-1.5 text-success">
       <Icon name="check" className="h-4 w-4" /> Saved {secs < 30 ? "just now" : `${Math.round(secs / 60)} min ago`}
     </span>
   );
@@ -212,7 +212,7 @@ function DobNote({ profile }: { profile: OwnProfile }) {
   if (!profile.dateOfBirth) return null;
   const d = new Date(`${profile.dateOfBirth}T00:00:00Z`);
   return (
-    <p className="mb-8 rounded-2xl bg-white/70 px-4 py-3 text-sm text-ink-soft">
+    <p className="mb-8 rounded-2xl bg-surface/70 px-4 py-3 text-sm text-ink-soft">
       Date of birth: <strong className="text-ink">{d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</strong> · others only see your age ({profile.age}). Contact support if it's wrong.
     </p>
   );
@@ -269,17 +269,17 @@ function PreviewStep({ profile, preview, onEdit }: { profile: OwnProfile; previe
       <h1 className="mt-3 text-4xl sm:text-5xl">This is your story.</h1>
       <p className="mt-3 max-w-2xl text-lg text-ink-soft">It's exactly what others will see. Nothing is public until you publish.</p>
       <div className="mt-10 grid gap-10 xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="min-w-0 rounded-[2.5rem] border hairline bg-white/50 p-4 sm:p-8">
+        <div className="min-w-0 rounded-[2.5rem] border hairline bg-surface/50 p-4 sm:p-8">
           <EditorialProfile profile={preview} preview />
         </div>
         <aside className="space-y-5 xl:sticky xl:top-36 xl:self-start">
           {tips.length > 0 && (
-            <div className="rounded-3xl bg-white/80 p-5">
+            <div className="rounded-3xl bg-surface/80 p-5">
               <p className="text-sm font-semibold">Optional finishing touches</p>
               <ul className="mt-2 space-y-1">
                 {tips.map((t) => (
                   <li key={t.text}>
-                    <button type="button" onClick={() => onEdit(t.step)} className="text-left text-sm text-plum hover:underline">
+                    <button type="button" onClick={() => onEdit(t.step)} className="text-left text-sm text-primary hover:underline">
                       {t.text}
                     </button>
                   </li>
@@ -287,7 +287,7 @@ function PreviewStep({ profile, preview, onEdit }: { profile: OwnProfile; previe
               </ul>
             </div>
           )}
-          <div className="rounded-3xl bg-white/80 p-5">
+          <div className="rounded-3xl bg-surface/80 p-5">
             <p className="text-sm font-semibold">Edit</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {STEPS.slice(0, 5).map((s) => (
@@ -297,15 +297,15 @@ function PreviewStep({ profile, preview, onEdit }: { profile: OwnProfile; previe
               ))}
             </div>
           </div>
-          <label className="flex items-start gap-3 rounded-3xl bg-white/80 p-5 text-sm">
-            <input type="checkbox" className="mt-0.5 h-5 w-5 accent-plum" checked={discoverable} onChange={(e) => setDiscoverable(e.target.checked)} />
+          <label className="flex items-start gap-3 rounded-3xl bg-surface/80 p-5 text-sm">
+            <input type="checkbox" className="mt-0.5 h-5 w-5 accent-primary" checked={discoverable} onChange={(e) => setDiscoverable(e.target.checked)} />
             <span>
               <span className="block font-semibold">Show me in Discover</span>
               <span className="text-ink-muted">Turn off to be seen only by people you like first.</span>
             </span>
           </label>
           {error && (
-            <p role="alert" className="rounded-2xl bg-rose-soft px-4 py-3 text-sm text-rose-ink">
+            <p role="alert" className="rounded-2xl bg-error-soft px-4 py-3 text-sm text-error">
               {error}
             </p>
           )}

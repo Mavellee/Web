@@ -29,11 +29,11 @@ export function Compatibility() {
       ) : (
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] [&>*]:min-w-0">
           <aside className="space-y-5 lg:sticky lg:top-8 lg:self-start">
-            <section aria-labelledby="progress-title" className="rounded-3xl border hairline bg-white p-6">
+            <section aria-labelledby="progress-title" className="rounded-3xl border hairline bg-surface p-6">
               <h2 id="progress-title" className="font-sans text-sm font-semibold">
                 Your answers
               </h2>
-              <p className="mt-2 font-serif text-4xl text-plum">
+              <p className="mt-2 font-serif text-4xl text-primary">
                 {answered}
                 <span className="text-xl text-ink-muted"> / {list.length}</span>
               </p>
@@ -49,8 +49,8 @@ export function Compatibility() {
                           {done}/{total}
                         </span>
                       </div>
-                      <div className="mt-1 h-1 overflow-hidden rounded-full bg-ivory-deep">
-                        <div className="h-full rounded-full bg-plum transition-all duration-500" style={{ width: `${(done / total) * 100}%` }} />
+                      <div className="mt-1 h-1 overflow-hidden rounded-full bg-parchment-deep">
+                        <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${(done / total) * 100}%` }} />
                       </div>
                     </li>
                   );
@@ -63,14 +63,14 @@ export function Compatibility() {
               )}
             </section>
             {method.data && (
-              <details className="rounded-3xl border hairline bg-white/70 p-5">
+              <details className="rounded-3xl border hairline bg-surface/70 p-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between font-semibold text-ink">
                   How scores work <Icon name="chevronRight" className="h-4 w-4" />
                 </summary>
                 <ul className="mt-3 space-y-2 text-sm text-ink-soft">
                   {method.data.notes.map((n) => (
                     <li key={n} className="flex gap-2">
-                      <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-sage-ink" />
+                      <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-success" />
                       {n}
                     </li>
                   ))}

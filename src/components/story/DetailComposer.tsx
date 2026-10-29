@@ -33,7 +33,7 @@ export function DetailComposer({ profile, detail, onClose, onSend }: { profile: 
             }
           }}
         >
-          <figure className="rounded-3xl bg-ivory-deep/70 p-4">
+          <figure className="rounded-3xl bg-parchment-deep/70 p-4">
             <figcaption className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">{detail.label}</figcaption>
             <blockquote className="mt-1 font-serif text-lg leading-snug">{detail.quote}</blockquote>
           </figure>
@@ -48,7 +48,7 @@ export function DetailComposer({ profile, detail, onClose, onSend }: { profile: 
               rows={3}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Ask about it, share yours, or simply say what caught your eye."
-              className="mt-1.5 block w-full resize-y rounded-2xl border border-[#E4D8CD] bg-white px-4 py-3 focus:border-plum focus:outline-none focus:ring-4 focus:ring-plum/10"
+              className="mt-1.5 block w-full resize-y rounded-2xl border border-line bg-surface px-4 py-3 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
             />
             <p className="mt-1 text-right text-xs text-ink-muted">{comment.length}/300</p>
           </div>

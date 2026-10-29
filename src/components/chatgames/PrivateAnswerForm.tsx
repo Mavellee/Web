@@ -47,7 +47,7 @@ export function PrivateAnswerForm({ v, r, prompt, onSubmit, onPass, onSkipCard }
             rows={2}
             onChange={(e) => setText(e.target.value)}
             placeholder={v.rules.mode === "guess" && r.subjectUserId !== v.participants.find((p) => p.isYou)?.userId ? "Your best guess…" : "Your answer…"}
-            className="block w-full resize-y rounded-2xl border border-[#E4D8CD] bg-white px-3.5 py-2.5 text-[0.95rem] focus:border-plum focus:outline-none focus:ring-4 focus:ring-plum/10"
+            className="block w-full resize-y rounded-2xl border border-line bg-surface px-3.5 py-2.5 text-[0.95rem] focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
           />
           <p className="mt-1 text-right text-[0.7rem] text-ink-muted">{text.length}/500</p>
         </div>

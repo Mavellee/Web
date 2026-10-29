@@ -57,7 +57,7 @@ export function QuestionCard({ q, onSaved }: { q: Question; onSaved?: (q: Questi
   const toggleAcceptable = (v: string) => setAcceptable((a) => (a.includes(v) ? a.filter((x) => x !== v) : [...a, v]));
 
   return (
-    <fieldset className="rounded-3xl border hairline bg-white/75 p-5 shadow-soft sm:p-6">
+    <fieldset className="rounded-3xl border hairline bg-surface/75 p-5 shadow-soft sm:p-6">
       <legend className="sr-only">{q.prompt}</legend>
       <div className="flex items-start justify-between gap-3">
         <p className="font-serif text-xl leading-snug" aria-hidden="true">
@@ -101,13 +101,13 @@ export function QuestionCard({ q, onSaved }: { q: Question; onSaved?: (q: Questi
             </div>
           </div>
           <label className="flex items-center gap-3 text-sm text-ink-soft">
-            <input type="checkbox" className="h-5 w-5 accent-plum" checked={dealbreaker} onChange={(e) => setDealbreaker(e.target.checked)} disabled={!acceptable.length} />
+            <input type="checkbox" className="h-5 w-5 accent-primary" checked={dealbreaker} onChange={(e) => setDealbreaker(e.target.checked)} disabled={!acceptable.length} />
             This is a dealbreaker for me {!acceptable.length && <span className="text-ink-muted">(choose acceptable answers first)</span>}
           </label>
         </div>
       )}
       {error && (
-        <p role="alert" className="mt-3 text-sm text-rose-ink">
+        <p role="alert" className="mt-3 text-sm text-error">
           {error}
         </p>
       )}

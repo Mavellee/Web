@@ -42,13 +42,13 @@ export function Matches() {
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((m) => (
-            <li key={m.id} className="group overflow-hidden rounded-[1.75rem] border hairline bg-white shadow-soft transition duration-300 hover:shadow-lift">
+            <li key={m.id} className="group overflow-hidden rounded-[1.75rem] border hairline bg-surface shadow-soft transition duration-300 hover:shadow-lift">
               <div className="grid grid-cols-[7.5rem_minmax(0,1fr)]">
                 <Link to={`/app/people/${m.profile.id}`} aria-label={`View ${m.profile.displayName}'s profile`}>
                   <Photo id={m.profile.photoIds[0]} alt="" className="h-full min-h-44 w-full" rounded="rounded-none" position="object-top" />
                 </Link>
                 <div className="flex flex-col p-5">
-                  <span className="w-fit rounded-full bg-sage px-2.5 py-0.5 text-xs font-semibold text-sage-ink">Mutual match</span>
+                  <span className="w-fit rounded-full bg-rose-soft px-2.5 py-0.5 text-xs font-semibold text-primary-700">Mutual match</span>
                   <p className="mt-3 font-serif text-2xl leading-tight">
                     {m.profile.displayName}
                     {m.profile.age != null && <span className="font-normal text-ink-soft">, {m.profile.age}</span>}
@@ -64,7 +64,7 @@ export function Matches() {
               </div>
               <div className="grid grid-cols-2 border-t hairline">
                 {m.conversationId && (
-                  <Link to={`/app/messages/${m.conversationId}`} className="flex items-center justify-center gap-2 py-3.5 text-sm font-semibold text-plum transition hover:bg-plum-50">
+                  <Link to={`/app/messages/${m.conversationId}`} className="flex items-center justify-center gap-2 py-3.5 text-sm font-semibold text-primary transition hover:bg-primary-50">
                     <Icon name="chat" className="h-4 w-4" /> {m.lastMessageAt ? "Continue" : "Say hello"}
                   </Link>
                 )}

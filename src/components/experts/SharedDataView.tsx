@@ -13,7 +13,7 @@ const IMPORTANCE = ["Doesn't matter", "A little", "Quite", "Very"];
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border hairline bg-white p-4">
+    <section className="rounded-2xl border hairline bg-surface p-4">
       <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">{title}</h4>
       <div className="mt-2 text-sm">{children}</div>
     </section>
@@ -51,7 +51,7 @@ export function SharedDataView({ data, fields }: { data: Shared; fields: string[
                   <p className="text-ink-soft">{a.question}</p>
                   <p className="font-semibold">
                     {a.answer}
-                    {a.dealbreaker && <span className="ml-2 rounded-full bg-rose-soft px-2 py-0.5 text-xs text-rose-ink">Dealbreaker</span>}
+                    {a.dealbreaker && <span className="ml-2 rounded-full bg-rose-soft px-2 py-0.5 text-xs text-accent">Dealbreaker</span>}
                   </p>
                   <p className="text-xs text-ink-muted">
                     Matters: {IMPORTANCE[a.importance] ?? a.importance}
@@ -70,7 +70,7 @@ export function SharedDataView({ data, fields }: { data: Shared; fields: string[
           {data.matchCompatibility && data.matchCompatibility.score !== null ? (
             <>
               <p>
-                <span className="font-serif text-2xl text-plum">{data.matchCompatibility.score}</span> / 100 overlap · {data.matchCompatibility.confidence.replace(/_/g, " ")}
+                <span className="font-serif text-2xl text-primary">{data.matchCompatibility.score}</span> / 100 overlap · {data.matchCompatibility.confidence.replace(/_/g, " ")}
               </p>
               <ul className="mt-2 grid gap-1 sm:grid-cols-2">
                 {data.matchCompatibility.dimensions.map((d) => (
@@ -93,9 +93,9 @@ export function SharedDataView({ data, fields }: { data: Shared; fields: string[
 
 export const REQUEST_STATUS: Record<string, { label: string; cls: string }> = {
   PENDING: { label: "Waiting for an expert", cls: "bg-gold-soft text-gold-ink" },
-  IN_REVIEW: { label: "In review", cls: "bg-lavender-soft text-plum-700" },
-  INFO_REQUESTED: { label: "Waiting on member", cls: "bg-rose-soft text-rose-ink" },
-  COMPLETED: { label: "Completed", cls: "bg-sage text-sage-ink" },
+  IN_REVIEW: { label: "In review", cls: "bg-rose-mist text-primary-700" },
+  INFO_REQUESTED: { label: "Waiting on member", cls: "bg-rose-soft text-accent" },
+  COMPLETED: { label: "Completed", cls: "bg-success-soft text-success" },
   DECLINED: { label: "Declined", cls: "bg-ink/5 text-ink-soft" },
   CANCELLED: { label: "Cancelled by member", cls: "bg-ink/5 text-ink-soft" },
 };

@@ -53,7 +53,7 @@ export function ExpertWorkspace() {
               ) : (
                 <ul className="space-y-3">
                   {queue.data.pending.map((p) => (
-                    <li key={p.id} className="rounded-3xl border hairline bg-white/75 p-4">
+                    <li key={p.id} className="rounded-3xl border hairline bg-surface/75 p-4">
                       <p className="font-semibold">{p.topic}</p>
                       <p className="mt-1 line-clamp-3 text-sm text-ink-soft">{p.question}</p>
                       <p className="mt-2 text-xs text-ink-muted">
@@ -72,7 +72,7 @@ export function ExpertWorkspace() {
               <ul className="space-y-2">
                 {queue.data?.assigned.map((a) => (
                   <li key={a.id}>
-                    <button type="button" onClick={() => setSelected(a.id)} className={cx("w-full rounded-2xl px-4 py-3 text-left transition", selected === a.id ? "bg-plum-50" : "bg-white/60 hover:bg-white")}>
+                    <button type="button" onClick={() => setSelected(a.id)} className={cx("w-full rounded-2xl px-4 py-3 text-left transition", selected === a.id ? "bg-primary-50" : "bg-surface/60 hover:bg-surface")}>
                       <span className="block font-semibold">{a.topic}</span>
                       <span className="mt-1 block"><StatusPill status={a.status} /></span>
                     </button>
@@ -85,7 +85,7 @@ export function ExpertWorkspace() {
                 <h2 className="mb-3 text-xl">History</h2>
                 <ul className="space-y-2 text-sm">
                   {history.data.map((h) => (
-                    <li key={h.id} className="flex justify-between rounded-2xl bg-white/50 px-4 py-2.5">
+                    <li key={h.id} className="flex justify-between rounded-2xl bg-surface/50 px-4 py-2.5">
                       <span>{h.topic}</span>
                       <StatusPill status={h.status} />
                     </li>
@@ -150,7 +150,7 @@ function RequestDetail({ id, onDone }: { id: string; onDone: () => void }) {
         <SharedDataView data={data.sharedData} fields={data.sharedFields} />
       </div>
       {data.reviews.length > 0 && (
-        <ol className="mt-6 space-y-2 border-l-2 border-plum-100 pl-4 text-sm">
+        <ol className="mt-6 space-y-2 border-l-2 border-primary-100 pl-4 text-sm">
           {data.reviews.map((r) => (
             <li key={r.id}>
               <p className="text-xs font-semibold text-ink-muted">
@@ -175,7 +175,7 @@ function RequestDetail({ id, onDone }: { id: string; onDone: () => void }) {
                 </Button>
               </>
             )}
-            <Button variant="quiet" className="text-rose-ink" onClick={() => act("decline", "Request declined")} loading={busy === "decline"}>
+            <Button variant="quiet" className="text-accent" onClick={() => act("decline", "Request declined")} loading={busy === "decline"}>
               Decline with explanation
             </Button>
           </div>

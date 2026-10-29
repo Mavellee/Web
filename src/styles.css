@@ -11,17 +11,22 @@
     text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-ivory font-sans text-ink antialiased;
+    @apply bg-parchment font-sans text-ink antialiased;
+    /* Warm parchment with a faint blush in the corners, like aged writing paper. */
+    background-image:
+      radial-gradient(60rem 40rem at 100% 0%, rgb(var(--rgb-rose-mist) / 0.9), transparent 70%),
+      radial-gradient(50rem 30rem at 0% 100%, rgb(var(--rgb-gold-soft) / 0.45), transparent 70%);
+    background-attachment: scroll;
   }
   h1, h2, h3 {
     @apply font-serif tracking-tight text-ink;
     font-variation-settings: "opsz" 96, "SOFT" 50;
   }
   ::selection {
-    @apply bg-lavender text-ink;
+    @apply bg-rose-soft text-ink;
   }
   :focus-visible {
-    @apply outline-none ring-2 ring-plum ring-offset-2 ring-offset-ivory;
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-parchment;
   }
 }
 
@@ -29,8 +34,27 @@
   .container-page {
     @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
   }
+  /* A short antique-gold rule before every eyebrow: the love-letter signature. */
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.18em] text-plum;
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-primary;
+  }
+  .eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 1.25rem;
+    height: 1px;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+    background: var(--color-gold);
+  }
+  /* Gold hairline with a small centred diamond, for dividing editorial sections. */
+  .ornament {
+    @apply flex items-center gap-3 text-gold;
+  }
+  .ornament::before,
+  .ornament::after {
+    content: "";
+    @apply h-px flex-1 bg-gold/50;
   }
   .prose-knot p {
     @apply mb-4 leading-relaxed text-ink-soft;
@@ -45,7 +69,7 @@
     @apply mb-4 list-disc space-y-1 pl-6 text-ink-soft;
   }
   .hairline {
-    @apply border-[#EADFD4];
+    @apply border-line;
   }
 }
 

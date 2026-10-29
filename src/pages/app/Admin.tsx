@@ -56,7 +56,7 @@ export function Admin() {
             ["Active members", overview.data.activeUsers],
             ["Pending deletion", overview.data.pendingDeletion],
           ].map(([l, v]) => (
-            <div key={l} className={cx("rounded-3xl p-4", l === "Possible under-18" && Number(v) > 0 ? "bg-rose-soft" : "bg-white/70")}>
+            <div key={l} className={cx("rounded-3xl p-4", l === "Possible under-18" && Number(v) > 0 ? "bg-rose-soft" : "bg-surface/70")}>
               <dt className="text-xs font-semibold text-ink-muted">{l}</dt>
               <dd className="mt-1 font-serif text-3xl">{v}</dd>
             </div>
@@ -101,16 +101,16 @@ function ReportsQueue({ onChange }: { onChange: () => void }) {
   return (
     <ul className="space-y-4">
       {data.map((r) => (
-        <li key={r.id} className={cx("rounded-3xl border bg-white/80 p-5 shadow-soft", r.reason === "UNDERAGE" ? "border-rose-ink/40" : "hairline")}>
+        <li key={r.id} className={cx("rounded-3xl border bg-surface/80 p-5 shadow-soft", r.reason === "UNDERAGE" ? "border-accent/40" : "hairline")}>
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone={r.reason === "UNDERAGE" ? "rose" : "neutral"}>{reasonLabel(r.reason)}</Badge>
-            <Badge tone="lavender">{r.target.toLowerCase()}</Badge>
+            <Badge tone="rose">{r.target.toLowerCase()}</Badge>
             <span className="text-xs text-ink-muted">{timeAgo(r.createdAt)}</span>
           </div>
           <p className="mt-3 text-sm">
             <strong>{r.reportedUser.profile?.displayName ?? "Member"}</strong> ({r.reportedUser.status.toLowerCase()}, {r.reportedUser._count.reportsReceived} total reports) reported by {r.reporter.profile?.displayName ?? "member"}
           </p>
-          {r.details && <p className="mt-2 rounded-2xl bg-ivory-deep p-3 text-sm">{r.details}</p>}
+          {r.details && <p className="mt-2 rounded-2xl bg-parchment-deep p-3 text-sm">{r.details}</p>}
           {r.message && (
             <blockquote className="mt-2 rounded-2xl border-l-4 border-rose bg-rose-soft/50 p-3 text-sm">
               <span className="block text-xs font-semibold text-ink-muted">Reported message</span>
@@ -132,7 +132,7 @@ function ReportsQueue({ onChange }: { onChange: () => void }) {
             <Button size="sm" variant="quiet" onClick={() => update(r, "DISMISSED")}>
               Dismiss
             </Button>
-            <Button size="sm" variant="quiet" className="text-rose-ink" onClick={() => restrict(r, "SUSPENDED")}>
+            <Button size="sm" variant="quiet" className="text-accent" onClick={() => restrict(r, "SUSPENDED")}>
               {r.reason === "UNDERAGE" ? "Restrict pending age check" : "Suspend member"}
             </Button>
             <Button size="sm" variant="danger" onClick={() => restrict(r, "BANNED")}>
@@ -166,7 +166,7 @@ function ExpertApprovals({ onChange }: { onChange: () => void }) {
   return (
     <ul className="space-y-4">
       {data.map((a) => (
-        <li key={a.userId} className="rounded-3xl border hairline bg-white/80 p-5 shadow-soft">
+        <li key={a.userId} className="rounded-3xl border hairline bg-surface/80 p-5 shadow-soft">
           <p className="font-serif text-xl">{a.user.profile?.displayName}</p>
           <p className="text-sm text-ink-muted">
             {a.user.email} · applied {timeAgo(a.createdAt)}
@@ -180,7 +180,7 @@ function ExpertApprovals({ onChange }: { onChange: () => void }) {
           <div className="mt-4 space-y-3">
             <Input label="Decision note (shown to applicant)" value={note[a.userId] ?? ""} onChange={(e) => setNote((n) => ({ ...n, [a.userId]: e.target.value }))} />
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" className="h-5 w-5 accent-plum" checked={!!verified[a.userId]} onChange={(e) => setVerified((v) => ({ ...v, [a.userId]: e.target.checked }))} />I have checked these credentials with the issuing body
+              <input type="checkbox" className="h-5 w-5 accent-primary" checked={!!verified[a.userId]} onChange={(e) => setVerified((v) => ({ ...v, [a.userId]: e.target.checked }))} />I have checked these credentials with the issuing body
             </label>
             <div className="flex gap-2">
               <Button size="sm" onClick={() => decide(a, "APPROVED")}>
@@ -239,11 +239,11 @@ function UserSearch() {
             </Select>
             <Input label="Reason (required)" value={reason} onChange={(e) => setReason(e.target.value)} />
           </div>
-          <ul className="mt-4 divide-y hairline rounded-3xl border hairline bg-white/70">
+          <ul className="mt-4 divide-y hairline rounded-3xl border hairline bg-surface/70">
             {data.map((u) => (
               <li key={u.id} className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
                 <span>
-                  <strong>{u.profile?.displayName ?? "—"}</strong> · {u.email} · {u.age ?? "?"} · {u.role.toLowerCase()} · <span className={u.status === "ACTIVE" ? "text-sage-ink" : "text-rose-ink"}>{u.status.toLowerCase()}</span> · {u._count.reportsReceived} reports
+                  <strong>{u.profile?.displayName ?? "—"}</strong> · {u.email} · {u.age ?? "?"} · {u.role.toLowerCase()} · <span className={u.status === "ACTIVE" ? "text-success" : "text-accent"}>{u.status.toLowerCase()}</span> · {u._count.reportsReceived} reports
                 </span>
                 <Button size="sm" variant="secondary" disabled={reason.trim().length < 5} onClick={() => apply(u)}>
                   Apply
@@ -263,7 +263,7 @@ function AuditLog() {
   if (loading && !data) return <LoadingBlock />;
   if (error) return <ErrorState message={error.message} onRetry={reload} />;
   return (
-    <div className="overflow-x-auto rounded-3xl border hairline bg-white/70">
+    <div className="overflow-x-auto rounded-3xl border hairline bg-surface/70">
       <table className="w-full text-left text-sm">
         <thead className="text-xs uppercase tracking-wider text-ink-muted">
           <tr>

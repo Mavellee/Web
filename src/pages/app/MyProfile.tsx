@@ -73,7 +73,7 @@ export function MyProfile() {
           <aside className="space-y-5 lg:sticky lg:top-8 lg:self-start">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Preview</p>
-              {data.isPublished ? <Badge tone="sage">{data.discoveryPaused ? "Published · paused" : "Published"}</Badge> : <Badge tone="gold">Not published</Badge>}
+              {data.isPublished ? <Badge tone="success">{data.discoveryPaused ? "Published · paused" : "Published"}</Badge> : <Badge tone="gold">Not published</Badge>}
             </div>
             <StoryPreviewCard profile={preview} />
             <CompletionMeter items={items} onGo={go} />

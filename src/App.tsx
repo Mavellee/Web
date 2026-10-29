@@ -28,7 +28,7 @@ const ExpertWorkspace = named(() => import("./pages/app/ExpertWorkspace"), "Expe
 
 function PageLoading() {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center text-plum">
+    <div className="flex min-h-[50vh] items-center justify-center text-primary">
       <Spinner label="Loading" className="h-7 w-7" />
     </div>
   );

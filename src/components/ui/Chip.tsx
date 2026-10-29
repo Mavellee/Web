@@ -12,7 +12,7 @@ export function Chip({ selected, onToggle, children, disabled, role = "checkbox"
       onClick={onToggle}
       className={cx(
         "inline-flex min-h-10 items-center gap-1.5 rounded-full border px-4 text-sm font-medium transition duration-150",
-        selected ? "border-plum bg-plum text-ivory shadow-soft" : "border-[#E4D8CD] bg-white/70 text-ink-soft hover:border-plum/40 hover:text-ink",
+        selected ? "border-primary bg-primary text-surface shadow-soft" : "border-line bg-surface/70 text-ink-soft hover:border-primary/40 hover:text-ink",
         disabled && "opacity-50",
       )}
     >

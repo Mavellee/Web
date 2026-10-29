@@ -48,7 +48,7 @@ export function ReportDialog({ open, onClose, userId, name, messageId, onDone }:
         <Textarea label="Anything else we should know?" optional value={details} maxLength={1000} onChange={(e) => setDetails(e.target.value)} />
         <Checkbox label={`Also block ${name}`} checked={alsoBlock} onChange={(e) => setAlsoBlock(e.target.checked)} />
         {error && (
-          <p role="alert" className="text-sm text-rose-ink">
+          <p role="alert" className="text-sm text-error">
             {error}
           </p>
         )}
@@ -86,7 +86,7 @@ export function SafetyMenu({ userId, name, matchId, onEnded }: { userId: string;
     <div className="relative" ref={root}>
       <IconButton icon="more" label={`Safety options for ${name}`} tone="soft" aria-haspopup="menu" aria-expanded={open === "menu"} onClick={() => setOpen(open === "menu" ? null : "menu")} />
       {open === "menu" && (
-        <div role="menu" className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-2xl border hairline bg-ivory p-1.5 shadow-lift animate-rise">
+        <div role="menu" className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-2xl border hairline bg-parchment p-1.5 shadow-lift animate-rise">
           {matchId && (
             <button role="menuitem" className="block w-full rounded-xl px-3 py-2.5 text-left text-sm hover:bg-ink/5" onClick={() => setOpen("unmatch")}>
               Unmatch
@@ -95,7 +95,7 @@ export function SafetyMenu({ userId, name, matchId, onEnded }: { userId: string;
           <button role="menuitem" className="block w-full rounded-xl px-3 py-2.5 text-left text-sm hover:bg-ink/5" onClick={() => setOpen("block")}>
             Block {name}
           </button>
-          <button role="menuitem" className="block w-full rounded-xl px-3 py-2.5 text-left text-sm text-rose-ink hover:bg-rose-soft" onClick={() => setOpen("report")}>
+          <button role="menuitem" className="block w-full rounded-xl px-3 py-2.5 text-left text-sm text-accent hover:bg-rose-soft" onClick={() => setOpen("report")}>
             Report {name}
           </button>
         </div>

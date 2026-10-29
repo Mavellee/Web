@@ -37,7 +37,7 @@ export function GameSelectionSheet({ open, onClose, onStart, partnerName, highli
               const st = deckStyle(g.category);
               return (
                 <li key={g.slug} id={`game-${g.slug}`}>
-                  <article className={cx("flex h-full flex-col rounded-3xl border bg-white p-4 transition", highlight === g.slug ? "border-plum shadow-lift" : "hairline hover:shadow-soft")}>
+                  <article className={cx("flex h-full flex-col rounded-3xl border bg-surface p-4 transition", highlight === g.slug ? "border-primary shadow-lift" : "hairline hover:shadow-soft")}>
                     <div className="flex items-start gap-3">
                       <span className={cx("flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl", st.surface, st.ink)}>
                         <Icon name={st.icon} />
@@ -51,13 +51,13 @@ export function GameSelectionSheet({ open, onClose, onStart, partnerName, highli
                     </div>
                     <p className="mt-3 text-sm text-ink-soft">{g.description}</p>
                     {g.preview && (
-                      <div className="mt-3 rounded-2xl bg-ivory-deep/70 p-3" aria-label="Preview">
+                      <div className="mt-3 rounded-2xl bg-parchment-deep/70 p-3" aria-label="Preview">
                         <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-ink-muted">{modeLabel(g)}</p>
                         <p className="mt-1 font-serif text-[0.95rem] leading-snug">{g.mode === "guess" ? `Guess your match's ${g.preview.prompt}` : g.preview.prompt}</p>
                         {g.preview.options && (
                           <div className="mt-2 flex flex-wrap gap-1">
                             {g.preview.options.slice(0, 3).map((o) => (
-                              <span key={o} className="rounded-full border hairline bg-white px-2 py-0.5 text-xs">
+                              <span key={o} className="rounded-full border hairline bg-surface px-2 py-0.5 text-xs">
                                 {o}
                               </span>
                             ))}
