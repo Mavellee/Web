@@ -48,19 +48,6 @@ export function GameRoundHeader({ v, right }: { v: GameView; right?: ReactNode }
   );
 }
 
-export function GameProgressIndicator({ v }: { v: GameView }) {
-  const finished = v.history.map((h) => h.index);
-  return (
-    <ol className="flex gap-1" aria-label={`${finished.length} of ${v.totalRounds} cards played`}>
-      {Array.from({ length: v.totalRounds }, (_, i) => {
-        const done = finished.includes(i);
-        const current = i === v.currentRound && (v.status === "ACTIVE" || v.status === "PAUSED") && !done;
-        return <li key={i} className={cx("h-1 flex-1 rounded-full transition-colors duration-500", done ? "bg-primary" : current ? "bg-primary-300" : "bg-parchment-deep")} />;
-      })}
-    </ol>
-  );
-}
-
 /** Who has answered the current card — without revealing what. */
 export function ParticipantProgress({ v }: { v: GameView }) {
   const r = v.round;
@@ -70,7 +57,7 @@ export function ParticipantProgress({ v }: { v: GameView }) {
       {v.participants.map((p) => {
         const answered = p.isYou ? r.you.answered : r.partner.answered;
         return (
-          <li key={p.userId} className={cx("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1", answered ? "bg-success-soft text-success" : "bg-parchment-deep text-ink-muted")}>
+          <li key={p.userId} className={cx("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1", answered ? "bg-primary-50 text-primary-700" : "bg-parchment-deep text-ink-muted")}>
             {answered ? <Icon name="check" className="h-3.5 w-3.5" /> : <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" aria-hidden="true" />}
             {p.isYou ? "You" : p.displayName} {answered ? "answered" : "thinking…"}
           </li>
@@ -98,7 +85,7 @@ export function GameReconnectBanner({ v, selfStatus }: { v: GameView; selfStatus
   return null;
 }
 
-function answerText(a: RoundAnswer | null) {
+export function answerText(a: RoundAnswer | null) {
   if (!a) return null;
   if (a.skipped) return <em className="text-ink-muted">Passed</em>;
   return a.choice ?? a.text;
@@ -110,52 +97,3 @@ export function agreementLabel(v: GameView, agreed: boolean) {
   return agreed ? "You agreed" : "You see this differently";
 }
 
-export function AnswerReveal({ v, r }: { v: GameView; r: RoundView }) {
-  const partner = partnerOf(v);
-  const cells: [string, RoundAnswer | null][] = [
-    ["You", r.you.answer],
-    [partner?.displayName ?? "Partner", r.partner.answer],
-  ];
-  return (
-    <div className="space-y-2" aria-live="polite">
-      <div className="grid grid-cols-2 gap-2">
-        {cells.map(([who, a], i) => (
-          <div key={who} className="animate-rise rounded-2xl border hairline bg-surface p-3" style={{ animationDelay: `${i * 90}ms` }}>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-ink-muted">{who}</p>
-            <p className="mt-1 break-words text-[0.95rem]">{answerText(a)}</p>
-            {a?.note && <p className="mt-1.5 border-l-2 border-primary-200 pl-2 text-xs text-ink-soft">{a.note}</p>}
-          </div>
-        ))}
-      </div>
-      {r.agreed !== null && <p className={cx("text-center text-xs font-semibold", r.agreed ? "text-success" : "text-primary-700")}>{agreementLabel(v, r.agreed)}</p>}
-    </div>
-  );
-}
-
-/** Final or early-end summary, posted as its own timeline card. */
-export function GameResultSummary({ metadata, v }: { metadata: Record<string, unknown>; v?: GameView }) {
-  const event = metadata.event as string;
-  const name = (metadata.game as string) ?? v?.game.name ?? "Game";
-  const by = v?.participants.find((p) => p.userId === metadata.byUserId);
-  const agreements = metadata.agreements as number | null;
-  const comparable = metadata.comparableRounds as number | null;
-  const correct = metadata.correct as Record<string, number> | null;
-  const revealed = metadata.revealedRounds as number;
-  const lines: string[] = [];
-  if (agreements !== null && comparable) lines.push(`You agreed on ${agreements} out of ${comparable} card${comparable === 1 ? "" : "s"}.`);
-  if (correct && v) for (const p of v.participants) lines.push(`${p.isYou ? "You" : p.displayName} guessed ${correct[p.userId] ?? 0} right.`);
-  if (!lines.length && revealed) lines.push(`${revealed} card${revealed === 1 ? "" : "s"} answered together.`);
-
-  const title = event === "completed" ? `${name} finished` : event === "declined" ? `${by?.isYou ? "You" : (by?.displayName ?? "Your match")} passed on ${name}` : `${name} ended${by ? ` by ${by.isYou ? "you" : by.displayName}` : ""}`;
-  return (
-    <div className="mx-auto w-full max-w-sm rounded-3xl border hairline bg-surface/90 px-4 py-3 text-center">
-      <p className="text-sm font-semibold">{title}</p>
-      {lines.map((l) => (
-        <p key={l} className="text-sm text-ink-soft">
-          {l}
-        </p>
-      ))}
-      {event === "completed" && <p className="mt-1 text-xs text-ink-muted">Keep talking about anything that surprised you.</p>}
-    </div>
-  );
-}

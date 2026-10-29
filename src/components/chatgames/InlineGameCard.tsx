@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
-import { Icon } from "../ui/Icon";
 import { Skeleton } from "../ui/Skeleton";
 import { useSocket } from "../../lib/socket";
 import type { Message } from "../../lib/types";
 import { cx } from "../../lib/format";
-import { AnswerReveal, GameProgressIndicator, GameReconnectBanner, GameResultSummary, GameRoundHeader, ParticipantProgress, partnerOf, promptFor } from "./GamePieces";
-import { PrivateAnswerForm } from "./PrivateAnswerForm";
-import { isLive, type GameView, type RoundView } from "./types";
+import { AnswerRevealPanel } from "./AnswerRevealPanel";
+import { GameReconnectBanner, GameRoundHeader, partnerOf, promptFor } from "./GamePieces";
+import { GameProgress } from "./GameProgress";
+import { GameResultsSummary } from "./GameResultsSummary";
+import { GameRoundPanel } from "./GameRoundPanel";
+import { isLive, type GameView } from "./types";
 import type { ConversationGames } from "./useConversationGames";
 
 /** A game event in the conversation timeline: the live game card, or a finished-game summary. */
@@ -19,7 +21,7 @@ export function InlineGameCard({ message, games }: { message: Message; games: Co
   if (event !== "started") {
     return (
       <div className="py-2">
-        <GameResultSummary metadata={message.metadata ?? {}} v={v} />
+        <GameResultsSummary metadata={message.metadata ?? {}} v={v} />
       </div>
     );
   }
@@ -61,7 +63,7 @@ export function GameSessionPanel({ v, games }: { v: GameView; games: Conversatio
 
       {(live || expanded) && (
         <div className="mt-4 space-y-4">
-          {v.status !== "WAITING" && <GameProgressIndicator v={v} />}
+          {v.status !== "WAITING" && <GameProgress v={v} />}
           <GameReconnectBanner v={v} selfStatus={socketStatus} />
 
           {v.status === "WAITING" &&
@@ -95,7 +97,7 @@ export function GameSessionPanel({ v, games }: { v: GameView; games: Conversatio
             </div>
           )}
 
-          {v.status === "ACTIVE" && v.round && <CurrentRound v={v} r={v.round} act={act} />}
+          {v.status === "ACTIVE" && v.round && <GameRoundPanel v={v} r={v.round} act={act} />}
 
           {!live && expanded && <History v={v} />}
 
@@ -129,100 +131,15 @@ export function GameSessionPanel({ v, games }: { v: GameView; games: Conversatio
   );
 }
 
-function CurrentRound({ v, r, act }: { v: GameView; r: RoundView; act: (a: string, b?: object) => Promise<boolean> }) {
-  const prompt = promptFor(v, r);
-  const partner = partnerOf(v);
-  const me = v.participants.find((p) => p.isYou)!;
-  return (
-    <section aria-label={`Card ${r.index + 1}`} className="space-y-3">
-      <p className="font-serif text-xl leading-snug">{prompt}</p>
-      {v.rules.mode === "guess" && r.status === "OPEN" && (
-        <p className="text-xs text-ink-muted">{r.subjectUserId === me.userId ? `Answer honestly — ${partner?.displayName} will try to guess.` : `${partner?.displayName} is answering about themself. Your guess stays hidden until you both submit.`}</p>
-      )}
-      <ParticipantProgress v={v} />
-      {r.status === "OPEN" &&
-        (r.you.answered ? (
-          <p className="rounded-2xl bg-success-soft/60 px-3 py-2 text-sm text-success">Your answer is locked in. Waiting for {partner?.displayName}…</p>
-        ) : (
-          <PrivateAnswerForm
-            key={r.index}
-            v={v}
-            r={r}
-            prompt={prompt}
-            onSubmit={(a) => act("answer", { roundIndex: r.index, ...a })}
-            onPass={() => act("answer", { roundIndex: r.index, skip: true })}
-            onSkipCard={() => act("skip", { roundIndex: r.index })}
-          />
-        ))}
-      {r.status === "REVEALED" && (
-        <>
-          <AnswerReveal v={v} r={r} />
-          {v.rules.notes && r.you.answer && !r.you.answer.skipped && !r.you.answer.note && <NoteForm onSave={(note) => act("note", { roundIndex: r.index, note })} />}
-          {v.rules.mode === "guess" && r.subjectUserId === me.userId && r.partner.answer && !r.partner.answer.skipped && r.partner.answer.correct === null && (
-            <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-parchment-deep/70 p-3">
-              <p className="flex-1 text-sm">Did {partner?.displayName} get it?</p>
-              <Button size="sm" onClick={() => act("verdict", { roundIndex: r.index, correct: true })}>
-                They got it
-              </Button>
-              <Button size="sm" variant="secondary" onClick={() => act("verdict", { roundIndex: r.index, correct: false })}>
-                Not quite
-              </Button>
-            </div>
-          )}
-          {v.rules.mode === "guess" && r.partner.answer?.correct !== null && r.subjectUserId === me.userId && (
-            <p className="text-center text-xs text-ink-muted">{r.partner.answer?.correct ? `${partner?.displayName} got it right.` : "Not this time."}</p>
-          )}
-          {v.rules.mode === "guess" && r.subjectUserId !== me.userId && r.you.answer?.correct != null && (
-            <p className="text-center text-xs font-semibold text-success">{r.you.answer.correct ? "You got it right!" : `${partner?.displayName} says not quite.`}</p>
-          )}
-          <Button size="sm" className="w-full" onClick={() => act("next", { roundIndex: r.index })} icon={<Icon name="arrow" className="h-4 w-4" />}>
-            {v.currentRound + 1 >= v.totalRounds ? "See the summary" : "Next card"}
-          </Button>
-        </>
-      )}
-    </section>
-  );
-}
-
-function NoteForm({ onSave }: { onSave: (note: string) => Promise<boolean> }) {
-  const [open, setOpen] = useState(false);
-  const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
-  if (!open)
-    return (
-      <button type="button" onClick={() => setOpen(true)} className="text-xs font-semibold text-primary hover:underline">
-        Explain your choice
-      </button>
-    );
-  return (
-    <form
-      className="flex gap-2"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setBusy(true);
-        if (await onSave(note)) setOpen(false);
-        setBusy(false);
-      }}
-    >
-      <label className="sr-only" htmlFor="game-note">
-        Explain your choice
-      </label>
-      <input id="game-note" value={note} maxLength={280} onChange={(e) => setNote(e.target.value)} placeholder="Because…" className="min-w-0 flex-1 rounded-full border border-line bg-surface px-3.5 py-2 text-sm focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10" />
-      <Button type="submit" size="sm" loading={busy} disabled={!note.trim()}>
-        Share
-      </Button>
-    </form>
-  );
-}
-
 function History({ v }: { v: GameView }) {
   if (!v.history.length) return <p className="text-sm text-ink-muted">No cards were played.</p>;
   return (
     <ol className="space-y-3">
       {v.history.map((r) => (
         <li key={r.index} className="space-y-2 border-t hairline pt-3 first:border-0 first:pt-0">
+          {r.theme && <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-accent">{r.theme}</p>}
           <p className="text-sm font-semibold">{promptFor(v, r)}</p>
-          {r.status === "SKIPPED" ? <p className="text-xs text-ink-muted">Skipped</p> : <AnswerReveal v={v} r={r} />}
+          {r.status === "SKIPPED" ? <p className="text-xs text-ink-muted">Skipped — answers to this card stay private.</p> : <AnswerRevealPanel v={v} r={r} />}
         </li>
       ))}
     </ol>

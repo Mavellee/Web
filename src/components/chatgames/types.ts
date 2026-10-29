@@ -12,6 +12,8 @@ export interface RoundView {
   index: number;
   status: "OPEN" | "REVEALED" | "SKIPPED";
   prompt: string;
+  theme: string | null;
+  discussion: string | null; // only present once revealed
   options: string[] | null;
   subjectUserId: string | null;
   you: { answered: boolean; answer: RoundAnswer | null };

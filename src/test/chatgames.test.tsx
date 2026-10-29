@@ -26,7 +26,9 @@ const base = (over: Partial<GameView> = {}): GameView => ({
     index: 0,
     status: "OPEN",
     prompt: "They remember a small detail you mentioned weeks ago.",
-    options: ["Green flag", "Yellow flag", "Red flag"],
+    theme: "Effort and emotional availability",
+    discussion: null,
+    options: ["Red Flag", "Green Flag", "It Depends"],
     subjectUserId: null,
     you: { answered: false, answer: null },
     partner: { answered: true, answer: null },
@@ -46,9 +48,13 @@ describe("in-chat game card", () => {
     const { container } = renderWithProviders(<GameSessionPanel v={base()} games={gamesWith(act)} />);
     expect(screen.getByText("Bilal answered")).toBeInTheDocument();
     expect(screen.getByText(/Hidden from Bilal until you've both answered/)).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("radio", { name: /Green flag/ }));
+    await userEvent.click(screen.getByRole("radio", { name: /Green Flag/ }));
     await userEvent.click(screen.getByRole("button", { name: "Lock in answer" }));
-    expect(act).toHaveBeenCalledWith("s1", "answer", { roundIndex: 0, choice: "Green flag" });
+    expect(act).toHaveBeenCalledWith("s1", "answer", { roundIndex: 0, choice: "Green Flag" });
+    // Skipping is round-level only; there is no per-player "pass" that could trigger a reveal.
+    expect(screen.queryByRole("button", { name: /pass/i })).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: "Skip this card" }));
+    expect(act).toHaveBeenCalledWith("s1", "skip", { roundIndex: 0 });
     expect(await axeViolations(container)).toEqual([]);
   });
 
@@ -56,13 +62,14 @@ describe("in-chat game card", () => {
     mockApi({});
     const act = vi.fn(async () => true);
     const revealed = base({
-      round: { ...base().round!, status: "REVEALED", you: { answered: true, answer: { choice: "Green flag", text: null, skipped: false, note: null, correct: null } }, partner: { answered: true, answer: { choice: "Red flag", text: null, skipped: false, note: "Feels intense", correct: null } }, agreed: false },
+      round: { ...base().round!, status: "REVEALED", discussion: "What small gestures make you each feel noticed?", you: { answered: true, answer: { choice: "Green Flag", text: null, skipped: false, note: null, correct: null } }, partner: { answered: true, answer: { choice: "It Depends", text: null, skipped: false, note: "Feels intense", correct: null } }, agreed: false },
     });
     renderWithProviders(<GameSessionPanel v={revealed} games={gamesWith(act)} />);
-    expect(screen.getByText("Red flag")).toBeInTheDocument();
+    expect(screen.getByText("It Depends")).toBeInTheDocument();
+    expect(screen.getByText("What small gestures make you each feel noticed?")).toBeInTheDocument();
     expect(screen.getByText("Feels intense")).toBeInTheDocument();
     expect(screen.getByText("You see this differently")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: /Next card/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Next scenario/ }));
     expect(act).toHaveBeenCalledWith("s1", "next", { roundIndex: 0 });
   });
 
