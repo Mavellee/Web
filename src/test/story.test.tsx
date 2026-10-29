@@ -5,7 +5,6 @@ import { EditorialProfile, type EditorialData } from "../components/story/Editor
 import { DetailComposer } from "../components/story/DetailComposer";
 import { PromptWriter } from "../components/story/PromptWriter";
 import { StoryPreviewCard } from "../components/story/StoryPreview";
-import { PhotoWorkspace } from "../components/story/PhotoWorkspace";
 import { sharedSentence } from "../lib/profile";
 import { axeViolations, mockApi, renderWithProviders } from "./utils";
 
@@ -55,21 +54,44 @@ describe("editorial profile", () => {
     expect(screen.getByText("Demo profile")).toBeInTheDocument();
     expect(screen.getByText("A long drive, coffee and absolutely no plans.")).toBeInTheDocument();
     expect(screen.getByText("You both enjoy Hiking and Coffee.")).toBeInTheDocument();
-    // Photo carousel is keyboard and button accessible.
-    await userEvent.click(screen.getByRole("button", { name: "Next photo" }));
-    expect(screen.getByAltText("Photo 2 of 2 of Isha")).toBeInTheDocument();
+    // Every photo is on the page, not only the first.
+    expect(screen.getByRole("button", { name: "Open Photo 2 of Isha" })).toBeInTheDocument();
     await userEvent.click(screen.getAllByRole("button", { name: /Respond/ })[0]);
     expect(onRespond).toHaveBeenCalledWith({ kind: "PROMPT", ref: "ideal_sunday", label: "My ideal Sunday looks like…", quote: "A long drive, coffee and absolutely no plans." });
     expect(await axeViolations(container)).toEqual([]);
   });
 
-  it("omits compatibility rather than inventing it, and explains when there isn't enough information", () => {
+  it("never invents a score: without enough shared answers it says so and shows only genuine overlaps", () => {
     mockApi({});
     const { unmount } = renderWithProviders(<EditorialProfile profile={person} />);
-    expect(screen.queryByText(/Where you line up/)).toBeNull();
+    expect(screen.getByRole("heading", { name: "Still discovering your compatibility" })).toBeInTheDocument();
+    expect(screen.queryByText(/% overlap/)).toBeNull();
+    expect(screen.getByText("You both listed")).toBeInTheDocument();
     unmount();
     renderWithProviders(<EditorialProfile profile={{ ...person, compatibility: { version: "v", score: null, confidence: "not_enough_information", dimensions: [], items: [], dealbreakerConflicts: 0, sharedInterests: 0 } }} />);
-    expect(screen.getByText(/isn't enough shared information to compare yet/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Still discovering your compatibility" })).toBeInTheDocument();
+  });
+
+  it("explains a calculated score by area, with the full breakdown one tap away", async () => {
+    mockApi({});
+    const compatibility = {
+      version: "2026-10.v1",
+      score: 72,
+      confidence: "moderate" as const,
+      dimensions: [
+        { dimension: "RELATIONSHIP_GOALS", score: 100, weight: 5, compared: 1, missing: 0 },
+        { dimension: "LIFESTYLE", score: 40, weight: 3, compared: 2, missing: 0 },
+      ],
+      items: [{ key: "intentions", dimension: "RELATIONSHIP_GOALS", label: "Both open to: Exploring connections", status: "aligned" as const }],
+      dealbreakerConflicts: 0,
+      sharedInterests: 2,
+    };
+    renderWithProviders(<EditorialProfile profile={{ ...person, compatibility }} />);
+    expect(screen.getByRole("heading", { name: "72% overlap with Isha" })).toBeInTheDocument();
+    expect(screen.getByText("Both open to: Exploring connections")).toBeInTheDocument();
+    expect(screen.getByText(/can't predict how things will go/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "See compatibility details" }));
+    expect(screen.getByRole("heading", { name: "72 / 100 overlap" })).toBeInTheDocument();
   });
 });
 
@@ -101,26 +123,6 @@ describe("prompt writer", () => {
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
     expect(calls.find((c) => c.key === "PUT /profiles/me/prompts")?.body).toEqual({ prompts: [{ key: "ideal_sunday", answer: "Slow breakfast" }] });
     expect(screen.getByText("On your profile")).toBeInTheDocument();
-  });
-});
-
-describe("photo workspace", () => {
-  it("marks the main photo, offers accessible reordering and saves the new order", async () => {
-    const { calls } = mockApi({ "PUT /profiles/me/photos/order": { body: { data: { ordered: true } } } });
-    const onChange = vi.fn();
-    renderWithProviders(
-      <PhotoWorkspace
-        photos={[
-          { id: "p1", focusX: 50, focusY: 50 },
-          { id: "p2", focusX: 50, focusY: 50 },
-        ]}
-        onChange={onChange}
-      />,
-    );
-    expect(screen.getByText("Main photo")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Move photo 2 earlier" }));
-    await waitFor(() => expect(onChange).toHaveBeenCalled());
-    expect(calls.find((c) => c.key === "PUT /profiles/me/photos/order")?.body).toEqual({ ids: ["p2", "p1"] });
   });
 });
 

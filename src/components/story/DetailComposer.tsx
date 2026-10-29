@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Button } from "../ui/Button";
 import { Dialog } from "../ui/Dialog";
-import type { PublicProfile } from "../../lib/types";
+import type { MediaItem, PublicProfile } from "../../lib/types";
+import { MediaThumb } from "../media/MediaThumb";
 
 export interface DetailTarget {
-  kind: "PROMPT" | "INTEREST";
+  kind: "PROMPT" | "INTEREST" | "MEDIA";
   ref: string;
   label: string;
   quote: string;
+  media?: MediaItem;
 }
 
 /**
@@ -33,9 +35,12 @@ export function DetailComposer({ profile, detail, onClose, onSend }: { profile: 
             }
           }}
         >
-          <figure className="rounded-3xl bg-parchment-deep/70 p-4">
-            <figcaption className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">{detail.label}</figcaption>
-            <blockquote className="mt-1 font-serif text-lg leading-snug">{detail.quote}</blockquote>
+          <figure className="flex gap-4 rounded-3xl bg-parchment-deep/70 p-4">
+            {detail.media && <MediaThumb item={detail.media} alt={`${profile.displayName}'s ${detail.label.toLowerCase()}`} className="h-24 w-20 shrink-0" />}
+            <div className="min-w-0">
+              <figcaption className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">{detail.label}</figcaption>
+              {detail.quote && <blockquote className="mt-1 font-serif text-lg leading-snug">{detail.quote}</blockquote>}
+            </div>
           </figure>
           <div>
             <label htmlFor="detail-comment" className="text-sm font-semibold">

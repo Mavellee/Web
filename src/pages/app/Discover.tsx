@@ -4,22 +4,28 @@ import { AppPage, PageHeader } from "../../components/app/PageHeader";
 import { useConnectionActions } from "../../components/app/MatchDialog";
 import { EditorialProfile, type EditorialData } from "../../components/story/EditorialProfile";
 import { DetailComposer, type DetailTarget } from "../../components/story/DetailComposer";
-import { FeaturedProfile } from "./discover/FeaturedProfile";
+import { MediaThumb } from "../../components/media/MediaThumb";
 import { Button, ButtonLink } from "../../components/ui/Button";
 import { Drawer } from "../../components/ui/Drawer";
 import { Icon } from "../../components/ui/Icon";
-import { LoadMore } from "../../components/ui/LoadMore";
 import { Skeleton, LoadingBlock } from "../../components/ui/Skeleton";
 import { EmptyState, ErrorState } from "../../components/ui/States";
-import { api, ApiError } from "../../lib/api";
+import { api, ApiError, photoUrl } from "../../lib/api";
 import { useResource } from "../../lib/useResource";
 import { intentionLabel } from "../../lib/labels";
+import { mediaOf, primaryOf } from "../../lib/profile";
+import { cx } from "../../lib/format";
 import type { OwnProfile, PublicProfile } from "../../lib/types";
-import { DiscoverTile } from "./discover/DiscoverTile";
 import { activeFilterCount, DiscoverFilters, filtersFromParams, filtersToQuery, type Filters } from "./discover/DiscoverFilters";
 
 type Page = { items: PublicProfile[]; nextCursor: string | null };
 
+/**
+ * Discover, one person at a time: their whole profile — every photo and video, their words, their world and
+ * how you connect — with Pass, Start with a detail, View compatibility and Like always within reach.
+ * Profiles come from the cursor-paged discovery API; only the next person's profile data and main photo are
+ * fetched ahead, never anyone's full gallery.
+ */
 export function Discover() {
   const [params, setParams] = useSearchParams();
   const filters = useMemo(() => filtersFromParams(params), [params]);
@@ -28,23 +34,25 @@ export function Discover() {
   const interests = useResource<{ slug: string; name: string }[]>("/meta/interests");
   const interestNames = useMemo(() => new Map((interests.data ?? []).map((i) => [i.slug, i.name])), [interests.data]);
 
-  const [items, setItems] = useState<PublicProfile[]>([]);
+  const [queue, setQueue] = useState<PublicProfile[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
-  const [leaving, setLeaving] = useState<Record<string, "like" | "pass">>({});
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [picker, setPicker] = useState(false);
   const [detail, setDetail] = useState<{ profile: PublicProfile; target: DetailTarget } | null>(null);
-  const sentinel = useRef<HTMLDivElement>(null);
+  const [compatOpen, setCompatOpen] = useState(false);
+  const [full, setFull] = useState<Record<string, EditorialData | ApiError>>({});
+  const acted = useRef(new Set<string>());
+  const fetchingMore = useRef(false);
   const seq = useRef(0);
+  const top = useRef<HTMLDivElement>(null);
 
   const fetchPage = useCallback(
     async (from: string | null) => {
       const n = ++seq.current;
       const q = new URLSearchParams(query);
-      q.set("limit", "12");
+      q.set("limit", "8");
       if (from) q.set("cursor", from);
       const page = await api.get<Page>(`/discovery?${q}`);
       return n === seq.current ? page : null;
@@ -52,14 +60,14 @@ export function Discover() {
     [query],
   );
 
-  // Reload from the start whenever the filters change.
+  // Start over whenever the filters change.
   useEffect(() => {
     setLoading(true);
     setError(null);
     fetchPage(null)
       .then((page) => {
         if (!page) return;
-        setItems(page.items);
+        setQueue(page.items.filter((p) => !acted.current.has(p.id)));
         setCursor(page.nextCursor);
         setLoading(false);
       })
@@ -69,50 +77,71 @@ export function Discover() {
       });
   }, [fetchPage]);
 
-  const more = async () => {
-    setLoadingMore(true);
-    try {
-      const page = await fetchPage(cursor);
-      if (page) {
-        setItems((list) => [...list, ...page.items.filter((p) => !list.some((x) => x.id === p.id))]);
-        setCursor(page.nextCursor);
-      }
-    } catch (e) {
-      setError(e instanceof ApiError ? e : null);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
-  // Load the next page when the end of the list scrolls into view.
+  // Keep a couple of people queued; never re-add anyone already shown or acted on.
   useEffect(() => {
-    const el = sentinel.current;
-    if (!el || !cursor || loading) return;
-    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && !loadingMore && void more(), { rootMargin: "400px" });
-    io.observe(el);
-    return () => io.disconnect();
-  });
+    if (loading || !cursor || queue.length > 2 || fetchingMore.current) return;
+    fetchingMore.current = true;
+    fetchPage(cursor)
+      .then((page) => {
+        if (!page) return;
+        setQueue((q) => [...q, ...page.items.filter((p) => !acted.current.has(p.id) && !q.some((x) => x.id === p.id))]);
+        setCursor(page.nextCursor);
+      })
+      .catch(() => {})
+      .finally(() => (fetchingMore.current = false));
+  }, [queue.length, cursor, loading, fetchPage]);
 
-  const removeAfter = useCallback((id: string, kind: "like" | "pass") => {
-    setLeaving((l) => ({ ...l, [id]: kind }));
-    setOpenId((o) => (o === id ? null : o));
-    setDetail((d) => (d?.profile.id === id ? null : d));
-    setTimeout(() => setItems((list) => list.filter((p) => p.id !== id)), 450);
+  const current = queue[0] ?? null;
+  const next = queue[1] ?? null;
+
+  // The complete profile (with the full compatibility breakdown) for the current person, and the next one ahead.
+  const load = useCallback(async (id: string) => {
+    try {
+      const data = await api.get<EditorialData>(`/profiles/${id}`);
+      setFull((f) => ({ ...f, [id]: data }));
+    } catch (e) {
+      setFull((f) => ({ ...f, [id]: e instanceof ApiError ? e : new ApiError(0, "UNKNOWN", "Couldn't load this profile.") }));
+    }
   }, []);
-  const { act, busy, dialog } = useConnectionActions(removeAfter);
+  useEffect(() => {
+    if (current && !full[current.id]) void load(current.id);
+  }, [current, full, load]);
+  useEffect(() => {
+    if (!next || full[next.id]) return;
+    void load(next.id);
+    const lead = primaryOf(mediaOf(next));
+    if (lead) new Image().src = photoUrl(lead.id); // only their main photo, so it appears instantly
+  }, [next, full, load]);
+
+  const advance = useCallback((id: string) => {
+    acted.current.add(id);
+    setDetail(null);
+    setPicker(false);
+    setCompatOpen(false);
+    setQueue((q) => q.filter((p) => p.id !== id));
+    top.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }, []);
+  const { act, busy, dialog } = useConnectionActions(advance);
 
   const applyFilters = (f: Filters) => {
     setParams(filtersToQuery(f), { replace: true });
     setFiltersOpen(false);
   };
   const count = activeFilterCount(filters);
-  const open = items.find((p) => p.id === openId) ?? null;
+  const profile = current ? full[current.id] : undefined;
+  const ready = profile && !(profile instanceof ApiError) ? profile : null;
+  const connectionId = current ? `connection-${current.id}` : undefined;
+  const viewCompatibility = () => {
+    setCompatOpen(true);
+    requestAnimationFrame(() => connectionId && document.getElementById(connectionId)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
 
   return (
     <AppPage wide>
+      <div ref={top} className="scroll-mt-24" />
       <PageHeader
         title="Discover"
-        lede="People whose intentions and preferences fit with yours — in both directions."
+        lede="One person at a time — people whose intentions and preferences fit with yours, in both directions."
         actions={
           <Button variant="secondary" size="sm" onClick={() => setFiltersOpen(true)} icon={<Icon name="sliders" className="h-4 w-4" />} disabled={!me.data}>
             Filters{count > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-surface">{count}</span>}
@@ -137,18 +166,8 @@ export function Discover() {
       )}
 
       {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3" role="status" aria-label="Loading profiles">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="overflow-hidden rounded-[1.75rem] border hairline bg-surface">
-              <Skeleton className="aspect-[4/5] rounded-none" />
-              <div className="space-y-3 p-5">
-                <Skeleton className="h-5 w-1/2" />
-                <Skeleton className="h-4 w-full" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : error && !items.length ? (
+        <ProfileSkeleton />
+      ) : error && !queue.length ? (
         error.status === 400 ? (
           <EmptyState title="Finish your profile first" action={<ButtonLink to="/onboarding">Continue setup</ButtonLink>}>
             {error.message}
@@ -156,7 +175,7 @@ export function Discover() {
         ) : (
           <ErrorState message={error.message} onRetry={() => setParams(params)} />
         )
-      ) : !items.length ? (
+      ) : !current ? (
         <EmptyState
           title={count ? "No one matches these filters" : "You're all caught up"}
           action={
@@ -175,78 +194,172 @@ export function Discover() {
           {count ? "Try widening the age range or distance, or choose different interests." : "You've seen everyone who fits your preferences right now. New people join every day — or widen your age range or distance."}
         </EmptyState>
       ) : (
-        <>
-          {items[0] && (
-            <div className="mb-8 animate-rise">
-              <FeaturedProfile
-                profile={items[0]}
-                leaving={leaving[items[0].id] ?? null}
-                busy={!!busy}
-                onOpen={() => setOpenId(items[0].id)}
-                onLike={() => act(items[0], "like")}
-                onPass={() => act(items[0], "pass")}
-                onRespond={() => {
-                  const pr = items[0].prompts?.[0];
-                  if (pr) setDetail({ profile: items[0], target: { kind: "PROMPT", ref: pr.key, label: pr.text, quote: pr.answer } });
-                }}
+        <div className="pb-36 md:pb-28">
+          {profile instanceof ApiError ? (
+            profile.status === 404 ? (
+              <EmptyState title="This profile is no longer available" action={<Button onClick={() => advance(current.id)}>Show the next person</Button>} />
+            ) : (
+              <ErrorState message={profile.message} onRetry={() => setFull((f) => Object.fromEntries(Object.entries(f).filter(([k]) => k !== current.id)))} />
+            )
+          ) : !ready ? (
+            <ProfileSkeleton />
+          ) : (
+            <div key={ready.id} className="animate-rise">
+              <EditorialProfile
+                profile={ready}
+                onRespond={(t) => setDetail({ profile: current, target: t })}
+                connectionId={connectionId}
+                connectionOpen={compatOpen}
+                onConnectionToggle={setCompatOpen}
+                actions={
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Button variant="secondary" size="lg" onClick={() => act(current, "pass")} disabled={!!busy} icon={<Icon name="close" />}>
+                      Pass
+                    </Button>
+                    <Button size="lg" onClick={() => act(current, "like")} disabled={!!busy} icon={<Icon name="heart" />}>
+                      Like {ready.displayName}
+                    </Button>
+                  </div>
+                }
               />
             </div>
           )}
-          <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {items.slice(1).map((p) => (
-              <li key={p.id} className="animate-rise">
-                <DiscoverTile
-                  profile={p}
-                  leaving={leaving[p.id] ?? null}
-                  busy={busy?.startsWith(p.id) ? (busy.endsWith("like") ? "like" : "pass") : null}
-                  onOpen={() => setOpenId(p.id)}
-                  onLike={() => act(p, "like")}
-                  onPass={() => act(p, "pass")}
-                />
-              </li>
-            ))}
-          </ul>
-          {/* Infinite scroll, with a button as an accessible fallback. */}
-          <div ref={sentinel} aria-hidden="true" />
-          <LoadMore hasMore={!!cursor} loading={loadingMore} onClick={more} label="Show more people" />
-          <p className="mt-8 text-center text-xs text-ink-muted">Likes stay private until they're mutual.</p>
-        </>
+          <p className="mt-10 text-center text-xs text-ink-muted">Likes stay private until they're mutual.</p>
+        </div>
+      )}
+
+      {current && ready && (
+        <ActionBar
+          name={ready.displayName}
+          busy={busy}
+          id={current.id}
+          onPass={() => act(current, "pass")}
+          onLike={() => act(current, "like")}
+          onDetail={() => setPicker(true)}
+          onCompat={viewCompatibility}
+        />
       )}
 
       <Drawer open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filters">
         <div className="p-6">{me.data ? <DiscoverFilters me={me.data} value={filters} onApply={applyFilters} interestNames={interestNames} /> : <LoadingBlock />}</div>
       </Drawer>
-      <ProfileDrawer profile={open} onClose={() => setOpenId(null)} onAct={(kind) => open && act(open, kind)} onRespond={(t) => open && setDetail({ profile: open, target: t })} busy={!!busy} />
+      {current && ready && (
+        <DetailPicker
+          open={picker}
+          profile={ready}
+          onClose={() => setPicker(false)}
+          onPick={(t) => {
+            setPicker(false);
+            setDetail({ profile: current, target: t });
+          }}
+        />
+      )}
       {detail && <DetailComposer profile={detail.profile} detail={detail.target} onClose={() => setDetail(null)} onSend={(d, comment) => act(detail.profile, "like", { kind: d.kind, ref: d.ref, comment: comment || undefined })} />}
       {dialog}
     </AppPage>
   );
 }
 
-function ProfileDrawer({ profile, onClose, onAct, onRespond, busy }: { profile: PublicProfile | null; onClose: () => void; onAct: (k: "like" | "pass") => void; onRespond: (t: DetailTarget) => void; busy: boolean }) {
-  // Full profile (with the compatibility explanation) is loaded on open.
-  const detail = useResource<EditorialData>(profile ? `/profiles/${profile.id}` : null);
+/** Always-visible actions for the person on screen, above the mobile tab bar and clear of the profile content. */
+function ActionBar({ name, id, busy, onPass, onLike, onDetail, onCompat }: { name: string; id: string; busy: string | null; onPass: () => void; onLike: () => void; onDetail: () => void; onCompat: () => void }) {
+  const working = busy?.startsWith(id) ?? false;
   return (
-    <Drawer
-      open={!!profile}
-      onClose={onClose}
-      title={profile?.displayName ?? ""}
-      footer={
-        profile && (
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="secondary" size="lg" onClick={() => onAct("pass")} disabled={busy} icon={<Icon name="close" />}>
-              Pass
-            </Button>
-            <Button size="lg" onClick={() => onAct("like")} disabled={busy} icon={<Icon name="heart" />}>
-              Like
-            </Button>
-          </div>
-        )
-      }
-    >
-      <div className="p-6">
-        {detail.loading || !detail.data ? detail.error ? <ErrorState message={detail.error.message} onRetry={detail.reload} /> : <LoadingBlock label="Loading profile" /> : <EditorialProfile profile={detail.data} onRespond={onRespond} />}
+    <div className="pointer-events-none fixed inset-x-0 bottom-[4.75rem] z-20 flex justify-center px-4 md:bottom-6 md:left-[17rem]">
+      <div role="toolbar" aria-label={`Actions for ${name}`} className="pointer-events-auto flex items-center gap-1.5 rounded-full border hairline bg-surface/95 p-1.5 shadow-lift backdrop-blur">
+        <button type="button" onClick={onPass} disabled={working} aria-label={`Pass on ${name}`} className="flex h-12 w-12 items-center justify-center rounded-full text-ink-soft transition hover:bg-ink/5 hover:text-ink disabled:opacity-50">
+          <Icon name="close" className="h-6 w-6" />
+        </button>
+        <button type="button" onClick={onDetail} disabled={working} aria-label="Start with a detail" className="flex h-12 items-center gap-2 rounded-full px-3 text-sm font-semibold text-primary transition hover:bg-primary-50 disabled:opacity-50 sm:px-4">
+          <Icon name="chat" className="h-5 w-5" />
+          <span className="hidden sm:inline" aria-hidden="true">
+            Start with a detail
+          </span>
+        </button>
+        <button type="button" onClick={onCompat} aria-label="View compatibility" className="flex h-12 items-center gap-2 rounded-full px-3 text-sm font-semibold text-primary transition hover:bg-primary-50 sm:px-4">
+          <Icon name="spark" className="h-5 w-5" />
+          <span className="hidden sm:inline" aria-hidden="true">
+            Compatibility
+          </span>
+        </button>
+        <button type="button" onClick={onLike} disabled={working} className="flex h-12 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-surface shadow-soft transition hover:bg-primary-hover disabled:opacity-50">
+          <Icon name="heart" className="h-5 w-5" /> Like
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** "Start with a detail": choose a photo, video, prompt or interest to respond to. */
+function DetailPicker({ open, profile, onClose, onPick }: { open: boolean; profile: EditorialData; onClose: () => void; onPick: (t: DetailTarget) => void }) {
+  const media = mediaOf(profile);
+  return (
+    <Drawer open={open} onClose={onClose} variant="sheet" title="Start with a detail" description={`Respond to something specific. ${profile.displayName} sees it with your like, and it becomes your first message if you match.`}>
+      <div className="space-y-6 p-6">
+        {media.length > 0 && (
+          <section>
+            <h3 className="font-sans text-sm font-semibold">Photos and videos</h3>
+            <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {media.map((m, k) => (
+                <li key={m.id}>
+                  <button
+                    type="button"
+                    onClick={() => onPick({ kind: "MEDIA", ref: m.id, label: m.kind === "VIDEO" ? "Video" : "Photo", quote: m.caption ?? "", media: m })}
+                    className="block w-full rounded-2xl text-left transition hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-label={`Respond to ${m.kind === "VIDEO" ? "video" : "photo"} ${k + 1}${m.caption ? `: ${m.caption}` : ""}`}
+                  >
+                    <MediaThumb item={m} alt="" className="aspect-[4/5] w-full" />
+                    {m.caption && <p className="mt-1 line-clamp-2 text-xs text-ink-soft">{m.caption}</p>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {(profile.prompts?.length ?? 0) > 0 && (
+          <section>
+            <h3 className="font-sans text-sm font-semibold">Their words</h3>
+            <ul className="mt-3 space-y-2">
+              {profile.prompts!.map((pr) => (
+                <li key={pr.key}>
+                  <button type="button" onClick={() => onPick({ kind: "PROMPT", ref: pr.key, label: pr.text, quote: pr.answer })} className="w-full rounded-2xl border hairline bg-surface p-4 text-left transition hover:border-primary/40">
+                    <p className="text-xs font-semibold text-ink-muted">{pr.text}</p>
+                    <p className="mt-1 font-serif text-lg leading-snug">{pr.answer}</p>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {profile.interests.length > 0 && (
+          <section>
+            <h3 className="font-sans text-sm font-semibold">Interests</h3>
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {profile.interests.map((i) => (
+                <li key={i.slug}>
+                  <button type="button" onClick={() => onPick({ kind: "INTEREST", ref: i.slug, label: "Interest", quote: i.name })} className={cx("rounded-full px-3.5 py-1.5 text-sm transition", i.shared ? "bg-primary text-surface" : "border hairline bg-surface hover:border-primary/40")}>
+                    {i.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </Drawer>
+  );
+}
+
+function ProfileSkeleton() {
+  return (
+    <div role="status" aria-label="Loading profile" className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-end">
+      <Skeleton className="aspect-[4/5] w-full rounded-[2rem]" />
+      <div className="space-y-4">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-7 w-2/3" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-24 w-full rounded-2xl" />
+      </div>
+    </div>
   );
 }

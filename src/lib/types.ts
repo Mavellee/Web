@@ -65,6 +65,7 @@ export interface PublicProfile {
   sharedInterestCount: number;
   photoIds: string[];
   photos?: PhotoRef[];
+  media?: MediaItem[];
   prompts?: PromptAnswer[];
   isDemo?: boolean;
   isApprovedExpert: boolean;
@@ -75,6 +76,34 @@ export interface PhotoRef {
   id: string;
   focusX: number;
   focusY: number;
+  caption?: string | null;
+}
+
+/** One gallery item: a photo or a short video, with its own optional caption. */
+export interface MediaItem {
+  id: string;
+  kind: "IMAGE" | "VIDEO";
+  caption: string | null;
+  isPrimary: boolean;
+  focusX: number;
+  focusY: number;
+  durationMs: number | null;
+  hasPoster: boolean;
+}
+
+/** The owner's view of an item, including moderation state and position. */
+export interface OwnMediaItem extends MediaItem {
+  position: number;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+}
+
+export interface MediaLimits {
+  maxPhotos: number;
+  maxVideos: number;
+  captionMax: number;
+  videoMaxSeconds: number;
+  videoMaxBytes: number;
+  photoMaxBytes: number;
 }
 
 export interface PromptAnswer {
@@ -90,10 +119,12 @@ export interface PromptDef {
 }
 
 export interface LikeDetail {
-  kind: "PROMPT" | "INTEREST";
+  kind: "PROMPT" | "INTEREST" | "MEDIA";
   ref: string;
   label: string;
   quote: string;
+  mediaId?: string;
+  mediaKind?: "IMAGE" | "VIDEO";
 }
 
 export interface OwnProfile {
@@ -114,7 +145,11 @@ export interface OwnProfile {
   isPublished: boolean;
   isDiscoverable: boolean;
   discoveryPaused: boolean;
-  photos: { id: string; position: number; status: string; focusX: number; focusY: number }[];
+  /** Images only, primary first. */
+  photos: OwnMediaItem[];
+  /** The whole gallery (photos and videos) in display order. */
+  media: OwnMediaItem[];
+  mediaLimits: MediaLimits;
   prompts: PromptAnswer[];
   dateOfBirth: string | null;
 }

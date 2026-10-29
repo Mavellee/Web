@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppPage, PageHeader } from "../../components/app/PageHeader";
 import { AiPanel } from "../../components/app/AiPanel";
 import { BasicsSection, IntentionSection, PreferencesSection } from "../../components/profile/ProfileSections";
-import { PhotoWorkspace } from "../../components/story/PhotoWorkspace";
+import { MediaWorkspace } from "../../components/story/MediaWorkspace";
 import { PromptWriter } from "../../components/story/PromptWriter";
 import { InterestPicker } from "../../components/story/InterestPicker";
 import { StoryPreviewCard, toPreview } from "../../components/story/StoryPreview";
@@ -89,7 +89,7 @@ export function MyProfile() {
                   </div>
                 </>
               )}
-              {tab === "photos" && <PhotoWorkspace photos={data.photos} onChange={reload} />}
+              {tab === "photos" && <MediaWorkspace media={data.media} limits={data.mediaLimits} onChange={reload} />}
               {tab === "words" && <PromptWriter answers={data.prompts} onSaved={saved} />}
               {tab === "little" && <InterestPicker selected={data.interests} onSaved={saved} />}
               {tab === "intentions" && <IntentionSection profile={data} onSaved={saved} />}

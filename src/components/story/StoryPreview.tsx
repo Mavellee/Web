@@ -3,6 +3,8 @@ import { Icon } from "../ui/Icon";
 import { IntentionBadges } from "../profile/ProfileCard";
 import type { OwnProfile, PublicProfile } from "../../lib/types";
 
+const published = (m: { status: string }) => m.status === "APPROVED";
+
 /** Builds the same shape other members receive, from the member's own saved data. */
 export function toPreview(p: OwnProfile, id: string, interests: { slug: string; name: string }[]): Omit<PublicProfile, "compatibility"> {
   return {
@@ -17,8 +19,10 @@ export function toPreview(p: OwnProfile, id: string, interests: { slug: string; 
     intentions: p.intentions,
     interests: p.interests.map((slug) => ({ slug, name: interests.find((i) => i.slug === slug)?.name ?? slug, shared: false })),
     sharedInterestCount: 0,
-    photoIds: p.photos.map((x) => x.id),
-    photos: p.photos.map((x) => ({ id: x.id, focusX: x.focusX, focusY: x.focusY })),
+    // Exactly what others receive: approved items only, photos primary-first, the gallery in your order.
+    photoIds: p.photos.filter(published).map((x) => x.id),
+    photos: p.photos.filter(published).map((x) => ({ id: x.id, focusX: x.focusX, focusY: x.focusY, caption: x.caption })),
+    media: p.media.filter(published).map(({ id, kind, caption, isPrimary, focusX, focusY, durationMs, hasPoster }) => ({ id, kind, caption, isPrimary, focusX, focusY, durationMs, hasPoster })),
     prompts: p.prompts,
     isApprovedExpert: false,
   };

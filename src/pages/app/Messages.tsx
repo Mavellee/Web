@@ -9,6 +9,7 @@ import { useAuth } from "../../lib/auth";
 import { useSocket, useSocketEvent } from "../../lib/socket";
 import { useResource } from "../../lib/useResource";
 import { clockTime, cx, dayLabel, timeAgo } from "../../lib/format";
+import { DetailMediaThumb } from "../../components/media/MediaThumb";
 import type { ConversationSummary, Message, PublicProfile } from "../../lib/types";
 import { Avatar } from "../../components/ui/Photo";
 import { Button, ButtonLink } from "../../components/ui/Button";
@@ -383,11 +384,12 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                       <div className={cx("max-w-[80%] rounded-3xl px-4 py-2.5 sm:max-w-[65%]", mine ? "rounded-br-lg bg-primary text-surface" : "rounded-bl-lg bg-surface text-ink shadow-soft", m.pending && "opacity-70")}>
                         {(() => {
                           // A first message that started from a profile detail quotes it.
-                          const d = m.metadata?.detail as { label: string; quote: string; kind: string } | undefined;
+                          const d = m.metadata?.detail as { label: string; quote: string; kind: string; mediaId?: string; mediaKind?: "IMAGE" | "VIDEO" } | undefined;
                           return d ? (
                             <figure className={cx("mb-2 rounded-2xl px-3 py-2 text-xs", mine ? "bg-parchment/15 text-surface/90" : "bg-parchment-deep text-ink-soft")}>
-                              <figcaption className="font-semibold">{d.kind === "PROMPT" ? d.label : "Interest"}</figcaption>
-                              <blockquote className="mt-0.5 font-serif text-sm">{d.quote}</blockquote>
+                              <figcaption className="font-semibold">{d.kind === "PROMPT" ? d.label : d.kind === "MEDIA" ? `About ${mine ? "their" : "your"} ${d.label.toLowerCase()}` : "Interest"}</figcaption>
+                              {d.kind === "MEDIA" && d.mediaId && <DetailMediaThumb id={d.mediaId} kind={d.mediaKind} className="my-1.5 h-20 w-16" />}
+                              {d.quote && <blockquote className="mt-0.5 font-serif text-sm">{d.quote}</blockquote>}
                             </figure>
                           ) : null;
                         })()}

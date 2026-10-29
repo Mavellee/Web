@@ -16,7 +16,7 @@ export function useConnectionActions(onDone?: (id: string, kind: "like" | "pass"
   const toast = useToast();
 
   const act = useCallback(
-    async (profile: PublicProfile, kind: "like" | "pass", detail?: { kind: "PROMPT" | "INTEREST"; ref: string; comment?: string }) => {
+    async (profile: PublicProfile, kind: "like" | "pass", detail?: { kind: "PROMPT" | "INTEREST" | "MEDIA"; ref: string; comment?: string }) => {
       setBusy(`${profile.id}:${kind}`);
       try {
         if (kind === "like") {

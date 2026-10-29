@@ -27,7 +27,9 @@ const me: OwnProfile = {
   isPublished: true,
   isDiscoverable: true,
   discoveryPaused: false,
-  photos: [{ id: "p1", position: 0, status: "APPROVED", focusX: 50, focusY: 50 }],
+  photos: [{ id: "p1", kind: "IMAGE", position: 0, status: "APPROVED", caption: null, isPrimary: true, focusX: 50, focusY: 50, durationMs: null, hasPoster: false }],
+  media: [{ id: "p1", kind: "IMAGE", position: 0, status: "APPROVED", caption: null, isPrimary: true, focusX: 50, focusY: 50, durationMs: null, hasPoster: false }],
+  mediaLimits: { maxPhotos: 6, maxVideos: 2, captionMax: 200, videoMaxSeconds: 30, videoMaxBytes: 52428800, photoMaxBytes: 5242880 },
   prompts: [],
   dateOfBirth: "1997-05-14",
 };

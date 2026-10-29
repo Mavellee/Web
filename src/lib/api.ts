@@ -42,3 +42,6 @@ export const api = {
 };
 
 export const photoUrl = (id: string) => `/api/photos/${id}`;
+/** Videos stream from the same URL as photos; their still frame is served separately. */
+export const mediaUrl = photoUrl;
+export const posterUrl = (id: string) => `/api/photos/${id}/poster`;

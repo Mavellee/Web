@@ -10,6 +10,7 @@ import { EmptyState, ErrorState } from "../../components/ui/States";
 import { Tabs } from "../../components/ui/Tabs";
 import { useResource } from "../../lib/useResource";
 import { timeAgo } from "../../lib/format";
+import { DetailMediaThumb } from "../../components/media/MediaThumb";
 import type { LikeDetail, PublicProfile } from "../../lib/types";
 
 type LikeEntry = { likedAt: string; profile: PublicProfile; detail: LikeDetail | null; comment: string | null };
@@ -77,9 +78,10 @@ export function Likes() {
                 {detail && (
                   <figure className="mt-4 rounded-2xl bg-rose-mist/60 p-3">
                     <figcaption className="text-xs text-ink-muted">
-                      {tab === "received" ? "Responded to your" : "You responded to their"} {detail.kind === "PROMPT" ? `answer: ${detail.label}` : "interest"}
+                      {tab === "received" ? "Responded to your" : "You responded to their"} {detail.kind === "PROMPT" ? `answer: ${detail.label}` : detail.kind === "MEDIA" ? detail.label.toLowerCase() : "interest"}
                     </figcaption>
-                    <blockquote className="mt-0.5 font-serif leading-snug">{detail.quote}</blockquote>
+                    {detail.kind === "MEDIA" && detail.mediaId && <DetailMediaThumb id={detail.mediaId} kind={detail.mediaKind} className="mt-2 h-24 w-20" />}
+                    {detail.quote && <blockquote className="mt-0.5 font-serif leading-snug">{detail.quote}</blockquote>}
                     {comment && <p className="mt-2 border-t border-primary/10 pt-2 text-sm text-ink">“{comment}”</p>}
                   </figure>
                 )}

@@ -8,7 +8,7 @@ import { LoadingBlock } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/ui/States";
 import { BasicsSection, IntentionSection, PreferencesSection } from "../../components/profile/ProfileSections";
 import { QuestionCard, type Question } from "../../components/compat/QuestionCard";
-import { PhotoWorkspace } from "../../components/story/PhotoWorkspace";
+import { MediaWorkspace } from "../../components/story/MediaWorkspace";
 import { PromptWriter } from "../../components/story/PromptWriter";
 import { InterestPicker } from "../../components/story/InterestPicker";
 import { EditorialProfile } from "../../components/story/EditorialProfile";
@@ -120,8 +120,8 @@ export function Onboarding() {
                 </Step>
               )}
               {step === "photos" && (
-                <Step title="Show your world." lede="Your first photo is the one people see first. Drag to reorder and adjust how each one is framed.">
-                  <PhotoWorkspace photos={data.photos} onChange={() => (void reload(), setSavedAt(new Date()))} />
+                <Step title="Show your world." lede="Add photos — and a short video if you like. Give any of them a caption, put them in your order, and choose your main photo. Only photos are required.">
+                  <MediaWorkspace media={data.media} limits={data.mediaLimits} onChange={() => (void reload(), setSavedAt(new Date()))} />
                   <Nav back={back("intro")} next={<Button size="lg" disabled={!data.photos.length} onClick={() => go("words")}>Continue</Button>} hint={!data.photos.length ? "Add at least one photo of yourself to continue." : undefined} />
                 </Step>
               )}
