@@ -93,7 +93,9 @@ export interface Message {
   id: string;
   conversationId: string;
   senderId: string | null;
-  kind: "TEXT" | "IMAGE" | "SYSTEM";
+  kind: "TEXT" | "IMAGE" | "SYSTEM" | "GAME";
+  gameSessionId?: string | null;
+  metadata?: Record<string, unknown> | null;
   body: string | null;
   hasAttachment: boolean;
   clientId: string | null;

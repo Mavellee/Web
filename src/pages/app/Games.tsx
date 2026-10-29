@@ -5,7 +5,6 @@ import { AiPanel } from "../../components/app/AiPanel";
 import { Button } from "../../components/ui/Button";
 import { Chip } from "../../components/ui/Chip";
 import { Dialog } from "../../components/ui/Dialog";
-import { Select } from "../../components/ui/Field";
 import { Icon } from "../../components/ui/Icon";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/ui/States";
@@ -16,14 +15,13 @@ import { deckStyle } from "./games/decks";
 
 type Game = { slug: string; name: string; description: string; category: string; questionCount: number };
 type ActiveSession = { id: string; game: { name: string; category: string }; progress: { current: number; total: number }; withName: string | null; isShared: boolean };
-type MatchLite = { id: string; profile: { displayName: string } };
+type MatchLite = { id: string; conversationId: string | null; profile: { displayName: string } };
 
 export function Games() {
   const games = useResource<Game[]>("/games");
   const sessions = useResource<ActiveSession[]>("/games/sessions");
   const matches = useResource<MatchLite[]>("/matches");
   const [picked, setPicked] = useState<Game | null>(null);
-  const [partner, setPartner] = useState("");
   const [count, setCount] = useState(8);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +32,7 @@ export function Games() {
     setBusy(true);
     setError(null);
     try {
-      const s = await api.post<{ id: string }>("/games/sessions", { gameSlug: picked.slug, matchId: partner || undefined, questionCount: count });
+      const s = await api.post<{ id: string }>("/games/sessions", { gameSlug: picked.slug, questionCount: count });
       navigate(`/app/games/${s.id}`);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Couldn't start the game.");
@@ -45,7 +43,7 @@ export function Games() {
 
   return (
     <AppPage wide>
-      <PageHeader title="Games" lede="Curated question decks for real conversations. Play on your own to reflect, or invite a match. Skip anything, any time." />
+      <PageHeader title="Games" lede="Curated question decks. Play with a match right inside your conversation, or on your own here to reflect. Skip anything, any time." />
 
       {!!sessions.data?.length && (
         <section aria-labelledby="in-progress" className="mb-12">
@@ -64,7 +62,7 @@ export function Games() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{s.game.name}</span>
                       <span className="text-sm text-ink-muted">
-                        {s.isShared ? `With ${s.withName}` : "Solo"} · {s.progress.current}/{s.progress.total}
+                        Solo · {s.progress.current}/{s.progress.total}
                       </span>
                     </span>
                     <Icon name="arrow" className="h-5 w-5 text-plum" />
@@ -116,14 +114,29 @@ export function Games() {
 
       <Dialog open={!!picked} onClose={() => setPicked(null)} title={picked?.name ?? ""} description={picked?.description}>
         <div className="space-y-5">
-          <Select label="Who's playing?" value={partner} onChange={(e) => setPartner(e.target.value)} hint={partner ? "They'll get an invitation. Joining is optional for them." : matches.data?.length ? "Play solo, or with someone you're sitting with." : "Match with someone to play together in the app."}>
-            <option value="">Just me (or together in person)</option>
-            {matches.data?.map((m) => (
-              <option key={m.id} value={m.id}>
-                With {m.profile.displayName}
-              </option>
-            ))}
-          </Select>
+          {matches.data && matches.data.filter((m) => m.conversationId).length > 0 && (
+            <section aria-labelledby="play-with">
+              <h3 id="play-with" className="font-sans text-sm font-semibold">
+                Play with a match
+              </h3>
+              <p className="text-xs text-ink-muted">Opens your conversation — you'll play together right in the chat.</p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {matches.data
+                  .filter((m) => m.conversationId)
+                  .map((m) => (
+                    <li key={m.id}>
+                      <Button size="sm" variant="secondary" onClick={() => navigate(`/app/messages/${m.conversationId}?play=${picked?.slug}`)}>
+                        With {m.profile.displayName}
+                      </Button>
+                    </li>
+                  ))}
+              </ul>
+            </section>
+          )}
+          <div className="border-t hairline pt-4">
+            <h3 className="font-sans text-sm font-semibold">Or play solo</h3>
+            <p className="text-xs text-ink-muted">Reflect on your own, or pass the phone to someone you're with.</p>
+          </div>
           <fieldset>
             <legend className="text-sm font-semibold">How many cards?</legend>
             <div role="radiogroup" className="mt-3 flex gap-2">
@@ -139,8 +152,8 @@ export function Games() {
               {error}
             </p>
           )}
-          <Button className="w-full" size="lg" onClick={start} loading={busy}>
-            Start game
+          <Button className="w-full" size="lg" variant="secondary" onClick={start} loading={busy}>
+            Start solo game
           </Button>
         </div>
       </Dialog>

@@ -1,5 +1,9 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { ChatGameLauncher } from "../../components/chatgames/ChatGameLauncher";
+import { GameSelectionSheet } from "../../components/chatgames/GameSelectionSheet";
+import { InlineGameCard } from "../../components/chatgames/InlineGameCard";
+import { useConversationGames } from "../../components/chatgames/useConversationGames";
 import { api, ApiError } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
 import { useSocket, useSocketEvent } from "../../lib/socket";
@@ -95,6 +99,9 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
   const navigate = useNavigate();
   const toast = useToast();
   const header = useResource<Header>(`/conversations/${id}`);
+  const games = useConversationGames(id);
+  const [params, setParams] = useSearchParams();
+  const [launcherOpen, setLauncherOpen] = useState(!!params.get("play"));
   const [messages, setMessages] = useState<Message[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -362,6 +369,11 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                         {dayLabel(m.createdAt)}
                       </li>
                     )}
+                    {m.kind === "GAME" ? (
+                      <li>
+                        <InlineGameCard message={m} games={games} />
+                      </li>
+                    ) : (
                     <li className={cx("group flex items-end gap-2", mine ? "justify-end" : "justify-start")}>
                       {!mine && !m.pending && (
                         <button type="button" onClick={() => setReporting(m)} className="order-last rounded-full p-1 text-ink-muted opacity-0 transition hover:text-rose-ink focus:opacity-100 group-hover:opacity-100" aria-label="Report this message">
@@ -376,6 +388,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                         </p>
                       </div>
                     </li>
+                    )}
                     {m.failed && (
                       <li className="flex justify-end">
                         <button type="button" onClick={() => retry(m)} className="text-xs font-semibold text-rose-ink underline">
@@ -404,6 +417,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
           <AiPanel className="mb-3" title="Need an opener?" request={{ feature: "conversation_starter", matchId: header.data.matchId }} onUse={(s) => setText(s)} />
         )}
         <form onSubmit={send} className="flex items-end gap-2">
+          <ChatGameLauncher onOpen={() => setLauncherOpen(true)} liveSessionId={games.live?.id ?? null} />
           <button type="button" onClick={() => fileInput.current?.click()} disabled={uploading} className="mb-1 rounded-full p-2.5 text-ink-soft hover:bg-ink/5" aria-label="Send a photo">
             {uploading ? <Spinner className="h-5 w-5" /> : <Icon name="image" />}
           </button>
@@ -436,6 +450,28 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
           </Button>
         </form>
       </div>
+      {other && (
+        <GameSelectionSheet
+          open={launcherOpen}
+          onClose={() => {
+            setLauncherOpen(false);
+            if (params.get("play")) setParams({}, { replace: true });
+          }}
+          partnerName={other.displayName}
+          highlight={params.get("play")}
+          onStart={async (slug) => {
+            try {
+              const v = await games.start(slug);
+              stickToBottom.current = true;
+              setTimeout(() => document.getElementById(`game-card-${v.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
+              return true;
+            } catch (e) {
+              toast(e instanceof ApiError ? e.message : "Couldn't start the game.", "error");
+              return false;
+            }
+          }}
+        />
+      )}
       {reporting && other && <ReportDialog open onClose={() => setReporting(null)} userId={other.id} name={other.displayName} messageId={reporting.id} onDone={(blocked) => blocked && navigate("/app/messages")} />}
     </div>
   );
