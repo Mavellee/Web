@@ -132,9 +132,7 @@ export function AppShell() {
             <Icon name="games" />
           </Link>
         </div>
-        <Link to="/app/discover" className="rounded-full px-2 font-serif text-[1.9rem] font-medium leading-none tracking-tight text-primary" aria-label="Knot home">
-          Knot
-        </Link>
+        <Logo to="/app/discover" size="sm" />
         <div className="flex items-center justify-end">
           <Link to="/app/notifications" className="relative rounded-full p-2.5 text-ink-soft" aria-label={`Notifications${unreadNotes ? `, ${unreadNotes} unread` : ""}`}>
             <Icon name="bell" />

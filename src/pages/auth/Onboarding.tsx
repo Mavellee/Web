@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/Button";
 import { Drawer } from "../../components/ui/Drawer";
 import { Icon } from "../../components/ui/Icon";
+import { LogoLockup } from "../../components/ui/Logo";
 import { LoadingBlock } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/ui/States";
 import { BasicsSection, IntentionSection, PreferencesSection } from "../../components/profile/ProfileSections";
@@ -80,7 +81,7 @@ export function Onboarding() {
               </button>
             )}
           </div>
-          <span className="font-serif text-[1.9rem] font-medium leading-none tracking-tight text-primary">Knot</span>
+          <LogoLockup size="sm" />
           <div className="flex items-center justify-end gap-3 text-sm">
             <SaveIndicator at={savedAt} />
             {step !== "preview" && preview && (

@@ -1,4 +1,5 @@
-@import "@fontsource-variable/fraunces";
+/* Full Fraunces axes (opsz, wght, SOFT, WONK): the soft display shapes used by headings and the wordmark. */
+@import "@fontsource-variable/fraunces/full.css";
 @import "@fontsource-variable/manrope";
 
 @tailwind base;
