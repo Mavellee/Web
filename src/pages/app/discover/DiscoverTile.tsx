@@ -4,6 +4,7 @@ import { Icon } from "../../../components/ui/Icon";
 import { Photo } from "../../../components/ui/Photo";
 import { IntentionBadges } from "../../../components/profile/ProfileCard";
 import { cx } from "../../../lib/format";
+import { photosOf, sharedSentence } from "../../../lib/profile";
 import type { CompatSummary, PublicProfile } from "../../../lib/types";
 
 export function DiscoverTile({ profile: p, onOpen, onLike, onPass, busy, leaving }: { profile: PublicProfile; onOpen: () => void; onLike: () => void; onPass: () => void; busy: "like" | "pass" | null; leaving: "like" | "pass" | null }) {
@@ -18,7 +19,8 @@ export function DiscoverTile({ profile: p, onOpen, onLike, onPass, busy, leaving
       )}
     >
       <button type="button" onClick={onOpen} className="relative block text-left" aria-label={`View ${p.displayName}'s full profile`}>
-        <Photo id={p.photoIds[0]} alt="" className="aspect-[4/5] w-full" rounded="rounded-none" position="object-top" />
+        <Photo id={photosOf(p)[0]?.id} focus={photosOf(p)[0]} alt="" className="aspect-[4/5] w-full" rounded="rounded-none" />
+        {p.isDemo && <span className="absolute left-3 top-3 rounded-full bg-ivory/95 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink">Demo profile</span>}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 via-ink/15 to-transparent px-5 pb-4 pt-16 text-ivory">
           <h2 className="font-serif text-[1.65rem] leading-tight text-ivory">
             {p.displayName}
@@ -41,7 +43,15 @@ export function DiscoverTile({ profile: p, onOpen, onLike, onPass, busy, leaving
           <IntentionBadges intentions={p.intentions} />
           {p.isApprovedExpert && <Badge tone="gold">Knot expert</Badge>}
         </div>
-        {p.bio && <p className="line-clamp-2 text-sm leading-relaxed text-ink-soft">{p.bio}</p>}
+        {p.prompts?.[0] ? (
+          <figure>
+            <figcaption className="text-xs text-ink-muted">{p.prompts[0].text}</figcaption>
+            <blockquote className="mt-0.5 line-clamp-2 font-serif text-[1.05rem] leading-snug">{p.prompts[0].answer}</blockquote>
+          </figure>
+        ) : (
+          p.bio && <p className="line-clamp-2 text-sm leading-relaxed text-ink-soft">{p.bio}</p>
+        )}
+        {sharedSentence(p) && <p className="text-xs font-semibold text-sage-ink">{sharedSentence(p)}</p>}
         {p.interests.length > 0 && (
           <ul className="flex flex-wrap gap-1.5" aria-label="Interests">
             {p.interests.slice(0, 3).map((i) => (

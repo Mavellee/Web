@@ -10,9 +10,9 @@ import { EmptyState, ErrorState } from "../../components/ui/States";
 import { Tabs } from "../../components/ui/Tabs";
 import { useResource } from "../../lib/useResource";
 import { timeAgo } from "../../lib/format";
-import type { PublicProfile } from "../../lib/types";
+import type { LikeDetail, PublicProfile } from "../../lib/types";
 
-type LikeEntry = { likedAt: string; profile: PublicProfile };
+type LikeEntry = { likedAt: string; profile: PublicProfile; detail: LikeDetail | null; comment: string | null };
 
 export function Likes() {
   const [tab, setTab] = useState<"received" | "sent">("received");
@@ -57,7 +57,7 @@ export function Likes() {
         </EmptyState>
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {data.map(({ profile: p, likedAt }) => (
+          {data.map(({ profile: p, likedAt, detail, comment }) => (
             <li key={p.id} className="flex flex-col overflow-hidden rounded-[1.75rem] border hairline bg-white shadow-soft">
               <Link to={`/app/people/${p.id}`} className="relative block" aria-label={`View ${p.displayName}'s profile`}>
                 <Photo id={p.photoIds[0]} alt="" className="aspect-[4/5] w-full" rounded="rounded-none" position="object-top" />
@@ -74,6 +74,15 @@ export function Likes() {
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   <IntentionBadges intentions={p.intentions} />
                 </div>
+                {detail && (
+                  <figure className="mt-4 rounded-2xl bg-lavender-soft/60 p-3">
+                    <figcaption className="text-xs text-ink-muted">
+                      {tab === "received" ? "Responded to your" : "You responded to their"} {detail.kind === "PROMPT" ? `answer: ${detail.label}` : "interest"}
+                    </figcaption>
+                    <blockquote className="mt-0.5 font-serif leading-snug">{detail.quote}</blockquote>
+                    {comment && <p className="mt-2 border-t border-plum/10 pt-2 text-sm text-ink">“{comment}”</p>}
+                  </figure>
+                )}
                 {tab === "received" ? (
                   <div className="mt-auto grid grid-cols-2 gap-2 pt-5">
                     <Button variant="secondary" size="sm" onClick={() => act(p, "pass")} disabled={!!busy}>

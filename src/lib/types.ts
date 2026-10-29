@@ -64,8 +64,36 @@ export interface PublicProfile {
   interests: { slug: string; name: string; shared: boolean }[];
   sharedInterestCount: number;
   photoIds: string[];
+  photos?: PhotoRef[];
+  prompts?: PromptAnswer[];
+  isDemo?: boolean;
   isApprovedExpert: boolean;
   compatibility?: CompatSummary | CompatResult | null;
+}
+
+export interface PhotoRef {
+  id: string;
+  focusX: number;
+  focusY: number;
+}
+
+export interface PromptAnswer {
+  key: string;
+  text: string;
+  answer: string;
+}
+
+export interface PromptDef {
+  key: string;
+  text: string;
+  ideas: string[];
+}
+
+export interface LikeDetail {
+  kind: "PROMPT" | "INTEREST";
+  ref: string;
+  label: string;
+  quote: string;
 }
 
 export interface OwnProfile {
@@ -86,7 +114,9 @@ export interface OwnProfile {
   isPublished: boolean;
   isDiscoverable: boolean;
   discoveryPaused: boolean;
-  photos: { id: string; position: number; status: string }[];
+  photos: { id: string; position: number; status: string; focusX: number; focusY: number }[];
+  prompts: PromptAnswer[];
+  dateOfBirth: string | null;
 }
 
 export interface Message {

@@ -16,13 +16,13 @@ export function useConnectionActions(onDone?: (id: string, kind: "like" | "pass"
   const toast = useToast();
 
   const act = useCallback(
-    async (profile: PublicProfile, kind: "like" | "pass") => {
+    async (profile: PublicProfile, kind: "like" | "pass", detail?: { kind: "PROMPT" | "INTEREST"; ref: string; comment?: string }) => {
       setBusy(`${profile.id}:${kind}`);
       try {
         if (kind === "like") {
-          const r = await api.post<LikeResult>("/likes", { userId: profile.id });
+          const r = await api.post<LikeResult>("/likes", { userId: profile.id, detail });
           if (r.matched && r.matchId) setMatched({ profile, matchId: r.matchId });
-          else toast(`You liked ${profile.displayName}. If they like you too, you'll match.`, "info");
+          else toast(detail?.comment ? `Sent to ${profile.displayName} with your like. If you match, it starts your conversation.` : `You liked ${profile.displayName}. If they like you too, you'll match.`, "info");
         } else {
           await api.post("/likes/pass", { userId: profile.id });
         }

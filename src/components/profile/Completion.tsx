@@ -14,8 +14,8 @@ export function completionItems(p: OwnProfile, answeredQuestions: number | null)
   const items: CompletionItem[] = [
     { key: "photo", label: "Add a photo", done: p.photos.length > 0, tab: "photos" },
     { key: "photos3", label: "Add at least three photos", done: p.photos.length >= 3, tab: "photos" },
-    { key: "bio", label: "Write a short bio", done: !!p.bio?.trim(), tab: "details" },
-    { key: "interests", label: "Choose three or more interests", done: p.interests.length >= 3, tab: "details" },
+    { key: "prompts", label: "Answer two prompts in your own words", done: (p.prompts?.length ?? 0) >= 2, tab: "words" },
+    { key: "interests", label: "Choose three or more of the little things", done: p.interests.length >= 3, tab: "little" },
     { key: "languages", label: "Add the languages you speak", done: p.languages.length > 0, tab: "details" },
     { key: "city", label: "Set your city", done: !!p.city || p.hasApproxLocation, tab: "details" },
     { key: "intentions", label: "Choose your intentions", done: p.intentions.length > 0, tab: "intentions" },

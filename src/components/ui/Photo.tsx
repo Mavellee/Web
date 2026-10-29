@@ -14,7 +14,8 @@ function Fallback({ alt, className, rounded }: { alt: string; className?: string
 }
 
 /** Member photo served by the API, with a skeleton while loading and a graceful fallback on error. */
-export function Photo({ id, alt, className, rounded = "rounded-3xl", position = "object-center" }: { id?: string | null; alt: string; className?: string; rounded?: string; position?: string }) {
+/** `focus` is the member's chosen focal point (0–100 %), applied as a non-destructive crop. */
+export function Photo({ id, alt, className, rounded = "rounded-3xl", position = "object-center", focus }: { id?: string | null; alt: string; className?: string; rounded?: string; position?: string; focus?: { focusX: number; focusY: number } | null }) {
   const [state, setState] = useState<"loading" | "loaded" | "error">("loading");
   if (!id || state === "error") return <Fallback alt={alt} className={className} rounded={rounded} />;
   return (
@@ -26,7 +27,8 @@ export function Photo({ id, alt, className, rounded = "rounded-3xl", position = 
         decoding="async"
         onLoad={() => setState("loaded")}
         onError={() => setState("error")}
-        className={cx("h-full w-full object-cover transition-opacity duration-500", position, state === "loaded" ? "opacity-100" : "opacity-0")}
+        style={focus ? { objectPosition: `${focus.focusX}% ${focus.focusY}%` } : undefined}
+        className={cx("h-full w-full object-cover transition-opacity duration-500", !focus && position, state === "loaded" ? "opacity-100" : "opacity-0")}
       />
     </div>
   );

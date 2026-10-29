@@ -381,6 +381,16 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                         </button>
                       )}
                       <div className={cx("max-w-[80%] rounded-3xl px-4 py-2.5 sm:max-w-[65%]", mine ? "rounded-br-lg bg-plum text-ivory" : "rounded-bl-lg bg-white text-ink shadow-soft", m.pending && "opacity-70")}>
+                        {(() => {
+                          // A first message that started from a profile detail quotes it.
+                          const d = m.metadata?.detail as { label: string; quote: string; kind: string } | undefined;
+                          return d ? (
+                            <figure className={cx("mb-2 rounded-2xl px-3 py-2 text-xs", mine ? "bg-ivory/15 text-ivory/90" : "bg-ivory-deep text-ink-soft")}>
+                              <figcaption className="font-semibold">{d.kind === "PROMPT" ? d.label : "Interest"}</figcaption>
+                              <blockquote className="mt-0.5 font-serif text-sm">{d.quote}</blockquote>
+                            </figure>
+                          ) : null;
+                        })()}
                         {m.hasAttachment && <img src={`/api/conversations/${id}/attachments/${m.id}`} alt="Shared photo" className="mb-1 max-h-72 rounded-2xl object-cover" loading="lazy" />}
                         {m.body && <p className="whitespace-pre-wrap break-words leading-relaxed">{m.body}</p>}
                         <p className={cx("mt-0.5 text-right text-[0.68rem]", mine ? "text-ivory/70" : "text-ink-muted")}>

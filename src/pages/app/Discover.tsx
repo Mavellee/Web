@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppPage, PageHeader } from "../../components/app/PageHeader";
 import { useConnectionActions } from "../../components/app/MatchDialog";
-import { ProfileDetail, type DetailedProfile } from "../../components/profile/ProfileDetail";
+import { EditorialProfile, type EditorialData } from "../../components/story/EditorialProfile";
+import { DetailComposer, type DetailTarget } from "../../components/story/DetailComposer";
+import { FeaturedProfile } from "./discover/FeaturedProfile";
 import { Button, ButtonLink } from "../../components/ui/Button";
 import { Drawer } from "../../components/ui/Drawer";
 import { Icon } from "../../components/ui/Icon";
@@ -34,6 +36,8 @@ export function Discover() {
   const [leaving, setLeaving] = useState<Record<string, "like" | "pass">>({});
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [detail, setDetail] = useState<{ profile: PublicProfile; target: DetailTarget } | null>(null);
+  const sentinel = useRef<HTMLDivElement>(null);
   const seq = useRef(0);
 
   const fetchPage = useCallback(
@@ -80,9 +84,19 @@ export function Discover() {
     }
   };
 
+  // Load the next page when the end of the list scrolls into view.
+  useEffect(() => {
+    const el = sentinel.current;
+    if (!el || !cursor || loading) return;
+    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && !loadingMore && void more(), { rootMargin: "400px" });
+    io.observe(el);
+    return () => io.disconnect();
+  });
+
   const removeAfter = useCallback((id: string, kind: "like" | "pass") => {
     setLeaving((l) => ({ ...l, [id]: kind }));
     setOpenId((o) => (o === id ? null : o));
+    setDetail((d) => (d?.profile.id === id ? null : d));
     setTimeout(() => setItems((list) => list.filter((p) => p.id !== id)), 450);
   }, []);
   const { act, busy, dialog } = useConnectionActions(removeAfter);
@@ -162,8 +176,24 @@ export function Discover() {
         </EmptyState>
       ) : (
         <>
+          {items[0] && (
+            <div className="mb-8 animate-rise">
+              <FeaturedProfile
+                profile={items[0]}
+                leaving={leaving[items[0].id] ?? null}
+                busy={!!busy}
+                onOpen={() => setOpenId(items[0].id)}
+                onLike={() => act(items[0], "like")}
+                onPass={() => act(items[0], "pass")}
+                onRespond={() => {
+                  const pr = items[0].prompts?.[0];
+                  if (pr) setDetail({ profile: items[0], target: { kind: "PROMPT", ref: pr.key, label: pr.text, quote: pr.answer } });
+                }}
+              />
+            </div>
+          )}
           <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((p) => (
+            {items.slice(1).map((p) => (
               <li key={p.id} className="animate-rise">
                 <DiscoverTile
                   profile={p}
@@ -176,6 +206,8 @@ export function Discover() {
               </li>
             ))}
           </ul>
+          {/* Infinite scroll, with a button as an accessible fallback. */}
+          <div ref={sentinel} aria-hidden="true" />
           <LoadMore hasMore={!!cursor} loading={loadingMore} onClick={more} label="Show more people" />
           <p className="mt-8 text-center text-xs text-ink-muted">Likes stay private until they're mutual.</p>
         </>
@@ -184,15 +216,16 @@ export function Discover() {
       <Drawer open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filters">
         <div className="p-6">{me.data ? <DiscoverFilters me={me.data} value={filters} onApply={applyFilters} interestNames={interestNames} /> : <LoadingBlock />}</div>
       </Drawer>
-      <ProfileDrawer profile={open} onClose={() => setOpenId(null)} onAct={(kind) => open && act(open, kind)} busy={!!busy} />
+      <ProfileDrawer profile={open} onClose={() => setOpenId(null)} onAct={(kind) => open && act(open, kind)} onRespond={(t) => open && setDetail({ profile: open, target: t })} busy={!!busy} />
+      {detail && <DetailComposer profile={detail.profile} detail={detail.target} onClose={() => setDetail(null)} onSend={(d, comment) => act(detail.profile, "like", { kind: d.kind, ref: d.ref, comment: comment || undefined })} />}
       {dialog}
     </AppPage>
   );
 }
 
-function ProfileDrawer({ profile, onClose, onAct, busy }: { profile: PublicProfile | null; onClose: () => void; onAct: (k: "like" | "pass") => void; busy: boolean }) {
+function ProfileDrawer({ profile, onClose, onAct, onRespond, busy }: { profile: PublicProfile | null; onClose: () => void; onAct: (k: "like" | "pass") => void; onRespond: (t: DetailTarget) => void; busy: boolean }) {
   // Full profile (with the compatibility explanation) is loaded on open.
-  const detail = useResource<DetailedProfile>(profile ? `/profiles/${profile.id}` : null);
+  const detail = useResource<EditorialData>(profile ? `/profiles/${profile.id}` : null);
   return (
     <Drawer
       open={!!profile}
@@ -212,7 +245,7 @@ function ProfileDrawer({ profile, onClose, onAct, busy }: { profile: PublicProfi
       }
     >
       <div className="p-6">
-        {detail.loading || !detail.data ? detail.error ? <ErrorState message={detail.error.message} onRetry={detail.reload} /> : <LoadingBlock label="Loading profile" /> : <ProfileDetail profile={detail.data} compact />}
+        {detail.loading || !detail.data ? detail.error ? <ErrorState message={detail.error.message} onRetry={detail.reload} /> : <LoadingBlock label="Loading profile" /> : <EditorialProfile profile={detail.data} onRespond={onRespond} />}
       </div>
     </Drawer>
   );

@@ -27,7 +27,9 @@ const me: OwnProfile = {
   isPublished: true,
   isDiscoverable: true,
   discoveryPaused: false,
-  photos: [{ id: "p1", position: 0, status: "APPROVED" }],
+  photos: [{ id: "p1", position: 0, status: "APPROVED", focusX: 50, focusY: 50 }],
+  prompts: [],
+  dateOfBirth: "1997-05-14",
 };
 
 describe("Tabs", () => {
@@ -61,7 +63,7 @@ describe("Profile completion", () => {
   it("is computed only from saved data", () => {
     const items = completionItems(me, 1);
     const done = Object.fromEntries(items.map((i) => [i.key, i.done]));
-    expect(done).toMatchObject({ photo: true, photos3: false, bio: false, interests: false, languages: false, city: true, intentions: true, questions: false });
+    expect(done).toMatchObject({ photo: true, photos3: false, prompts: false, interests: false, languages: false, city: true, intentions: true, questions: false });
     // Without question data, that item is left out rather than guessed.
     expect(completionItems(me, null).some((i) => i.key === "questions")).toBe(false);
   });

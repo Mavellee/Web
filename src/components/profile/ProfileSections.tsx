@@ -20,6 +20,8 @@ interface SectionProps {
   onSaved: (p: OwnProfile) => void;
   submitLabel?: string;
   secondary?: React.ReactNode;
+  /** Hide fields that another step handles (their saved values are kept). */
+  show?: { bio?: boolean; interests?: boolean };
 }
 
 function useSave(onSaved: (p: OwnProfile) => void) {
@@ -69,7 +71,9 @@ const basicsSchema = z.object({
 });
 type Basics = z.infer<typeof basicsSchema>;
 
-export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondary }: SectionProps) {
+export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondary, show = {} }: SectionProps) {
+  const showBio = show.bio !== false;
+  const showInterests = show.interests !== false;
   const cities = useResource<{ name: string; region: string }[]>("/meta/cities");
   const interests = useResource<{ slug: string; name: string; category: string }[]>("/meta/interests");
   const { error, save } = useSave(onSaved);
@@ -151,12 +155,13 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
           </p>
         )}
       </div>
-      <Textarea label="About you" optional placeholder="A few honest lines about you, and what a good first conversation looks like." hint={`${bio.length}/500`} error={formState.errors.bio?.message} {...register("bio")} />
+      {showBio && <Textarea label="In a sentence or two" optional placeholder="A short line about you. Prompts do the rest." hint={`${bio.length}/500`} error={formState.errors.bio?.message} {...register("bio")} />}
       <Controller
         control={control}
         name="languages"
         render={({ field }) => <ChipGroup label="Languages you speak" options={LANGUAGES.map((l) => ({ value: l, label: l }))} value={field.value} onChange={field.onChange} />}
       />
+      {showInterests && (
       <Controller
         control={control}
         name="interests"
@@ -186,6 +191,7 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
           </fieldset>
         )}
       />
+      )}
       <FormFooter error={error} submitting={formState.isSubmitting} submitLabel={submitLabel} secondary={secondary} />
     </form>
   );
