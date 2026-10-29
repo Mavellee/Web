@@ -11,20 +11,20 @@ import { Spinner } from "./components/ui/Spinner";
 // The signed-in app is split from the public site so visitors download less.
 const named = <T, K extends keyof T>(load: () => Promise<T>, name: K) => lazy(() => load().then((m) => ({ default: m[name] as React.ComponentType })));
 const Onboarding = named(() => import("./pages/auth/Onboarding"), "Onboarding");
-const Discover = named(() => import("./pages/app/Connections"), "Discover");
-const Likes = named(() => import("./pages/app/Connections"), "Likes");
-const Matches = named(() => import("./pages/app/Connections"), "Matches");
-const PersonProfile = named(() => import("./pages/app/Connections"), "PersonProfile");
+const Discover = named(() => import("./pages/app/Discover"), "Discover");
+const Likes = named(() => import("./pages/app/Likes"), "Likes");
+const Matches = named(() => import("./pages/app/Matches"), "Matches");
+const PersonProfile = named(() => import("./pages/app/PersonProfile"), "PersonProfile");
 const Messages = named(() => import("./pages/app/Messages"), "Messages");
-const Compatibility = named(() => import("./pages/app/Play"), "Compatibility");
-const Experts = named(() => import("./pages/app/Play"), "Experts");
-const Games = named(() => import("./pages/app/Play"), "Games");
-const GameSession = named(() => import("./pages/app/Play"), "GameSession");
-const MyProfile = named(() => import("./pages/app/Account"), "MyProfile");
-const Notifications = named(() => import("./pages/app/Account"), "Notifications");
-const Settings = named(() => import("./pages/app/Account"), "Settings");
-const Admin = named(() => import("./pages/app/Staff"), "Admin");
-const ExpertWorkspace = named(() => import("./pages/app/Staff"), "ExpertWorkspace");
+const Compatibility = named(() => import("./pages/app/Compatibility"), "Compatibility");
+const Experts = named(() => import("./pages/app/Experts"), "Experts");
+const Games = named(() => import("./pages/app/Games"), "Games");
+const GameSession = named(() => import("./pages/app/GameSession"), "GameSession");
+const MyProfile = named(() => import("./pages/app/MyProfile"), "MyProfile");
+const Notifications = named(() => import("./pages/app/Notifications"), "Notifications");
+const Settings = named(() => import("./pages/app/Settings"), "Settings");
+const Admin = named(() => import("./pages/app/Admin"), "Admin");
+const ExpertWorkspace = named(() => import("./pages/app/ExpertWorkspace"), "ExpertWorkspace");
 
 function PageLoading() {
   return (

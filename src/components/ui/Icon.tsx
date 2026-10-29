@@ -25,6 +25,16 @@ const paths: Record<string, string> = {
   admin: "M4 20V10m5 10V4m5 16v-7m5 7V8",
   arrow: "M5 12h14m-6-6 6 6-6 6",
   undo: "M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3",
+  menu: "M4 7h16M4 12h16M4 17h10",
+  lock: "M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z",
+  eye: "M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Zm9.5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z",
+  filter: "M4 6h16M7 12h10M10 18h4",
+  sliders: "M4 7h9m4 0h3M4 17h3m4 0h9M15 4v6M9 14v6",
+  grid: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
+  stack: "M12 3 3 8l9 5 9-5-9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5",
+  edit: "M4 20h4L19 9l-4-4L4 16v4Zm9-13 4 4",
+  chevronLeft: "M15 5l-7 7 7 7",
+  chevronRight: "M9 5l7 7-7 7",
 };
 
 export type IconName = keyof typeof paths;

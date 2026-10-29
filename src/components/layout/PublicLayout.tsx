@@ -12,16 +12,20 @@ const NAV = [
   { to: "/intentions", label: "Intentions" },
   { to: "/safety", label: "Safety" },
   { to: "/about", label: "About" },
+  { to: "/contact", label: "Support" },
 ];
 
 export function PublicLayout() {
   const { account } = useAuth();
   const [open, setOpen] = useState(false);
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   useEffect(() => {
     setOpen(false);
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    // Honour in-page anchors such as /intentions#marriage; otherwise start at the top.
+    const target = hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
+    if (target) target.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }, [pathname, hash]);
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -51,7 +55,7 @@ export function PublicLayout() {
             )}
           </div>
           <button type="button" className="rounded-full p-2 text-ink md:hidden" aria-expanded={open} aria-controls="mobile-nav" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen((o) => !o)}>
-            <Icon name={open ? "close" : "more"} className="h-6 w-6" />
+            <Icon name={open ? "close" : "menu"} className="h-6 w-6" />
           </button>
         </div>
         {open && (

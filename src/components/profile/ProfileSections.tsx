@@ -10,6 +10,7 @@ import { Button } from "../ui/Button";
 import { Chip } from "../ui/Chip";
 import { Input, Select, Textarea } from "../ui/Field";
 import { Icon } from "../ui/Icon";
+import { Skeleton } from "../ui/Skeleton";
 import { cx } from "../../lib/format";
 
 const LANGUAGES = ["English", "Hindi", "Bengali", "Marathi", "Telugu", "Tamil", "Gujarati", "Kannada", "Malayalam", "Punjabi", "Urdu", "Odia", "French", "Spanish", "Arabic"];
@@ -128,14 +129,19 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
         )}
       />
       <div className="space-y-2">
-        <Select label="City" hint="Others see your city and a distance range — never your exact location." error={formState.errors.city?.message} {...register("city")}>
-          <option value="">Choose your city…</option>
-          {(cities.data ?? []).map((c) => (
-            <option key={c.name} value={c.name}>
-              {c.name}, {c.region}
-            </option>
-          ))}
-        </Select>
+        {/* Rendered only once the options exist, so the saved city stays selected. */}
+        {cities.data ? (
+          <Select label="City" hint="Others see your city and a distance range — never your exact location." error={formState.errors.city?.message} {...register("city")}>
+            <option value="">Choose your city…</option>
+            {(cities.data ?? []).map((c) => (
+              <option key={c.name} value={c.name}>
+                {c.name}, {c.region}
+              </option>
+            ))}
+          </Select>
+        ) : (
+          <Skeleton className="h-20" />
+        )}
         <button type="button" onClick={useLocation} className="inline-flex items-center gap-1.5 text-sm font-semibold text-plum">
           <Icon name="location" className="h-4 w-4" /> Use my approximate location for distance instead
         </button>

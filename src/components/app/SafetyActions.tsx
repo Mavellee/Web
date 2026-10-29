@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
+import { IconButton } from "../ui/IconButton";
 import { api, ApiError } from "../../lib/api";
 import { REPORT_REASONS } from "../../lib/labels";
 import { Button } from "../ui/Button";
@@ -63,44 +65,26 @@ export function ReportDialog({ open, onClose, userId, name, messageId, onDone }:
   );
 }
 
-export function ConfirmDialog({ open, onClose, title, body, confirmLabel, onConfirm, danger }: { open: boolean; onClose: () => void; title: string; body: string; confirmLabel: string; onConfirm: () => Promise<void>; danger?: boolean }) {
-  const [busy, setBusy] = useState(false);
-  return (
-    <Dialog open={open} onClose={onClose} title={title}>
-      <p className="text-ink-soft">{body}</p>
-      <div className="mt-6 flex justify-end gap-2">
-        <Button variant="quiet" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button
-          variant={danger ? "danger" : "primary"}
-          loading={busy}
-          onClick={async () => {
-            setBusy(true);
-            try {
-              await onConfirm();
-              onClose();
-            } finally {
-              setBusy(false);
-            }
-          }}
-        >
-          {confirmLabel}
-        </Button>
-      </div>
-    </Dialog>
-  );
-}
-
 /** Report / block menu for a person. */
 export function SafetyMenu({ userId, name, matchId, onEnded }: { userId: string; name: string; matchId?: string; onEnded?: () => void }) {
   const [open, setOpen] = useState<"menu" | "report" | "block" | "unmatch" | null>(null);
   const toast = useToast();
+  const root = useRef<HTMLDivElement>(null);
+  // Close the menu on outside click or Escape.
+  useEffect(() => {
+    if (open !== "menu") return;
+    const onDown = (e: MouseEvent) => !root.current?.contains(e.target as Node) && setOpen(null);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(null);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
   return (
-    <div className="relative">
-      <Button variant="quiet" size="sm" aria-haspopup="menu" aria-expanded={open === "menu"} onClick={() => setOpen(open === "menu" ? null : "menu")}>
-        Safety
-      </Button>
+    <div className="relative" ref={root}>
+      <IconButton icon="more" label={`Safety options for ${name}`} tone="soft" aria-haspopup="menu" aria-expanded={open === "menu"} onClick={() => setOpen(open === "menu" ? null : "menu")} />
       {open === "menu" && (
         <div role="menu" className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-2xl border hairline bg-ivory p-1.5 shadow-lift animate-rise">
           {matchId && (

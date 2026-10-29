@@ -83,13 +83,18 @@ describe("QuestionCard", () => {
 });
 
 describe("Landing page", () => {
-  it("covers the required sections and labels the illustrative quote honestly", async () => {
+  it("covers the required sections, uses the new hero copy and labels illustrations honestly", async () => {
     mockApi({});
     const { container } = renderWithProviders(<Landing />);
-    for (const name of [/Find your/, /Less guessing/, /Say what you want/, /Match, talk/, /thoughtful second opinion/, /Built so you feel in control/, /Ready when you are/]) {
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Not just a match.A connection that makes sense.");
+    for (const cta of screen.getAllByRole("link", { name: "Find your connection" })) expect(cta).toHaveAttribute("href", "/signup");
+    expect(screen.getByRole("link", { name: "Discover how Knot works" })).toHaveAttribute("href", "/how-it-works");
+    for (const name of [/Every kind of connection is valid/, /From first impression/, /thoughtful second opinion/, /Better questions/, /You stay in control/, /Start with what you're looking for/]) {
       expect(screen.getByRole("heading", { name })).toBeInTheDocument();
     }
-    expect(screen.getByText(/not a real testimonial/)).toBeInTheDocument();
+    // Each intention card links to its explanation, and none is presented as better than another.
+    for (const slug of ["single", "situationship", "marriage"]) expect(container.querySelector(`a[href="/intentions#${slug}"]`)).not.toBeNull();
+    expect(screen.getByText(/not real members/)).toBeInTheDocument();
     expect(await axeViolations(container)).toEqual([]);
   });
 });

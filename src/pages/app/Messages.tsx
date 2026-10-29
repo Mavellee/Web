@@ -23,8 +23,8 @@ export function Messages() {
   useSocketEvent("match:ended", reload);
 
   return (
-    <div className="mx-auto grid h-[calc(100dvh-7.5rem)] max-w-6xl md:h-dvh md:grid-cols-[22rem_1fr] md:px-6 md:py-6">
-      <section aria-label="Conversations" className={cx("flex min-h-0 flex-col md:rounded-l-4xl md:border md:hairline md:bg-white/60", id && "hidden md:flex")}>
+    <div className="mx-auto grid h-[calc(100dvh-7.5rem)] max-w-6xl md:h-dvh md:px-6 md:py-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
+      <section aria-label="Conversations" className={cx("flex min-h-0 flex-col md:rounded-4xl md:border md:hairline md:bg-white/60 lg:rounded-r-none", id && "hidden lg:flex")}>
         <div className="px-5 pb-3 pt-6 md:pt-7">
           <h1 className="text-3xl">Messages</h1>
         </div>
@@ -72,7 +72,7 @@ export function Messages() {
           )}
         </div>
       </section>
-      <section aria-label="Conversation" className={cx("min-h-0 md:rounded-r-4xl md:border md:border-l-0 md:hairline md:bg-white/80", !id && "hidden md:block")}>
+      <section aria-label="Conversation" className={cx("min-h-0 md:rounded-4xl md:border md:hairline md:bg-white/80 lg:rounded-l-none lg:border-l-0", !id && "hidden lg:block")}>
         {id ? (
           <Conversation key={id} id={id} onActivity={reload} />
         ) : (
@@ -298,7 +298,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
   return (
     <div className="flex h-full min-h-0 flex-col">
       <header className="flex items-center gap-3 border-b hairline px-4 py-3">
-        <Link to="/app/messages" className="rounded-full p-2 text-ink-soft md:hidden" aria-label="Back to conversations">
+        <Link to="/app/messages" className="rounded-full p-2 text-ink-soft lg:hidden" aria-label="Back to conversations">
           <Icon name="back" />
         </Link>
         {other ? (

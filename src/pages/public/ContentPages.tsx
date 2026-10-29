@@ -78,7 +78,7 @@ export function Intentions() {
       </PageIntro>
       <section className="container-page space-y-6">
         {INTENTIONS.map((i, idx) => (
-          <article key={i.value} className="grid gap-6 rounded-4xl border hairline bg-white/70 p-8 shadow-soft md:grid-cols-[14rem_1fr] md:p-10">
+          <article key={i.value} id={i.value.toLowerCase()} className="scroll-mt-28 grid gap-6 rounded-4xl border hairline bg-white/70 p-8 shadow-soft md:grid-cols-[14rem_1fr] md:p-10">
             <div>
               <span className={["inline-block rounded-full px-3 py-1 text-xs font-semibold", idx === 0 ? "bg-sage text-sage-ink" : idx === 1 ? "bg-rose-soft text-rose-ink" : "bg-lavender-soft text-plum-700"].join(" ")}>{i.short}</span>
               <h2 className="mt-4 text-3xl">{i.title}</h2>

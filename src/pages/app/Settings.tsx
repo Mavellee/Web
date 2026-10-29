@@ -1,73 +1,17 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AppPage, PageHeader } from "../../components/app/PageHeader";
-import { AiPanel } from "../../components/app/AiPanel";
-import { BasicsSection, IntentionSection, PreferencesSection } from "../../components/profile/ProfileSections";
-import { PhotoManager } from "../../components/profile/PhotoManager";
-import { Button, ButtonLink } from "../../components/ui/Button";
+import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Dialog } from "../../components/ui/Dialog";
 import { Input } from "../../components/ui/Field";
 import { LoadingBlock } from "../../components/ui/Skeleton";
-import { EmptyState, ErrorState } from "../../components/ui/States";
+import { ErrorState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/Toast";
 import { api, ApiError } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
 import { useResource } from "../../lib/useResource";
-import { cx, timeAgo } from "../../lib/format";
-import type { OwnProfile } from "../../lib/types";
-
-const TABS = [
-  ["details", "Details"],
-  ["photos", "Photos"],
-  ["intentions", "Intentions"],
-  ["preferences", "Preferences"],
-] as const;
-
-export function MyProfile() {
-  const [params, setParams] = useSearchParams();
-  const tab = (params.get("tab") ?? "details") as (typeof TABS)[number][0];
-  const { data, error, loading, reload, setData } = useResource<OwnProfile>("/profiles/me");
-  const { account, refresh } = useAuth();
-  const toast = useToast();
-  const saved = (p: OwnProfile) => {
-    setData(p);
-    toast("Saved");
-    void refresh();
-  };
-
-  return (
-    <AppPage>
-      <PageHeader title="Your profile" lede="Changes are visible to others straight away." actions={account && <ButtonLink to={`/app/people/${account.id}`} variant="secondary" size="sm">View as others see it</ButtonLink>} />
-      <div role="tablist" aria-label="Profile sections" className="mb-8 flex gap-1 overflow-x-auto rounded-full bg-ivory-deep p-1">
-        {TABS.map(([k, label]) => (
-          <button key={k} role="tab" aria-selected={tab === k} onClick={() => setParams({ tab: k })} className={cx("shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition", tab === k ? "bg-white text-plum shadow-soft" : "text-ink-soft")}>
-            {label}
-          </button>
-        ))}
-      </div>
-      {loading && !data ? (
-        <LoadingBlock />
-      ) : error ? (
-        <ErrorState message={error.message} onRetry={reload} />
-      ) : data ? (
-        <div role="tabpanel" className="animate-rise">
-          {tab === "details" && (
-            <>
-              <BasicsSection key={JSON.stringify(data.interests)} profile={data} onSaved={saved} />
-              <div className="mt-8">
-                <AiPanel title="Help with my bio" request={{ feature: "bio_help", draft: data.bio ?? "" }} />
-              </div>
-            </>
-          )}
-          {tab === "photos" && <PhotoManager photos={data.photos} onChange={reload} />}
-          {tab === "intentions" && <IntentionSection profile={data} onSaved={saved} />}
-          {tab === "preferences" && <PreferencesSection profile={data} onSaved={saved} />}
-        </div>
-      ) : null}
-    </AppPage>
-  );
-}
+import { timeAgo } from "../../lib/format";
 
 type SettingsData = { aiEnabled: boolean; readReceipts: boolean; typingIndicators: boolean; emailNotifications: boolean; showDistance: boolean; isDiscoverable: boolean; discoveryPaused: boolean };
 type SessionRow = { id: string; userAgent: string | null; createdAt: string; lastUsedAt: string; current: boolean };
@@ -307,71 +251,5 @@ function DeleteDialog({ open, onClose, onDeleted }: { open: boolean; onClose: ()
         </div>
       </form>
     </Dialog>
-  );
-}
-
-type Note = { id: string; type: string; title: string; body: string | null; data: { conversationId?: string; matchId?: string; sessionId?: string; requestId?: string }; readAt: string | null; createdAt: string };
-
-export function Notifications() {
-  const { data, error, loading, reload } = useResource<{ items: Note[]; unread: number }>("/notifications");
-  const navigate = useNavigate();
-  const target = (n: Note) =>
-    n.data.conversationId ? `/app/messages/${n.data.conversationId}` : n.data.sessionId ? `/app/games/${n.data.sessionId}` : n.data.requestId ? "/app/experts" : n.type === "MATCH" ? "/app/matches" : null;
-
-  return (
-    <AppPage>
-      <PageHeader
-        title="Notifications"
-        actions={
-          !!data?.unread && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={async () => {
-                await api.post("/notifications/read-all");
-                window.dispatchEvent(new Event("knot:counts"));
-                reload();
-              }}
-            >
-              Mark all read
-            </Button>
-          )
-        }
-      />
-      {loading && !data ? (
-        <LoadingBlock />
-      ) : error ? (
-        <ErrorState message={error.message} onRetry={reload} />
-      ) : !data?.items.length ? (
-        <EmptyState title="Nothing new">Matches, messages and updates will appear here.</EmptyState>
-      ) : (
-        <ul className="divide-y hairline overflow-hidden rounded-3xl border hairline bg-white/70">
-          {data.items.map((n) => (
-            <li key={n.id}>
-              <button
-                type="button"
-                className="flex w-full items-start gap-4 px-5 py-4 text-left hover:bg-white"
-                onClick={async () => {
-                  if (!n.readAt) {
-                    await api.post(`/notifications/${n.id}/read`);
-                    window.dispatchEvent(new Event("knot:counts"));
-                  }
-                  const t = target(n);
-                  if (t) navigate(t);
-                  else reload();
-                }}
-              >
-                <span className={cx("mt-2 h-2 w-2 shrink-0 rounded-full", n.readAt ? "bg-transparent" : "bg-plum")} aria-hidden="true" />
-                <span className="min-w-0 flex-1">
-                  <span className={cx("block", !n.readAt && "font-semibold")}>{n.title}</span>
-                  {n.body && <span className="block text-sm text-ink-muted">{n.body}</span>}
-                </span>
-                <span className="shrink-0 text-xs text-ink-muted">{timeAgo(n.createdAt)}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </AppPage>
   );
 }
