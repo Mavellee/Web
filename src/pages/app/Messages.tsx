@@ -446,7 +446,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
             rows={1}
             value={text}
             maxLength={2000}
-            placeholder="Write a message…"
+            placeholder="Type a message…"
             onChange={(e) => {
               setText(e.target.value);
               setTyping(true);
@@ -459,9 +459,9 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                 void send();
               }
             }}
-            className="max-h-36 min-h-11 flex-1 resize-none rounded-3xl border border-line bg-surface px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+            className="max-h-36 min-h-11 flex-1 resize-none rounded-[1.4rem] border border-line bg-surface px-4 py-2.5 shadow-soft focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
           />
-          <Button type="submit" className="mb-0.5 h-11 w-11 !px-0" disabled={!text.trim()} aria-label="Send message">
+          <Button type="submit" className="mb-0.5 h-11 w-11 shrink-0 !px-0" disabled={!text.trim()} aria-label="Send message">
             <Icon name="send" />
           </Button>
         </form>

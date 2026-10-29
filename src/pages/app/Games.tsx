@@ -17,12 +17,20 @@ type Game = { slug: string; name: string; description: string; category: string;
 type ActiveSession = { id: string; game: { name: string; category: string }; progress: { current: number; total: number }; withName: string | null; isShared: boolean };
 type MatchLite = { id: string; conversationId: string | null; profile: { displayName: string } };
 
+// Groupings come from each deck's category; nothing here is based on popularity data we don't have.
+const FILTERS = [
+  { key: "all", label: "All", categories: [] as string[] },
+  { key: "deep", label: "Deep talks", categories: ["DEEP_QUESTIONS", "LOYALTY_BOUNDARIES", "LOVE_LANGUAGES"] },
+  { key: "fun", label: "Fun", categories: ["WOULD_YOU_RATHER", "FUN_CHALLENGES", "RED_FLAG_GREEN_FLAG", "KNOW_EACH_OTHER"] },
+] as const;
+
 export function Games() {
   const games = useResource<Game[]>("/games");
   const sessions = useResource<ActiveSession[]>("/games/sessions");
   const matches = useResource<MatchLite[]>("/matches");
   const [picked, setPicked] = useState<Game | null>(null);
   const [count, setCount] = useState(8);
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -74,37 +82,48 @@ export function Games() {
         </section>
       )}
 
-      <h2 className="mb-4 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Choose a deck</h2>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Choose a deck</h2>
+        <div role="group" aria-label="Filter decks" className="flex gap-2">
+          {FILTERS.map((f) => (
+            <button key={f.key} type="button" aria-pressed={filter === f.key} onClick={() => setFilter(f.key)} className={cx("rounded-full px-4 py-1.5 text-sm font-semibold transition", filter === f.key ? "bg-primary text-surface" : "border border-line bg-surface text-ink-soft hover:border-primary/40")}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
       {games.loading ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="h-56 rounded-[1.75rem]" />
+        <div className="space-y-3">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-28 rounded-[1.75rem]" />
           ))}
         </div>
       ) : games.error ? (
         <ErrorState message={games.error.message} onRetry={games.reload} />
       ) : (
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {games.data?.map((g) => {
-            const st = deckStyle(g.category);
-            return (
-              <li key={g.slug}>
-                <button type="button" onClick={() => setPicked(g)} className={cx("group relative flex h-full min-h-56 w-full flex-col overflow-hidden rounded-[1.75rem] p-6 text-left transition duration-300 hover:-translate-y-1 hover:shadow-lift", st.surface, st.ink)}>
-                  {/* Stacked-card edge hints that it's a deck. */}
-                  <span aria-hidden="true" className="absolute -right-6 -top-6 h-24 w-24 rounded-3xl border-2 border-current opacity-10 transition group-hover:rotate-6" />
-                  <span className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
-                    {st.mood}
-                    <span>{g.questionCount} cards</span>
+        <ul className="grid gap-3 lg:grid-cols-2">
+          {games.data
+            ?.filter((g) => filter === "all" || (FILTERS.find((f) => f.key === filter)!.categories as readonly string[]).includes(g.category))
+            .map((g) => {
+              const st = deckStyle(g.category);
+              return (
+                <li key={g.slug} className="flex items-center gap-4 rounded-[1.75rem] border hairline bg-surface/90 p-4 shadow-soft">
+                  <span className={cx("flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl", st.surface, st.ink)} aria-hidden="true">
+                    <Icon name={st.icon} className="h-7 w-7" />
                   </span>
-                  <span className="mt-8 font-serif text-2xl leading-tight">{g.name}</span>
-                  <span className="mt-2 flex-1 text-sm opacity-85">{g.description}</span>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold">
-                    Set up a game <Icon name="arrow" className="h-4 w-4 transition group-hover:translate-x-1" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-serif text-xl leading-tight">{g.name}</span>
+                    <span className="mt-0.5 line-clamp-2 block text-sm text-ink-muted">{g.description}</span>
+                    <span className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-muted">
+                      <Icon name="stack" className="h-3.5 w-3.5" /> {g.questionCount} cards · {st.mood}
+                    </span>
                   </span>
-                </button>
-              </li>
-            );
-          })}
+                  <Button size="sm" onClick={() => setPicked(g)} aria-label={`Play ${g.name}`}>
+                    Play
+                  </Button>
+                </li>
+              );
+            })}
         </ul>
       )}
 

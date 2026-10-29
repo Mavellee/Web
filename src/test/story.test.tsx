@@ -66,7 +66,8 @@ describe("editorial profile", () => {
     const { unmount } = renderWithProviders(<EditorialProfile profile={person} />);
     expect(screen.getByRole("heading", { name: "Still discovering your compatibility" })).toBeInTheDocument();
     expect(screen.queryByText(/% overlap/)).toBeNull();
-    expect(screen.getByText("You both listed")).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "You both listed" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "No score yet" })).toBeInTheDocument();
     unmount();
     renderWithProviders(<EditorialProfile profile={{ ...person, compatibility: { version: "v", score: null, confidence: "not_enough_information", dimensions: [], items: [], dealbreakerConflicts: 0, sharedInterests: 0 } }} />);
     expect(screen.getByRole("heading", { name: "Still discovering your compatibility" })).toBeInTheDocument();
@@ -87,7 +88,10 @@ describe("editorial profile", () => {
       sharedInterests: 2,
     };
     renderWithProviders(<EditorialProfile profile={{ ...person, compatibility }} />);
-    expect(screen.getByRole("heading", { name: "72% overlap with Isha" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Compatibility" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "72% overlap" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "You're well aligned" })).toBeInTheDocument();
+    expect(screen.getByText(/72% overlap with Isha/)).toBeInTheDocument();
     expect(screen.getByText("Both open to: Exploring connections")).toBeInTheDocument();
     expect(screen.getByText(/can't predict how things will go/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "See compatibility details" }));

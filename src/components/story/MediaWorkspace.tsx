@@ -91,7 +91,8 @@ export function MediaWorkspace({ media, limits, onChange }: { media: OwnMediaIte
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
   const [framing, setFraming] = useState<OwnMediaItem | null>(null);
-  const [viewing, setViewing] = useState<OwnMediaItem | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editing = media.find((m) => m.id === editingId) ?? null;
   const [removing, setRemoving] = useState<OwnMediaItem | null>(null);
   const [status, setStatus] = useState("");
   const toast = useToast();
@@ -279,87 +280,63 @@ export function MediaWorkspace({ media, limits, onChange }: { media: OwnMediaIte
           </ul>
         )}
 
-        {media.length > 0 ? (
-          <ol className="mt-6 space-y-4" aria-label="Your photos and videos, in display order">
-            {media.map((m, i) => (
-              <li
-                key={m.id}
-                draggable
-                onDragStart={(e) => {
-                  setDragFrom(i);
-                  e.dataTransfer.effectAllowed = "move";
-                }}
-                onDragEnd={() => {
-                  setDragFrom(null);
-                  setDragOver(null);
-                }}
-                onDragOver={(e) => {
-                  if (dragFrom === null) return;
-                  e.preventDefault();
-                  setDragOver(i);
-                }}
-                onDrop={(e) => {
-                  if (dragFrom === null) return;
-                  e.preventDefault();
-                  void reorder(dragFrom, i);
-                  setDragFrom(null);
-                  setDragOver(null);
-                }}
-                className={cx("grid gap-4 rounded-[1.75rem] border bg-surface/90 p-3 shadow-soft transition sm:grid-cols-[9rem_minmax(0,1fr)] sm:p-4", dragOver === i && dragFrom !== i ? "border-primary ring-4 ring-primary/15" : "hairline", dragFrom === i && "opacity-50")}
-              >
-                <div className="relative">
-                  <button type="button" onClick={() => setViewing(m)} className="block w-full cursor-grab active:cursor-grabbing" aria-label={`Preview ${m.kind === "VIDEO" ? "video" : "photo"} ${i + 1}`}>
-                    <MediaThumb item={m} alt="" className="aspect-[4/5] w-full" />
-                  </button>
-                  <span className="absolute left-2 top-2 flex flex-wrap gap-1">
-                    <span className="rounded-full bg-parchment/95 px-2 py-0.5 text-[0.7rem] font-semibold text-ink shadow-soft">{i + 1}</span>
-                    {m.isPrimary && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[0.7rem] font-semibold text-surface">
-                        <Icon name="star" filled className="h-3 w-3" /> Main photo
-                      </span>
-                    )}
+        <ol className="mt-6 grid grid-cols-3 gap-2.5 sm:gap-3" aria-label="Your photos and videos, in display order">
+          <li>
+            <button
+              type="button"
+              onClick={() => (photos < limits.maxPhotos ? photoInput : videoInput).current?.click()}
+              disabled={photos >= limits.maxPhotos && videos >= limits.maxVideos}
+              className="flex aspect-[4/5] w-full flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-primary/25 bg-surface/70 text-sm font-semibold text-primary transition hover:border-primary hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Icon name="plus" className="h-6 w-6" />
+              Add
+            </button>
+          </li>
+          {media.map((m, i) => (
+            <li
+              key={m.id}
+              draggable
+              onDragStart={(e) => {
+                setDragFrom(i);
+                e.dataTransfer.effectAllowed = "move";
+              }}
+              onDragEnd={() => {
+                setDragFrom(null);
+                setDragOver(null);
+              }}
+              onDragOver={(e) => {
+                if (dragFrom === null) return;
+                e.preventDefault();
+                setDragOver(i);
+              }}
+              onDrop={(e) => {
+                if (dragFrom === null) return;
+                e.preventDefault();
+                void reorder(dragFrom, i);
+                setDragFrom(null);
+                setDragOver(null);
+              }}
+              className={cx("relative rounded-2xl transition", dragOver === i && dragFrom !== i && "ring-4 ring-primary/30", dragFrom === i && "opacity-50")}
+            >
+              <button type="button" onClick={() => setEditingId(m.id)} className="block w-full cursor-grab overflow-hidden rounded-2xl active:cursor-grabbing" aria-label={`Edit ${m.kind === "VIDEO" ? "video" : "photo"} ${i + 1}${m.isPrimary ? ", main photo" : ""}${m.caption ? `, caption: ${m.caption}` : ", no caption"}`}>
+                <MediaThumb item={m} alt="" className="aspect-[4/5] w-full" rounded="rounded-2xl" />
+              </button>
+              <span className="pointer-events-none absolute bottom-1.5 left-1.5 flex flex-wrap gap-1">
+                {m.isPrimary && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[0.65rem] font-semibold text-surface">
+                    <Icon name="star" filled className="h-3 w-3" /> Main photo
                   </span>
-                  {m.status !== "APPROVED" && <span className="absolute inset-x-2 bottom-2 rounded-full bg-gold-soft px-2 py-0.5 text-center text-[0.7rem] font-semibold text-gold-ink">{m.status === "REJECTED" ? "Not shown: removed by review" : "Waiting for review"}</span>}
-                </div>
-                <div className="min-w-0 space-y-3">
-                  <CaptionEditor item={m} index={i} max={limits.captionMax} onSaved={onChange} />
-                  <div className="flex flex-wrap items-center gap-1 border-t hairline pt-3">
-                    <IconButton icon="chevronLeft" size="sm" className="rotate-90" label={`Move ${i + 1} earlier`} disabled={i === 0} onClick={() => reorder(i, i - 1)} />
-                    <IconButton icon="chevronRight" size="sm" className="rotate-90" label={`Move ${i + 1} later`} disabled={i === media.length - 1} onClick={() => reorder(i, i + 1)} />
-                    {m.kind === "IMAGE" && !m.isPrimary && (
-                      <Button size="sm" variant="ghost" onClick={() => makePrimary(m)} icon={<Icon name="star" className="h-4 w-4" />}>
-                        Make main photo
-                      </Button>
-                    )}
-                    {m.kind === "IMAGE" && (
-                      <Button size="sm" variant="ghost" onClick={() => setFraming(m)} icon={<Icon name="edit" className="h-4 w-4" />}>
-                        Framing
-                      </Button>
-                    )}
-                    {m.kind === "VIDEO" && <span className="px-2 text-xs text-ink-muted">Video · {formatDuration(m.durationMs)}</span>}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setReplacing(m);
-                        requestAnimationFrame(() => replaceInput.current?.click());
-                      }}
-                      icon={<Icon name="upload" className="h-4 w-4" />}
-                    >
-                      Replace
-                    </Button>
-                    <Button size="sm" variant="ghost" className="!text-accent" onClick={() => setRemoving(m)} icon={<Icon name="close" className="h-4 w-4" />}>
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="mt-6 rounded-2xl bg-parchment-deep/60 p-5 text-sm text-ink-soft">Nothing here yet. Start with one clear, recent photo of you — videos are optional.</p>
-        )}
-        <p className="mt-3 text-sm text-ink-muted">Drag items to reorder, or use the arrows. Your main photo is chosen separately and is what people see first; videos are never used as your main photo.</p>
+                )}
+              </span>
+              <span className={cx("pointer-events-none absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full", m.caption ? "bg-surface/95 text-primary shadow-soft" : "bg-ink/35 text-surface")} aria-hidden="true">
+                <Icon name="edit" className="h-3.5 w-3.5" />
+              </span>
+              {m.status !== "APPROVED" && <span className="pointer-events-none absolute inset-x-1.5 bottom-1.5 rounded-full bg-gold-soft px-2 py-0.5 text-center text-[0.65rem] font-semibold text-gold-ink">{m.status === "REJECTED" ? "Removed by review" : "In review"}</span>}
+            </li>
+          ))}
+        </ol>
+        {media.length === 0 && <p className="mt-4 rounded-2xl bg-parchment-deep/60 p-5 text-sm text-ink-soft">Nothing here yet. Start with one clear, recent photo of you — videos are optional.</p>}
+        <p className="mt-3 text-sm text-ink-muted">Tap a photo or video to add a caption, reorder it or make it your main photo. You can also drag tiles to reorder. Videos are never used as your main photo.</p>
         <p className="sr-only" aria-live="polite">
           {status}
         </p>
@@ -378,14 +355,28 @@ export function MediaWorkspace({ media, limits, onChange }: { media: OwnMediaIte
       </aside>
 
       <FocusEditor photo={framing} onClose={() => setFraming(null)} onSaved={onChange} />
-      <Dialog open={!!viewing} onClose={() => setViewing(null)} title={viewing?.kind === "VIDEO" ? "Video preview" : "Photo preview"}>
-        {viewing && (
-          <div className="space-y-3">
-            {viewing.kind === "VIDEO" ? <VideoPlayer item={viewing} label="Your video" className="max-h-[60vh] w-full rounded-2xl" /> : <img src={photoUrl(viewing.id)} alt="Your photo" className="max-h-[60vh] w-full rounded-2xl object-contain" />}
-            {viewing.caption && <p className="font-serif text-lg italic text-ink-soft">{viewing.caption}</p>}
-          </div>
-        )}
-      </Dialog>
+      {editing && (
+        <ItemSheet
+          key={editing.id}
+          item={editing}
+          index={media.findIndex((m) => m.id === editing.id)}
+          total={media.length}
+          max={limits.captionMax}
+          onClose={() => setEditingId(null)}
+          onSaved={onChange}
+          onMove={(to) => reorder(media.findIndex((m) => m.id === editing.id), to)}
+          onPrimary={() => makePrimary(editing)}
+          onFraming={() => setFraming(editing)}
+          onReplace={() => {
+            setReplacing(editing);
+            requestAnimationFrame(() => replaceInput.current?.click());
+          }}
+          onDelete={() => {
+            setEditingId(null);
+            setRemoving(editing);
+          }}
+        />
+      )}
       <ConfirmDialog
         open={!!removing}
         onClose={() => setRemoving(null)}
@@ -401,80 +392,103 @@ export function MediaWorkspace({ media, limits, onChange }: { media: OwnMediaIte
   );
 }
 
-/** One item's caption: live preview, character counter, and explicit save / discard / remove. */
-function CaptionEditor({ item, index, max, onSaved }: { item: OwnMediaItem; index: number; max: number; onSaved: () => void }) {
+/**
+ * One item, opened from the grid: a large preview, its own caption (counter, live preview, Cancel / Save),
+ * and everything else you can do with it. Captions belong to the item, so they move with it.
+ */
+function ItemSheet({ item, index, total, max, onClose, onSaved, onMove, onPrimary, onFraming, onReplace, onDelete }: { item: OwnMediaItem; index: number; total: number; max: number; onClose: () => void; onSaved: () => void; onMove: (to: number) => void; onPrimary: () => void; onFraming: () => void; onReplace: () => void; onDelete: () => void }) {
   const id = useId();
-  const [draft, setDraft] = useState<string | null>(null);
+  const [draft, setDraft] = useState(item.caption ?? "");
   const [busy, setBusy] = useState(false);
   const toast = useToast();
-  const value = draft ?? item.caption ?? "";
-  const dirty = draft !== null && draft.trim() !== (item.caption ?? "");
+  const dirty = draft.trim() !== (item.caption ?? "");
+  const kind = item.kind === "VIDEO" ? "video" : "photo";
   const save = async (caption: string | null) => {
     setBusy(true);
     try {
       await api.patch(`/profiles/me/photos/${item.id}`, { caption });
-      setDraft(null);
       onSaved();
       toast(caption ? "Caption saved" : "Caption removed");
+      return true;
     } catch (e) {
       toast(e instanceof ApiError ? e.message : "Couldn't save the caption.", "error");
+      return false;
     } finally {
       setBusy(false);
     }
   };
   return (
-    <div className="space-y-2">
-      <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-sm font-semibold">
-          Caption <span className="font-normal text-ink-muted">(optional)</span>
-        </label>
-        <span className={cx("text-xs tabular-nums", value.length > max ? "font-semibold text-error" : "text-ink-muted")} aria-live="polite">
-          {value.length}/{max}
-        </span>
-      </div>
-      <textarea
-        id={id}
-        rows={2}
-        value={value}
-        maxLength={max}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e: KeyboardEvent) => {
-          if (e.key === "Escape" && dirty) setDraft(null);
-        }}
-        placeholder={item.kind === "VIDEO" ? "What's happening in this clip? (optional)" : "The story behind this photo (optional)"}
-        aria-describedby={`${id}-preview`}
-        className="block w-full resize-y rounded-2xl border border-line bg-surface px-3.5 py-2.5 text-[0.95rem] focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
-      />
-      <p id={`${id}-preview`} className="min-h-[1.5rem] text-sm">
-        {value.trim() ? (
-          <>
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">On your profile: </span>
-            <span className="font-serif text-base italic text-ink-soft">{value.trim()}</span>
-          </>
-        ) : (
-          <span className="text-xs text-ink-muted">No caption — {index === 0 ? "that's fine, photos speak for themselves" : "it's optional"}.</span>
-        )}
-      </p>
-      {(dirty || item.caption) && (
-        <div className="flex flex-wrap gap-2">
-          {dirty && (
-            <>
-              <Button size="sm" loading={busy} onClick={() => save(value.trim() || null)}>
-                Save caption
-              </Button>
-              <Button size="sm" variant="quiet" disabled={busy} onClick={() => setDraft(null)}>
-                Discard
-              </Button>
-            </>
+    <Dialog open onClose={onClose} title={item.caption ? "Edit caption" : "Add a caption"} description={`${item.kind === "VIDEO" ? "Video" : "Photo"} ${index + 1} of ${total}`}>
+      <div className="space-y-4">
+        <div className="overflow-hidden rounded-2xl bg-ink">
+          {item.kind === "VIDEO" ? <VideoPlayer item={item} label="Your video" className="max-h-[40vh] w-full" /> : <img src={photoUrl(item.id)} alt="" style={{ objectPosition: `${item.focusX}% ${item.focusY}%` }} className="max-h-[40vh] w-full object-cover" />}
+        </div>
+        <div>
+          <label htmlFor={id} className="sr-only">
+            Caption
+          </label>
+          <textarea
+            id={id}
+            rows={2}
+            value={draft}
+            maxLength={max}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder={item.kind === "VIDEO" ? "What's happening in this clip? (optional)" : "The story behind this photo (optional)"}
+            aria-describedby={`${id}-count`}
+            className="block w-full resize-y rounded-2xl border border-line bg-surface px-3.5 py-3 text-[0.95rem] focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+          />
+          <p id={`${id}-count`} className="mt-1 text-right text-xs tabular-nums text-ink-muted" aria-live="polite">
+            {draft.length}/{max}
+          </p>
+          <p className="min-h-[1.25rem] text-sm">
+            {draft.trim() ? (
+              <>
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">On your profile: </span>
+                <span className="font-serif text-base italic text-ink-soft">{draft.trim()}</span>
+              </>
+            ) : (
+              <span className="text-xs text-ink-muted">Captions are optional.</span>
+            )}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1 border-t hairline pt-3">
+          <IconButton icon="chevronLeft" size="sm" label={`Move ${kind} earlier`} disabled={index <= 0} onClick={() => onMove(index - 1)} />
+          <IconButton icon="chevronRight" size="sm" label={`Move ${kind} later`} disabled={index >= total - 1} onClick={() => onMove(index + 1)} />
+          {item.kind === "IMAGE" && !item.isPrimary && (
+            <Button size="sm" variant="ghost" onClick={onPrimary} icon={<Icon name="star" className="h-4 w-4" />}>
+              Make main photo
+            </Button>
           )}
-          {!dirty && item.caption && (
+          {item.kind === "IMAGE" && (
+            <Button size="sm" variant="ghost" onClick={onFraming} icon={<Icon name="edit" className="h-4 w-4" />}>
+              Framing
+            </Button>
+          )}
+          {item.kind === "VIDEO" && <span className="px-2 text-xs text-ink-muted">Video · {formatDuration(item.durationMs)}</span>}
+          <Button size="sm" variant="ghost" onClick={onReplace} icon={<Icon name="upload" className="h-4 w-4" />}>
+            Replace
+          </Button>
+          <Button size="sm" variant="ghost" className="!text-accent" onClick={onDelete} icon={<Icon name="close" className="h-4 w-4" />}>
+            Delete
+          </Button>
+          {item.caption && !dirty && (
             <Button size="sm" variant="quiet" disabled={busy} onClick={() => save(null)}>
               Remove caption
             </Button>
           )}
         </div>
-      )}
-    </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="secondary" onClick={onClose} disabled={busy}>
+            Cancel
+          </Button>
+          <Button loading={busy} disabled={!dirty} onClick={async () => (await save(draft.trim() || null)) && onClose()}>
+            Save
+          </Button>
+        </div>
+      </div>
+    </Dialog>
   );
 }
 

@@ -61,10 +61,10 @@ export function AppShell() {
   const items: Item[] = [
     { to: "/app/discover", label: "Discover", icon: "discover", mobile: true },
     { to: "/app/likes", label: "Likes", icon: "heart", mobile: true },
-    { to: "/app/matches", label: "Matches", icon: "matches" },
-    { to: "/app/messages", label: "Messages", icon: "chat", badge: unreadChats, mobile: true },
+    { to: "/app/matches", label: "Matches", icon: "matches", mobile: true },
+    { to: "/app/messages", label: "Chat", icon: "chat", badge: unreadChats, mobile: true },
     { to: "/app/compatibility", label: "Compatibility", icon: "spark" },
-    { to: "/app/games", label: "Games", icon: "games", mobile: true },
+    { to: "/app/games", label: "Games", icon: "games" },
     { to: "/app/experts", label: "Experts", icon: "expert" },
     { to: "/app/profile", label: "Profile", icon: "user", mobile: true },
     { to: "/app/settings", label: "Settings", icon: "settings" },
@@ -126,12 +126,16 @@ export function AppShell() {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b hairline bg-parchment/90 px-4 py-3 backdrop-blur md:hidden">
-        <Logo to="/app/discover" />
-        <div className="flex items-center gap-1">
-          <Link to="/app/matches" className="rounded-full p-2.5 text-ink-soft" aria-label="Matches">
-            <Icon name="matches" />
+      <header className="sticky top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center border-b hairline bg-parchment/90 px-3 py-2.5 backdrop-blur md:hidden">
+        <div className="flex items-center">
+          <Link to="/app/games" className="rounded-full p-2.5 text-ink-soft" aria-label="Games">
+            <Icon name="games" />
           </Link>
+        </div>
+        <Link to="/app/discover" className="rounded-full px-2 font-serif text-[1.9rem] font-medium leading-none tracking-tight text-primary" aria-label="Knot home">
+          Knot
+        </Link>
+        <div className="flex items-center justify-end">
           <Link to="/app/notifications" className="relative rounded-full p-2.5 text-ink-soft" aria-label={`Notifications${unreadNotes ? `, ${unreadNotes} unread` : ""}`}>
             <Icon name="bell" />
             {!!unreadNotes && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold" />}
@@ -158,10 +162,10 @@ export function AppShell() {
             .filter((i) => i.mobile)
             .map((i) => (
               <li key={i.to}>
-                <NavLink to={i.to} className={({ isActive }) => cx("relative flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-semibold", isActive ? "text-primary before:absolute before:inset-x-[30%] before:top-0 before:h-0.5 before:rounded-full before:bg-primary" : "text-ink-muted")}>
+                <NavLink to={i.to} className={({ isActive }) => cx("relative flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-semibold transition-colors", isActive ? "text-primary" : "text-ink-muted")}>
                   {({ isActive }) => (
                     <>
-                      <Icon name={i.icon} className="h-6 w-6" filled={isActive && i.icon === "heart"} />
+                      <Icon name={i.icon} className="h-6 w-6" filled={isActive && i.icon !== "discover"} />
                       {i.label}
                       {!!i.badge && <span className="absolute right-[30%] top-1.5 h-2 w-2 rounded-full bg-primary" aria-label={`${i.badge} unread`} />}
                     </>

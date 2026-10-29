@@ -218,7 +218,7 @@ export function IntentionSection({ profile, onSaved, submitLabel = "Save", secon
     >
       <fieldset>
         <legend className="sr-only">What are you open to right now?</legend>
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {INTENTIONS.map((i) => {
             const on = selected.includes(i.value);
             return (
@@ -228,13 +228,13 @@ export function IntentionSection({ profile, onSaved, submitLabel = "Save", secon
                 role="checkbox"
                 aria-checked={on}
                 onClick={() => toggle(i.value)}
-                className={cx("flex items-start gap-4 rounded-3xl border-2 p-5 text-left transition", on ? "border-primary bg-primary-50" : "border-line bg-surface/70 hover:border-primary/40")}
+                className={cx("flex items-center gap-4 rounded-[1.75rem] border px-5 py-3.5 text-left transition", on ? "border-primary bg-primary text-surface shadow-soft" : "border-line bg-surface/80 text-ink hover:border-primary/40")}
               >
-                <span className={cx("mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", on ? "border-primary bg-primary text-surface" : "border-line-strong")}>{on && <Icon name="check" className="h-4 w-4" />}</span>
-                <span>
-                  <span className="block font-serif text-xl text-ink">{i.title}</span>
-                  <span className="mt-1 block text-ink-soft">{i.description}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold">{i.title}</span>
+                  <span className={cx("mt-0.5 block text-sm", on ? "text-surface/80" : "text-ink-muted")}>{i.description}</span>
                 </span>
+                <span className={cx("flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", on ? "border-surface bg-surface text-primary" : "border-line-strong")}>{on && <Icon name="check" className="h-4 w-4" />}</span>
               </button>
             );
           })}

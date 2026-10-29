@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { Logo } from "../../components/ui/Logo";
 import { Button } from "../../components/ui/Button";
 import { Drawer } from "../../components/ui/Drawer";
 import { Icon } from "../../components/ui/Icon";
@@ -20,12 +19,12 @@ import { cx } from "../../lib/format";
 import type { OwnProfile } from "../../lib/types";
 
 const STEPS = [
-  { key: "intro", title: "Your introduction", short: "Intro" },
-  { key: "photos", title: "Your photographs", short: "Photos" },
-  { key: "words", title: "More than a bio", short: "Your words" },
-  { key: "connection", title: "My kind of connection", short: "Connection" },
-  { key: "little", title: "The little things", short: "Little things" },
-  { key: "preview", title: "Preview your story", short: "Preview" },
+  { key: "intro", title: "Introduction", short: "Intro", sub: "Tell us about yourself" },
+  { key: "photos", title: "Photos & videos", short: "Photos", sub: "Add your moments" },
+  { key: "words", title: "Prompts", short: "Your words", sub: "Share your thoughts" },
+  { key: "connection", title: "Relationship intentions", short: "Connection", sub: "What you're looking for" },
+  { key: "little", title: "Interests", short: "Little things", sub: "What you love" },
+  { key: "preview", title: "Preview", short: "Preview", sub: "See your complete profile" },
 ] as const;
 type StepKey = (typeof STEPS)[number]["key"];
 
@@ -73,9 +72,16 @@ export function Onboarding() {
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-20 border-b hairline bg-parchment/90 backdrop-blur">
-        <div className="container-page flex items-center justify-between gap-4 py-4">
-          <Logo />
-          <div className="flex items-center gap-3 text-sm">
+        <div className="container-page grid grid-cols-[1fr_auto_1fr] items-center gap-4 py-3">
+          <div>
+            {index > 0 && (
+              <button type="button" onClick={() => go(STEPS[index - 1].key)} className="rounded-full p-2 text-ink-soft hover:bg-ink/5" aria-label="Previous step">
+                <Icon name="chevronLeft" />
+              </button>
+            )}
+          </div>
+          <span className="font-serif text-[1.9rem] font-medium leading-none tracking-tight text-primary">Knot</span>
+          <div className="flex items-center justify-end gap-3 text-sm">
             <SaveIndicator at={savedAt} />
             {step !== "preview" && preview && (
               <Button variant="secondary" size="sm" className="lg:hidden" onClick={() => setPreviewOpen(true)} icon={<Icon name="eye" className="h-4 w-4" />}>
@@ -85,22 +91,27 @@ export function Onboarding() {
           </div>
         </div>
         <nav aria-label="Your story progress" className="container-page pb-3">
-          <ol className="grid grid-cols-6 gap-1.5">
-            {STEPS.map((s, i) => (
-              <li key={s.key}>
-                <button
-                  type="button"
-                  disabled={!data || i > reachable}
-                  onClick={() => go(s.key)}
-                  aria-current={s.key === step ? "step" : undefined}
-                  className="group block w-full text-left disabled:cursor-default"
-                >
-                  <span className={cx("block h-1 rounded-full transition-colors duration-500", i <= index ? "bg-primary" : i <= reachable ? "bg-primary-200" : "bg-line")} />
-                  <span className={cx("mt-1.5 hidden truncate text-xs font-semibold md:block", s.key === step ? "text-primary" : "text-ink-muted")}>{s.short}</span>
-                </button>
-              </li>
-            ))}
-          </ol>
+          <div className="flex items-center gap-3">
+            <ol className="grid flex-1 grid-cols-6 gap-1">
+              {STEPS.map((s, i) => (
+                <li key={s.key}>
+                  <button
+                    type="button"
+                    disabled={!data || i > reachable}
+                    onClick={() => go(s.key)}
+                    aria-current={s.key === step ? "step" : undefined}
+                    aria-label={`Step ${i + 1}: ${s.title}`}
+                    className="block w-full py-1.5 disabled:cursor-default"
+                  >
+                    <span className={cx("block h-1.5 rounded-full transition-colors duration-500", i <= index ? "bg-primary" : i <= reachable ? "bg-primary-200" : "bg-line")} />
+                  </button>
+                </li>
+              ))}
+            </ol>
+            <span className="text-xs font-semibold tabular-nums text-ink-muted">
+              {index + 1}/{STEPS.length}
+            </span>
+          </div>
         </nav>
       </header>
 
@@ -156,7 +167,25 @@ export function Onboarding() {
         </main>
         {step !== "preview" && preview && (
           <aside className="hidden lg:block" aria-label="Live preview">
-            <div className="sticky top-36">
+            <div className="sticky top-32 space-y-6">
+              <section aria-labelledby="create-profile">
+                <h2 id="create-profile" className="font-serif text-2xl">
+                  Create your profile
+                </h2>
+                <ol className="mt-3 space-y-1">
+                  {STEPS.map((s, i) => (
+                    <li key={s.key}>
+                      <button type="button" disabled={!data || i > reachable} onClick={() => go(s.key)} className={cx("flex w-full items-center gap-3 rounded-2xl px-2 py-1.5 text-left transition disabled:cursor-default", s.key === step ? "bg-surface shadow-soft" : "hover:bg-surface/60")}>
+                        <span className={cx("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold", i < index ? "bg-primary text-surface" : s.key === step ? "bg-primary-50 text-primary" : "bg-rose-mist text-ink-muted")}>{String(i + 1).padStart(2, "0")}</span>
+                        <span className="min-w-0">
+                          <span className={cx("block text-sm font-semibold", s.key === step ? "text-primary" : "text-ink")}>{s.title}</span>
+                          <span className="block text-xs text-ink-muted">{s.sub}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              </section>
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Live preview</p>
               <StoryPreviewCard profile={preview} />
             </div>

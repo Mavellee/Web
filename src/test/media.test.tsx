@@ -39,39 +39,46 @@ const person = (id: string, name: string, over: Partial<EditorialData> = {}): Ed
 });
 
 describe("media workspace", () => {
-  it("gives each item its own caption with a live preview, counter, save and discard", async () => {
+  it("opens one item at a time to add its own caption, with a live preview, counter, cancel and save", async () => {
     const { calls } = mockApi({ "PATCH /profiles/me/photos/p2": { body: { data: item("p2", { caption: "A little memory from my Goa trip." }) } } });
     const onChange = vi.fn();
     renderWithProviders(<MediaWorkspace media={[item("p1", { isPrimary: true, caption: "My favourite sunset." }), item("p2", { position: 1 })]} limits={limits} onChange={onChange} />);
-    const rows = screen.getAllByRole("listitem").filter((li) => within(li).queryByLabelText(/Caption/));
-    expect(rows).toHaveLength(2);
+    expect(screen.getByRole("button", { name: /Edit photo 1, main photo, caption: My favourite sunset\./ })).toBeInTheDocument();
 
-    const second = within(rows[1]).getByLabelText(/Caption/);
-    await userEvent.type(second, "Some draft");
-    expect(within(rows[1]).getByText("10/200")).toBeInTheDocument();
-    expect(rows[1].querySelector('[id$="-preview"]')).toHaveTextContent("On your profile: Some draft"); // live preview
-    await userEvent.click(within(rows[1]).getByRole("button", { name: "Discard" }));
-    expect(second).toHaveValue("");
+    await userEvent.click(screen.getByRole("button", { name: /Edit photo 2, no caption/ }));
+    const box = screen.getByLabelText("Caption");
+    await userEvent.type(box, "Some draft");
+    expect(screen.getByText("10/200")).toBeInTheDocument();
+    expect(screen.getByText("On your profile:").parentElement).toHaveTextContent("On your profile: Some draft"); // live preview
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(calls.some((c) => c.key.startsWith("PATCH"))).toBe(false); // cancel discards
 
-    await userEvent.type(second, "A little memory from my Goa trip.");
-    await userEvent.click(within(rows[1]).getByRole("button", { name: "Save caption" }));
+    await userEvent.click(screen.getByRole("button", { name: /Edit photo 2/ }));
+    expect(screen.getByLabelText("Caption")).toHaveValue("");
+    await userEvent.type(screen.getByLabelText("Caption"), "A little memory from my Goa trip.");
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(onChange).toHaveBeenCalled());
     expect(calls.find((c) => c.key === "PATCH /profiles/me/photos/p2")?.body).toEqual({ caption: "A little memory from my Goa trip." });
-    // The first item's existing caption is untouched and can be removed on its own.
-    expect(within(rows[0]).getByRole("button", { name: "Remove caption" })).toBeInTheDocument();
   });
 
-  it("reorders, marks the main photo separately, and never offers a video as the main photo", async () => {
+  it("chooses the main photo separately, never offers a video as main, and reorders", async () => {
     const { calls } = mockApi({ "PUT /profiles/me/photos/order": { body: { data: { ordered: true } } }, "PUT /profiles/me/photos/p2/primary": { body: { data: { primary: "p2" } } } });
     const onChange = vi.fn();
     const { container } = renderWithProviders(<MediaWorkspace media={[item("p1", { isPrimary: true }), item("v1", { kind: "VIDEO", position: 1, durationMs: 12000 }), item("p2", { position: 2 })]} limits={limits} onChange={onChange} />);
     expect(screen.getAllByText("Main photo")).toHaveLength(1);
+    expect(screen.getByText("0:12")).toBeInTheDocument(); // video length on its tile
+
+    await userEvent.click(screen.getByRole("button", { name: /Edit video 2/ }));
+    expect(screen.queryByRole("button", { name: "Make main photo" })).toBeNull();
     expect(screen.getByText("Video · 0:12")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "Make main photo" })).toHaveLength(1); // only the other photo, not the video
+    await userEvent.click(screen.getByRole("button", { name: "Move video earlier" }));
+    await waitFor(() => expect(calls.find((c) => c.key === "PUT /profiles/me/photos/order")?.body).toEqual({ ids: ["v1", "p1", "p2"] }));
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    await userEvent.click(screen.getByRole("button", { name: /Edit photo 3/ }));
     await userEvent.click(screen.getByRole("button", { name: "Make main photo" }));
     await waitFor(() => expect(calls.some((c) => c.key === "PUT /profiles/me/photos/p2/primary")).toBe(true));
-    await userEvent.click(screen.getByRole("button", { name: "Move 2 earlier" }));
-    await waitFor(() => expect(calls.find((c) => c.key === "PUT /profiles/me/photos/order")?.body).toEqual({ ids: ["v1", "p1", "p2"] }));
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(await axeViolations(container)).toEqual([]);
   });
 });
@@ -86,7 +93,8 @@ describe("full-profile gallery", () => {
     expect(screen.getByText("My favourite sunset.")).toBeInTheDocument();
     expect(screen.getByText("Proof that I will always stop to pet a dog.")).toBeInTheDocument();
     expect(screen.getByText("A little memory from my Goa trip.")).toBeInTheDocument();
-    expect(screen.getByText("3 photos · 1 video")).toBeInTheDocument();
+    // Every item is also in the thumbnail strip under the main photo.
+    expect(within(screen.getByRole("list", { name: "Riya's photos and videos" })).getAllByRole("listitem")).toHaveLength(4);
     // Videos show only their poster until someone asks to play: no <video> element is on the page.
     expect(container.querySelector("video")).toBeNull();
     expect(container.querySelector('img[src="/api/photos/v1/poster"]')).not.toBeNull();
@@ -96,7 +104,7 @@ describe("full-profile gallery", () => {
     mockApi({});
     const { container } = renderWithProviders(<EditorialProfile profile={person("u1", "Riya")} />);
     await userEvent.click(screen.getByRole("button", { name: /^Open Video 1 of Riya/ }));
-    expect(screen.getByText("Riya · 1 of 4")).toBeInTheDocument();
+    expect(screen.getByText(/^1 \/ 4/)).toBeInTheDocument();
     const video = container.querySelector("video")!;
     expect(video).not.toBeNull();
     expect(video.autoplay).toBe(false);
@@ -104,7 +112,7 @@ describe("full-profile gallery", () => {
     expect(video.hasAttribute("controls")).toBe(true);
     expect(video.getAttribute("poster")).toBe("/api/photos/v1/poster");
     await userEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(screen.getByText("Riya · 2 of 4")).toBeInTheDocument();
+    expect(screen.getByText(/^2 \/ 4/)).toBeInTheDocument();
     expect(screen.getAllByText("My favourite sunset.").length).toBeGreaterThan(1); // caption shown in the viewer too
   });
 

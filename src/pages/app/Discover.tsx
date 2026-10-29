@@ -128,6 +128,11 @@ export function Discover() {
     setFiltersOpen(false);
   };
   const count = activeFilterCount(filters);
+  const filtersButton = (
+    <Button variant="secondary" size="sm" onClick={() => setFiltersOpen(true)} icon={<Icon name="sliders" className="h-4 w-4" />} disabled={!me.data}>
+      Filters{count > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-surface">{count}</span>}
+    </Button>
+  );
   const profile = current ? full[current.id] : undefined;
   const ready = profile && !(profile instanceof ApiError) ? profile : null;
   const connectionId = current ? `connection-${current.id}` : undefined;
@@ -139,15 +144,14 @@ export function Discover() {
   return (
     <AppPage wide>
       <div ref={top} className="scroll-mt-24" />
-      <PageHeader
-        title="Discover"
-        lede="One person at a time — people whose intentions and preferences fit with yours, in both directions."
-        actions={
-          <Button variant="secondary" size="sm" onClick={() => setFiltersOpen(true)} icon={<Icon name="sliders" className="h-4 w-4" />} disabled={!me.data}>
-            Filters{count > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-surface">{count}</span>}
-          </Button>
-        }
-      />
+      {/* Phones go straight to the person (the wordmark is in the top bar); larger screens keep the full header. */}
+      <div className="hidden md:block">
+        <PageHeader title="Discover" lede="One person at a time — people whose intentions and preferences fit with yours, in both directions." actions={filtersButton} />
+      </div>
+      <div className="-mt-2 mb-4 flex items-center justify-between md:hidden">
+        <h1 className="font-serif text-2xl">Discover</h1>
+        {filtersButton}
+      </div>
       {count > 0 && (
         <div className="-mt-4 mb-6 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-ink-muted">Filtered:</span>
@@ -207,6 +211,7 @@ export function Discover() {
             <div key={ready.id} className="animate-rise">
               <EditorialProfile
                 profile={ready}
+                onLike={() => act(current, "like")}
                 onRespond={(t) => setDetail({ profile: current, target: t })}
                 connectionId={connectionId}
                 connectionOpen={compatOpen}
@@ -265,24 +270,18 @@ function ActionBar({ name, id, busy, onPass, onLike, onDetail, onCompat }: { nam
   const working = busy?.startsWith(id) ?? false;
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-[4.75rem] z-20 flex justify-center px-4 md:bottom-6 md:left-[17rem]">
-      <div role="toolbar" aria-label={`Actions for ${name}`} className="pointer-events-auto flex items-center gap-1.5 rounded-full border hairline bg-surface/95 p-1.5 shadow-lift backdrop-blur">
-        <button type="button" onClick={onPass} disabled={working} aria-label={`Pass on ${name}`} className="flex h-12 w-12 items-center justify-center rounded-full text-ink-soft transition hover:bg-ink/5 hover:text-ink disabled:opacity-50">
+      <div role="toolbar" aria-label={`Actions for ${name}`} className="pointer-events-auto flex items-center gap-1.5 rounded-full border hairline bg-surface/95 p-1.5 shadow-lift backdrop-blur sm:gap-2 sm:p-2">
+        <button type="button" onClick={onPass} disabled={working} aria-label={`Pass on ${name}`} className="flex h-11 w-11 items-center sm:h-12 sm:w-12 justify-center rounded-full border border-line bg-surface text-ink-soft transition hover:border-ink/30 hover:text-ink disabled:opacity-50">
           <Icon name="close" className="h-6 w-6" />
         </button>
-        <button type="button" onClick={onDetail} disabled={working} aria-label="Start with a detail" className="flex h-12 items-center gap-2 rounded-full px-3 text-sm font-semibold text-primary transition hover:bg-primary-50 disabled:opacity-50 sm:px-4">
-          <Icon name="chat" className="h-5 w-5" />
-          <span className="hidden sm:inline" aria-hidden="true">
-            Start with a detail
-          </span>
-        </button>
-        <button type="button" onClick={onCompat} aria-label="View compatibility" className="flex h-12 items-center gap-2 rounded-full px-3 text-sm font-semibold text-primary transition hover:bg-primary-50 sm:px-4">
+        <button type="button" onClick={onCompat} aria-label="View compatibility" className="flex h-11 w-11 items-center sm:h-12 sm:w-12 justify-center rounded-full border border-line bg-surface text-primary transition hover:bg-primary-50">
           <Icon name="spark" className="h-5 w-5" />
-          <span className="hidden sm:inline" aria-hidden="true">
-            Compatibility
-          </span>
         </button>
-        <button type="button" onClick={onLike} disabled={working} className="flex h-12 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-surface shadow-soft transition hover:bg-primary-hover disabled:opacity-50">
-          <Icon name="heart" className="h-5 w-5" /> Like
+        <button type="button" onClick={onDetail} disabled={working} className="flex h-11 items-center whitespace-nowrap rounded-full bg-primary px-4 text-[0.82rem] font-semibold text-surface shadow-soft transition hover:bg-primary-hover disabled:opacity-50 sm:h-12 sm:px-5 sm:text-sm">
+          Start with a detail
+        </button>
+        <button type="button" onClick={onLike} disabled={working} aria-label={`Like ${name}`} className="flex h-11 w-11 items-center sm:h-12 sm:w-12 justify-center rounded-full bg-primary text-surface shadow-soft transition hover:bg-primary-hover disabled:opacity-50">
+          <Icon name="heart" filled className="h-6 w-6" />
         </button>
       </div>
     </div>
