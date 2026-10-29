@@ -7,7 +7,7 @@ const SocketContext = createContext<{ socket: Socket | null; status: Status }>({
 
 /** One authenticated socket per signed-in, active session. Reconnects automatically. */
 export function SocketProvider({ children }: { children: ReactNode }) {
-  const { account } = useAuth();
+  const { account, refresh } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [status, setStatus] = useState<Status>("offline");
   const active = account?.status === "ACTIVE";
@@ -18,14 +18,18 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     setSocket(s);
     setStatus("connecting");
     s.on("connect", () => setStatus("connected"));
-    s.on("disconnect", () => setStatus("reconnecting"));
+    s.on("disconnect", (reason) => {
+      setStatus("reconnecting");
+      // The server only drops a socket itself when its session was revoked (logout elsewhere, suspension).
+      if (reason === "io server disconnect") void refresh();
+    });
     s.on("connect_error", () => setStatus("reconnecting"));
     return () => {
       s.close();
       setSocket(null);
       setStatus("offline");
     };
-  }, [active]);
+  }, [active, refresh]);
 
   return <SocketContext.Provider value={{ socket, status }}>{children}</SocketContext.Provider>;
 }
