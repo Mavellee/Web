@@ -10,6 +10,7 @@ import { useSocket, useSocketEvent } from "../../lib/socket";
 import { useResource } from "../../lib/useResource";
 import { clockTime, cx, dayLabel, timeAgo } from "../../lib/format";
 import { DetailMediaThumb } from "../../components/media/MediaThumb";
+import { mergeMessages } from "../../lib/messages";
 import type { ConversationSummary, Message, PublicProfile } from "../../lib/types";
 import { Avatar } from "../../components/ui/Photo";
 import { Button, ButtonLink } from "../../components/ui/Button";
@@ -146,14 +147,21 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
     void load();
   }, [load]);
 
-  // Join the conversation room (again after every reconnect).
+  // Join the conversation room, and after every reconnect rejoin and catch up on anything sent while offline.
   useEffect(() => {
     if (!socket) return;
     const join = () => socket.emit("conversation:join", { conversationId: id });
+    const rejoin = () => {
+      join();
+      api
+        .get<{ items: Message[] }>(`/conversations/${id}/messages?limit=30`)
+        .then((page) => setMessages((list) => mergeMessages(list, page.items)))
+        .catch(() => {});
+    };
     if (socket.connected) join();
-    socket.on("connect", join);
+    socket.on("connect", rejoin);
     return () => {
-      socket.off("connect", join);
+      socket.off("connect", rejoin);
       socket.emit("conversation:leave", { conversationId: id });
     };
   }, [socket, id]);
@@ -163,11 +171,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
     useCallback(
       (m) => {
         if (m.conversationId !== id) return;
-        setMessages((list) => {
-          const i = list.findIndex((x) => x.id === m.id || (m.clientId && x.clientId === m.clientId && x.senderId === m.senderId));
-          if (i >= 0) return list.map((x, k) => (k === i ? m : x));
-          return [...list, m];
-        });
+        setMessages((list) => mergeMessages(list, [m]));
         if (m.senderId !== me) {
           setTheyTyping(false);
           if (document.visibilityState === "visible") socket?.emit("conversation:read", { conversationId: id });
