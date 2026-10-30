@@ -7,13 +7,13 @@ import { api } from "../../lib/api";
 import { useResource } from "../../lib/useResource";
 import { cx, timeAgo } from "../../lib/format";
 
-type Note = { id: string; type: string; title: string; body: string | null; data: { conversationId?: string; matchId?: string; sessionId?: string; requestId?: string }; readAt: string | null; createdAt: string };
+type Note = { id: string; type: string; title: string; body: string | null; data: { path?: string; conversationId?: string; matchId?: string; sessionId?: string; requestId?: string }; readAt: string | null; createdAt: string };
 
 export function Notifications() {
   const { data, error, loading, reload } = useResource<{ items: Note[]; unread: number }>("/notifications");
   const navigate = useNavigate();
   const target = (n: Note) =>
-    n.data.conversationId ? `/app/messages/${n.data.conversationId}` : n.data.sessionId ? `/app/games/${n.data.sessionId}` : n.data.requestId ? "/app/experts" : n.type === "MATCH" ? "/app/matches" : null;
+    n.data.path ? n.data.path : n.data.conversationId ? `/app/messages/${n.data.conversationId}` : n.data.sessionId ? `/app/games/${n.data.sessionId}` : n.data.requestId ? "/app/experts" : n.type === "MATCH" ? "/app/matches" : null;
 
   return (
     <AppPage>

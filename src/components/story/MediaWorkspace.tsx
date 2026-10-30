@@ -328,7 +328,7 @@ export function MediaWorkspace({ media, limits, onChange }: { media: OwnMediaIte
                   </span>
                 )}
               </span>
-              <span className={cx("pointer-events-none absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full", m.caption ? "bg-surface/95 text-primary shadow-soft" : "bg-ink/35 text-surface")} aria-hidden="true">
+              <span className={cx("pointer-events-none absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full", m.caption ? "bg-surface/95 text-primary shadow-soft" : "bg-scrim/35 text-surface")} aria-hidden="true">
                 <Icon name="edit" className="h-3.5 w-3.5" />
               </span>
               {m.status !== "APPROVED" && <span className="pointer-events-none absolute inset-x-1.5 bottom-1.5 rounded-full bg-gold-soft px-2 py-0.5 text-center text-[0.65rem] font-semibold text-gold-ink">{m.status === "REJECTED" ? "Removed by review" : "In review"}</span>}
@@ -420,7 +420,7 @@ function ItemSheet({ item, index, total, max, onClose, onSaved, onMove, onPrimar
   return (
     <Dialog open onClose={onClose} title={item.caption ? "Edit caption" : "Add a caption"} description={`${item.kind === "VIDEO" ? "Video" : "Photo"} ${index + 1} of ${total}`}>
       <div className="space-y-4">
-        <div className="overflow-hidden rounded-2xl bg-ink">
+        <div className="overflow-hidden rounded-2xl bg-scrim">
           {item.kind === "VIDEO" ? <VideoPlayer item={item} label="Your video" className="max-h-[40vh] w-full" /> : <img src={photoUrl(item.id)} alt="" style={{ objectPosition: `${item.focusX}% ${item.focusY}%` }} className="max-h-[40vh] w-full object-cover" />}
         </div>
         <div>

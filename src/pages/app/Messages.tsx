@@ -22,6 +22,7 @@ import { Spinner } from "../../components/ui/Spinner";
 import { useToast } from "../../components/ui/Toast";
 import { ReportDialog, SafetyMenu } from "../../components/app/SafetyActions";
 import { CoupleEntry } from "../../components/couple/CoupleEntry";
+import { FriendReviewConsent } from "../../components/friendreview/FriendReviewPanel";
 import { AiPanel } from "../../components/app/AiPanel";
 
 export function Messages() {
@@ -390,6 +391,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
         {header.data && <AstroEntry matchId={header.data.matchId} />}
         {other && header.data && <SafetyMenu userId={other.id} name={other.displayName} matchId={header.data.matchId} onEnded={() => navigate("/app/messages")} />}
       </header>
+      {header.data && other && <FriendReviewConsent matchId={header.data.matchId} name={other.displayName} />}
       {header.data && <ZodiacCard matchId={header.data.matchId} />}
 
       <div

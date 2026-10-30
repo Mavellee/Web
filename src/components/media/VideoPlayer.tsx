@@ -27,7 +27,7 @@ export function VideoPlayer({ item, label, className }: { item: Pick<MediaItem, 
       controlsList="nodownload"
       aria-label={label}
       onError={() => setError(true)}
-      className={cx("bg-ink", className)}
+      className={cx("bg-scrim", className)}
     />
   );
 }

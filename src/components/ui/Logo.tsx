@@ -12,11 +12,11 @@ type Tone = "default" | "light";
 export function LogoMark({ className = "h-9 w-9", tone = "default" }: { className?: string; tone?: Tone }) {
   const light = tone === "light";
   const id = useId().replace(/:/g, "");
-  const gap = light ? "stroke-surface" : undefined;
+  const gap = light ? "stroke-paper" : undefined;
   const gapStroke = light ? undefined : `url(#${id}-seal)`;
   // Seal: pressed-wax depth on burgundy. Rings: antique gold with a soft champagne sheen.
   // Both gradients use the emblem's own coordinates, so the weave gaps match the seal behind them exactly.
-  const ring = light ? "stroke-primary" : "";
+  const ring = light ? "stroke-brand" : "";
   const ringStroke = light ? undefined : `url(#${id}-gold)`;
   return (
     <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
@@ -34,9 +34,9 @@ export function LogoMark({ className = "h-9 w-9", tone = "default" }: { classNam
           </linearGradient>
         </defs>
       )}
-      <circle cx="20" cy="20" r="19.5" fill={light ? undefined : `url(#${id}-seal)`} className={light ? "fill-surface" : undefined} />
+      <circle cx="20" cy="20" r="19.5" fill={light ? undefined : `url(#${id}-seal)`} className={light ? "fill-paper" : undefined} />
       {/* Fine gold rim, like the edge of a wax seal. */}
-      <circle cx="20" cy="20" r="17" fill="none" strokeWidth="0.6" className={light ? "stroke-primary/40" : "stroke-gold/60"} />
+      <circle cx="20" cy="20" r="17" fill="none" strokeWidth="0.6" className={light ? "stroke-brand/40" : "stroke-gold/60"} />
       <g fill="none" strokeLinecap="round" strokeWidth="2.1" className={ring} stroke={ringStroke}>
         <circle cx="16" cy="20" r="7.5" />
         <circle cx="24" cy="20" r="7.5" />

@@ -120,7 +120,7 @@ export function EditorialProfile({
                 className="aspect-[4/5] w-full"
                 rounded="rounded-[2rem]"
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-[2rem] bg-gradient-to-t from-ink/80 via-ink/25 to-transparent px-6 pb-6 pt-28 text-surface">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-[2rem] bg-gradient-to-t from-scrim/80 via-scrim/25 to-transparent px-6 pb-6 pt-28 text-surface">
                 {p.isDemo && (
                   <span className="mb-2 inline-block rounded-full bg-surface/90 px-2.5 py-0.5 text-[0.7rem] font-semibold text-ink">
                     Demo profile
@@ -186,7 +186,7 @@ export function EditorialProfile({
                         rounded="rounded-2xl"
                       />
                       {more > 0 && (
-                        <span className="absolute inset-0 flex items-center justify-center bg-ink/55 font-semibold text-surface">
+                        <span className="absolute inset-0 flex items-center justify-center bg-scrim/55 font-semibold text-surface">
                           +{more}
                         </span>
                       )}

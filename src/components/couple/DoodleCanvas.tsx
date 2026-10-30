@@ -141,7 +141,7 @@ export function DoodleCanvas({ doodle, matchId, me }: { doodle: Doodle; matchId:
         width={CANVAS}
         height={CANVAS}
         aria-label="Shared doodle canvas"
-        className="aspect-square w-full cursor-crosshair touch-none rounded-3xl border hairline bg-surface"
+        className="aspect-square w-full cursor-crosshair touch-none rounded-3xl border hairline bg-paper"
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
           begin(point(e));

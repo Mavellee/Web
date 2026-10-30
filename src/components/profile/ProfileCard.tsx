@@ -46,7 +46,7 @@ export function ProfileCard({ profile, actions, preview, linkToProfile = true }:
             <button type="button" className="absolute inset-y-0 right-0 w-1/3" onClick={() => setPhoto((p) => Math.min(photos.length - 1, p + 1))} aria-label="Next photo" />
           </>
         )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 via-ink/20 to-transparent px-6 pb-5 pt-20 text-surface">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim/75 via-scrim/20 to-transparent px-6 pb-5 pt-20 text-surface">
           <h2 className="font-serif text-3xl text-surface">
             {profile.displayName}
             {profile.age != null && <span className="font-normal">, {profile.age}</span>}

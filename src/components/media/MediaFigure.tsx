@@ -43,7 +43,7 @@ export function MediaFigure({ item, label, onOpen, action, className }: { item: 
             <PlayBadge durationMs={item.durationMs} />
           </>
         )}
-        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-ink/45 p-2 text-surface opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true">
+        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-scrim/45 p-2 text-surface opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true">
           <Icon name="expand" className="h-4 w-4" />
         </span>
       </button>

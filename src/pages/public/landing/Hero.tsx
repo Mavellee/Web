@@ -47,7 +47,7 @@ function HeroComposition() {
       <div className="grid grid-cols-2 items-center gap-4 md:grid-cols-[1fr_1.05fr_1fr] md:gap-6">
         <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-lift">
           <img src="/images/people/p13.jpg" alt="Illustrative portrait of a woman in a patterned collar" className="h-full w-full object-cover object-top" fetchPriority="high" />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/70 to-transparent p-4 pt-16 text-surface">
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim/70 to-transparent p-4 pt-16 text-surface">
             <p className="font-serif text-xl">Amara, 29</p>
             <p className="text-xs text-surface/80">Data scientist · Bengaluru</p>
           </div>

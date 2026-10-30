@@ -38,7 +38,7 @@ export function MediaLightbox({ items, name, index, onClose, onLike }: { items: 
         if (e.key === "ArrowRight") go(i + 1);
         if (e.key === "ArrowLeft") go(i - 1);
       }}
-      className="m-0 h-dvh max-h-none w-screen max-w-none bg-ink/95 p-0 text-surface backdrop:bg-ink/80"
+      className="m-0 h-dvh max-h-none w-screen max-w-none bg-scrim/95 p-0 text-surface backdrop:bg-scrim/80"
     >
       {open && item && (
         <div

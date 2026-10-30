@@ -21,6 +21,7 @@ const Experts = named(() => import("./pages/app/Experts"), "Experts");
 const Games = named(() => import("./pages/app/Games"), "Games");
 const GameSession = named(() => import("./pages/app/GameSession"), "GameSession");
 const KnotAstro = named(() => import("./pages/app/KnotAstro"), "KnotAstro");
+const FriendReview = named(() => import("./pages/public/FriendReview"), "FriendReview");
 const Us = named(() => import("./pages/app/Us"), "Us");
 const MyProfile = named(() => import("./pages/app/MyProfile"), "MyProfile");
 const Notifications = named(() => import("./pages/app/Notifications"), "Notifications");
@@ -57,6 +58,7 @@ export function App() {
         <Route path="contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Route>
+      <Route path="friend" element={<FriendReview />} />
       <Route path="signup" element={<Signup />} />
       <Route path="login" element={<Login />} />
       <Route path="forgot-password" element={<ForgotPassword />} />

@@ -25,7 +25,7 @@ function Thumb({ id, active, onOpen }: { id: string; active: boolean; onOpen: ()
     if (ctx && data) paintStrokes(ctx, data.strokes, 200);
   }, [data]);
   return (
-    <button type="button" onClick={onOpen} aria-label="Open doodle" aria-pressed={active} className={cx("overflow-hidden rounded-2xl border bg-surface", active ? "border-primary shadow-soft" : "hairline hover:shadow-soft")}>
+    <button type="button" onClick={onOpen} aria-label="Open doodle" aria-pressed={active} className={cx("overflow-hidden rounded-2xl border bg-paper", active ? "border-primary shadow-soft" : "hairline hover:shadow-soft")}>
       <canvas ref={ref} width={200} height={200} className="block aspect-square w-full" />
     </button>
   );

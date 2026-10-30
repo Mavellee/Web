@@ -2,7 +2,7 @@ import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type Selec
 import { cx } from "../../lib/format";
 
 const control =
-  "block w-full rounded-2xl border border-line bg-surface/80 px-4 py-3 text-ink placeholder:text-ink-muted/70 shadow-[inset_0_1px_0_rgba(255,255,255,.6)] transition focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/10 aria-[invalid=true]:border-accent aria-[invalid=true]:ring-rose/40 disabled:opacity-60";
+  "block w-full rounded-2xl border border-line bg-surface/80 px-4 py-3 text-ink placeholder:text-ink-muted/70 shadow-[inset_0_1px_0_var(--sheen)] transition focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/10 aria-[invalid=true]:border-accent aria-[invalid=true]:ring-rose/40 disabled:opacity-60";
 
 interface FieldShellProps {
   label: ReactNode;

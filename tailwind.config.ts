@@ -1,9 +1,15 @@
 import type { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
-import { cssVariables, type Token } from "./theme";
+import { cssVariables, darkCssVariables, type Token } from "./theme";
 
 // The Eternal Rose palette. Values live in theme.ts and reach the page as CSS variables.
 const v = (t: Token) => `rgb(var(--rgb-${t}) / <alpha-value>)`;
+
+// Foreground uses of the brand colours resolve to a lifted shade in dark mode; backgrounds stay deep burgundy.
+const brandForeground = {
+  primary: { DEFAULT: v("primary-text"), 700: v("primary-700-text"), 800: v("primary-800-text") },
+  accent: v("accent-text"),
+};
 
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
@@ -29,7 +35,17 @@ export default {
         line: { DEFAULT: v("border"), strong: v("border-strong") },
         success: { DEFAULT: v("success"), soft: v("success-soft") },
         error: { DEFAULT: v("error"), hover: v("error-hover"), soft: v("error-soft") },
+        paper: v("paper"),
+        scrim: v("scrim"),
+        brand: v("brand"),
+        panel: v("panel"),
       },
+      // text-surface always sits on burgundy or a photo, so it stays cream in both themes.
+      textColor: { ...brandForeground, surface: v("paper"), error: { DEFAULT: v("error-text"), hover: v("error-text"), soft: v("error-soft") } },
+      borderColor: { ...brandForeground, DEFAULT: v("border") },
+      ringColor: brandForeground,
+      stroke: brandForeground,
+      fill: brandForeground,
       fontFamily: {
         serif: ['"Fraunces Variable"', "Georgia", "serif"],
         sans: ['"Manrope Variable"', "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
@@ -46,5 +62,5 @@ export default {
       animation: { rise: "rise 400ms cubic-bezier(.2,.7,.2,1) both" },
     },
   },
-  plugins: [plugin(({ addBase }) => addBase({ ":root": cssVariables }))],
+  plugins: [plugin(({ addBase }) => addBase({ ":root": cssVariables, '[data-theme="dark"]': darkCssVariables }))],
 } satisfies Config;

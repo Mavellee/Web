@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             role={t.tone === "error" ? "alert" : "status"}
             className={cx(
               "pointer-events-auto animate-rise rounded-full px-5 py-3 text-sm font-medium shadow-lift",
-              t.tone === "error" ? "bg-error text-surface" : t.tone === "info" ? "bg-ink text-surface" : "bg-primary text-surface",
+              t.tone === "error" ? "bg-error text-surface" : t.tone === "info" ? "bg-scrim text-surface" : "bg-primary text-surface",
             )}
           >
             {t.message}

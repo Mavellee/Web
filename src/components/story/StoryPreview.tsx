@@ -43,7 +43,7 @@ export function StoryPreviewCard({ profile: p }: { profile: Omit<PublicProfile, 
             <span className="text-xs font-semibold uppercase tracking-[0.14em]">Placeholder — your photo goes here</span>
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 to-transparent px-5 pb-4 pt-16 text-surface">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim/75 to-transparent px-5 pb-4 pt-16 text-surface">
           <p className="font-serif text-2xl text-surface">
             {p.displayName}
             {p.age != null && <span className="font-normal">, {p.age}</span>}

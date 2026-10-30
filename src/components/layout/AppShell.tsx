@@ -9,6 +9,7 @@ import { Logo } from "../ui/Logo";
 import { Icon, type IconName } from "../ui/Icon";
 import { Avatar } from "../ui/Photo";
 import { Spinner } from "../ui/Spinner";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { useToast } from "../ui/Toast";
 
 type Item = { to: string; label: string; icon: IconName; badge?: number; mobile?: boolean };
@@ -101,7 +102,7 @@ export function AppShell() {
         Skip to content
       </a>
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col bg-primary px-4 py-6 text-surface md:flex">
+      <aside className="sticky top-0 hidden h-dvh flex-col bg-panel px-4 py-6 text-surface md:flex">
         <div className="px-3">
           <Logo to="/app/discover" tone="light" />
         </div>
@@ -117,7 +118,7 @@ export function AppShell() {
               <Icon name={i.icon} className="h-5 w-5" />
               <span className="flex-1">{i.label}</span>
               {!!i.badge && (
-                <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-primary-800" aria-label={`${i.badge} unread`}>
+                <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-scrim" aria-label={`${i.badge} unread`}>
                   {i.badge}
                 </span>
               )}
@@ -136,6 +137,7 @@ export function AppShell() {
               <p className="truncate text-sm font-semibold">{account?.displayName ?? "You"}</p>
               <ConnectionDot status={status} onDark />
             </div>
+            <ThemeToggle className={cx("p-2 text-surface/75 hover:bg-surface/10 hover:text-surface", ONDARK)} />
             <button type="button" onClick={onLogout} className={cx("rounded-full p-2 text-surface/75 hover:bg-surface/10 hover:text-surface", ONDARK)} aria-label="Log out">
               <Icon name="logout" />
             </button>
@@ -152,6 +154,7 @@ export function AppShell() {
         </div>
         <Logo to="/app/discover" size="sm" />
         <div className="flex items-center justify-end">
+          <ThemeToggle className="text-ink-soft" />
           <Link to="/app/notifications" className="relative rounded-full p-2.5 text-ink-soft" aria-label={`Notifications${unreadNotes ? `, ${unreadNotes} unread` : ""}`}>
             <Icon name="bell" />
             {!!unreadNotes && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold" />}

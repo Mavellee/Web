@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppPage } from "../../components/app/PageHeader";
 import { SafetyMenu } from "../../components/app/SafetyActions";
+import { FriendReviewPanel } from "../../components/friendreview/FriendReviewPanel";
 import { useConnectionActions } from "../../components/app/MatchDialog";
 import { EditorialProfile, type EditorialData } from "../../components/story/EditorialProfile";
 import { DetailComposer, type DetailTarget } from "../../components/story/DetailComposer";
@@ -81,6 +82,7 @@ export function PersonProfile() {
         )}
       </div>
       {isMe && <p className="mb-6 rounded-2xl bg-rose-mist px-4 py-3 text-sm text-primary-700">This is how your profile appears to other members.</p>}
+      {match && <FriendReviewPanel matchId={match.id} name={data.displayName} />}
       <EditorialProfile profile={data} onRespond={canAct ? setDetail : undefined} actions={cta} />
 
       {/* Restrained sticky actions on phones, above the app's bottom navigation. */}

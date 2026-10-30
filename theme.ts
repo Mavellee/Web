@@ -31,16 +31,70 @@ export const tokens = {
   error: "#A52F45",
   "error-hover": "#8A2539",
   "error-soft": "#F8E3E5",
+  // Text and lines in the brand colours. Burgundy can't be read on a dark page, so these lift in dark mode.
+  "primary-text": "#641E32",
+  "primary-700-text": "#521828",
+  "primary-800-text": "#3E111E",
+  "accent-text": "#A83F55",
+  "error-text": "#A52F45",
+  // The same in both themes: text on burgundy or photos, photo scrims, and the doodle paper.
+  paper: "#FFF9F5",
+  scrim: "#1C1216",
+  brand: "#641E32",
+  // Sidebar and footer: full burgundy in light, quieter in dark so it does not overpower the page.
+  panel: "#641E32",
 } as const;
 
 export type Token = keyof typeof tokens;
 
+/** Warm aubergine rather than grey, so dark mode still feels like Knot. */
+export const darkTokens: Record<Token, string> = {
+  ...tokens,
+  background: "#1A1216",
+  "background-deep": "#140D11",
+  surface: "#261B21",
+  primary: "#8A2C48",
+  "primary-hover": "#9E3654",
+  "primary-50": "#2F1B22",
+  "primary-100": "#3B212A",
+  "primary-200": "#5A2F3C",
+  "primary-300": "#B9808D",
+  "primary-700": "#6B2139",
+  "primary-800": "#4A1626",
+  accent: "#B84D64",
+  rose: "#5B2F3A",
+  "rose-soft": "#352026",
+  "rose-mist": "#25161B",
+  "gold-soft": "#33291A",
+  "gold-ink": "#E3C98F",
+  text: "#F5EAE6",
+  "text-soft": "#D3C2C3",
+  "text-muted": "#AC9A9F",
+  border: "#3B2D33",
+  "border-strong": "#524047",
+  success: "#8FB796",
+  "success-soft": "#1F2D23",
+  error: "#C2475F",
+  "error-hover": "#A83A50",
+  "error-soft": "#3A1C24",
+  panel: "#3A1522",
+  "primary-text": "#E7A9B3",
+  "primary-700-text": "#E7A9B3",
+  "primary-800-text": "#F0C4CB",
+  "accent-text": "#EC97A6",
+  "error-text": "#F09AA8",
+};
+
 const channels = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" ");
 
+const variables = (values: Record<string, string>) =>
+  Object.fromEntries(
+    Object.entries(values).flatMap(([k, v]) => [
+      [`--color-${k}`, v],
+      [`--rgb-${k}`, channels(v)],
+    ]),
+  );
+
 /** `--color-x: #hex` for direct CSS use, and `--rgb-x: r g b` so Tailwind opacity modifiers work. */
-export const cssVariables = Object.fromEntries(
-  Object.entries(tokens).flatMap(([k, v]) => [
-    [`--color-${k}`, v],
-    [`--rgb-${k}`, channels(v)],
-  ]),
-);
+export const cssVariables = { ...variables(tokens), "--sheen": "rgb(255 255 255 / 0.6)", "color-scheme": "light" };
+export const darkCssVariables = { ...variables(darkTokens), "--sheen": "rgb(255 255 255 / 0.04)", "color-scheme": "dark" };

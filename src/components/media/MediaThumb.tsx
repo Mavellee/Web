@@ -38,7 +38,7 @@ export function VideoPoster({ item, alt, className, fit = "cover", onLoad }: { i
 export function PlayBadge({ durationMs, size = "md" }: { durationMs: number | null; size?: "sm" | "md" }) {
   return (
     <span className={cx("pointer-events-none absolute inset-0 flex items-center justify-center")} aria-hidden="true">
-      <span className={cx("flex items-center gap-1.5 rounded-full bg-ink/60 font-semibold text-surface backdrop-blur-sm", size === "md" ? "px-4 py-2.5 text-sm" : "px-2 py-1 text-[0.7rem]")}>
+      <span className={cx("flex items-center gap-1.5 rounded-full bg-scrim/60 font-semibold text-surface backdrop-blur-sm", size === "md" ? "px-4 py-2.5 text-sm" : "px-2 py-1 text-[0.7rem]")}>
         <Icon name="play" filled className={size === "md" ? "h-5 w-5" : "h-3.5 w-3.5"} />
         {formatDuration(durationMs)}
       </span>

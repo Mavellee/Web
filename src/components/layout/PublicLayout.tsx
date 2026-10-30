@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Logo } from "../ui/Logo";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { ButtonLink } from "../ui/Button";
 import { Icon } from "../ui/Icon";
 import { useAuth } from "../../lib/auth";
@@ -43,6 +44,7 @@ export function PublicLayout() {
             ))}
           </nav>
           <div className="hidden items-center gap-2 md:flex">
+            <ThemeToggle className="text-ink-soft hover:bg-ink/5" />
             {account ? (
               <ButtonLink to="/app">Open Knot</ButtonLink>
             ) : (
@@ -54,6 +56,7 @@ export function PublicLayout() {
               </>
             )}
           </div>
+          <ThemeToggle className="ml-auto text-ink-soft md:hidden" />
           <button type="button" className="rounded-full p-2 text-ink md:hidden" aria-expanded={open} aria-controls="mobile-nav" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen((o) => !o)}>
             <Icon name={open ? "close" : "menu"} className="h-6 w-6" />
           </button>
@@ -101,7 +104,7 @@ function Footer() {
     { title: "Legal", links: [["Terms of service", "/terms"], ["Privacy policy", "/privacy"]] },
   ];
   return (
-    <footer className="mt-24 bg-primary text-surface/80">
+    <footer className="mt-24 bg-panel text-surface/80">
       <div className="container-page grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div className="max-w-xs">
           <Logo tone="light" />

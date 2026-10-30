@@ -10,6 +10,8 @@ import { ErrorState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/Toast";
 import { api, ApiError } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
+import { useTheme, type ThemeChoice } from "../../lib/theme";
+import { cx } from "../../lib/format";
 import { useResource } from "../../lib/useResource";
 import { timeAgo } from "../../lib/format";
 
@@ -27,7 +29,7 @@ function Toggle({ label, description, checked, onChange }: { label: string; desc
       <span className="relative mt-1 inline-flex shrink-0">
         <input type="checkbox" role="switch" className="peer sr-only" checked={checked} onChange={(e) => onChange(e.target.checked)} />
         <span className="h-7 w-12 rounded-full bg-line transition peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2" />
-        <span className="absolute left-1 top-1 h-5 w-5 rounded-full bg-surface shadow transition peer-checked:translate-x-5" />
+        <span className="absolute left-1 top-1 h-5 w-5 rounded-full bg-paper shadow transition peer-checked:translate-x-5" />
       </span>
     </label>
   );
@@ -55,6 +57,28 @@ function AstroData() {
       >
         Delete my astrology data
       </Button>
+    </Card>
+  );
+}
+
+const THEMES: { value: ThemeChoice; label: string }[] = [
+  { value: "system", label: "Match my device" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
+function Appearance() {
+  const { choice, setChoice } = useTheme();
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl">Appearance</h2>
+      <div role="radiogroup" aria-label="Theme" className="mt-4 grid gap-2 sm:grid-cols-3">
+        {THEMES.map((t) => (
+          <button key={t.value} type="button" role="radio" aria-checked={choice === t.value} onClick={() => setChoice(t.value)} className={cx("rounded-2xl border px-4 py-3 text-sm font-semibold transition", choice === t.value ? "border-primary bg-primary-50 text-primary" : "hairline bg-surface/70 text-ink-soft hover:bg-surface")}>
+            {t.label}
+          </button>
+        ))}
+      </div>
     </Card>
   );
 }
@@ -95,6 +119,7 @@ export function Settings() {
         <ErrorState message={settings.error.message} onRetry={settings.reload} />
       ) : s ? (
         <div className="space-y-6">
+          <Appearance />
           <Card className="px-6 py-2">
             <h2 className="pt-4 text-xl">Visibility</h2>
             <div className="divide-y hairline">
