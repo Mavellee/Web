@@ -236,6 +236,7 @@ export function Privacy() {
           <li>Account details: email, password (stored only as a secure hash), date of birth.</li>
           <li>Profile details you choose to add: name, photos, bio, gender, interests, languages, city, intentions, preferences.</li>
           <li>Optional compatibility answers, which are never shown to other members.</li>
+          <li>If you and a match both choose Knot Astro: your birth date, time and place, stored encrypted and used only to calculate your chart. Your match sees sign-level results, never these details. If you both agree, sign-level results (without names or birth details) go to an external AI provider to write your reading. You can withdraw and delete this at any time.</li>
           <li>Activity needed to run the service: likes, matches, messages, reports, and basic security logs.</li>
         </ul>
         <h2>What others can see</h2>

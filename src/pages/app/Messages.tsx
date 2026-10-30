@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ChatGameLauncher } from "../../components/chatgames/ChatGameLauncher";
 import { GameSelectionSheet } from "../../components/chatgames/GameSelectionSheet";
 import { InlineGameCard } from "../../components/chatgames/InlineGameCard";
@@ -11,6 +11,7 @@ import { useResource } from "../../lib/useResource";
 import { clockTime, cx, dayLabel, timeAgo } from "../../lib/format";
 import { DetailMediaThumb } from "../../components/media/MediaThumb";
 import { mergeMessages } from "../../lib/messages";
+import type { AstroState } from "../../lib/astro";
 import type { ConversationSummary, Message, PublicProfile } from "../../lib/types";
 import { Avatar } from "../../components/ui/Photo";
 import { Button, ButtonLink } from "../../components/ui/Button";
@@ -91,6 +92,22 @@ export function Messages() {
   );
 }
 
+/** Shown only where the server says Knot Astro applies to this match. */
+function AstroEntry({ matchId }: { matchId: string }) {
+  const { data, reload } = useResource<AstroState>(`/astro/matches/${matchId}`);
+  useSocketEvent<{ matchId: string }>("astro:update", (e) => {
+    if (e.matchId === matchId) void reload();
+  });
+  if (!data?.available) return null;
+  if (!data.hasReport && (data.status === "DECLINED" || !data.eligible)) return null;
+  return (
+    <Link to={`/app/astro/${matchId}`} aria-label="Knot Astro" className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gold/50 bg-gold-soft/40 px-3 py-1.5 text-xs font-semibold text-gold-ink hover:bg-gold-soft">
+      <Icon name="star" className="h-3.5 w-3.5" />
+      <span className="hidden sm:inline">{data.hasReport ? "Your Cosmic Connection" : "Knot Astro"}</span>
+    </Link>
+  );
+}
+
 type Header = { id: string; matchId: string; other: PublicProfile; otherLastReadAt: string | null };
 type Ack = { ok: boolean; data?: Message; error?: { message: string } };
 
@@ -109,7 +126,9 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [olderLoading, setOlderLoading] = useState(false);
-  const [text, setText] = useState("");
+  const location = useLocation();
+  // A question chosen from the report only fills the box: the person decides whether to send it.
+  const [text, setText] = useState((location.state as { draft?: string } | null)?.draft ?? "");
   const [theyTyping, setTheyTyping] = useState(false);
   const [otherReadAt, setOtherReadAt] = useState<string | null>(null);
   const [reporting, setReporting] = useState<Message | null>(null);
@@ -326,6 +345,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
         ) : (
           <Skeleton className="h-10 flex-1" />
         )}
+        {header.data && <AstroEntry matchId={header.data.matchId} />}
         {other && header.data && <SafetyMenu userId={other.id} name={other.displayName} matchId={header.data.matchId} onEnded={() => navigate("/app/messages")} />}
       </header>
 

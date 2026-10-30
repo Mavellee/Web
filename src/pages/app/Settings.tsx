@@ -33,6 +33,32 @@ function Toggle({ label, description, checked, onChange }: { label: string; desc
   );
 }
 
+/** Only appears for people who have actually given birth details to Knot Astro. */
+function AstroData() {
+  const { data, reload } = useResource<{ hasBirthDetails: boolean; retentionDays: number }>("/astro/me");
+  const toast = useToast();
+  if (!data?.hasBirthDetails) return null;
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl">Knot Astro</h2>
+      <p className="mt-2 text-sm text-ink-muted">Your encrypted birth details and chart. They're removed automatically after {data.retentionDays} days without use. Deleting them also removes any joint reports they were used for.</p>
+      <Button
+        className="mt-4"
+        variant="secondary"
+        size="sm"
+        onClick={async () => {
+          if (!window.confirm("Delete your birth details, chart and joint reports? Your matches and chats stay as they are.")) return;
+          await api.delete("/astro/me");
+          toast("Your astrology data has been deleted.", "info");
+          void reload();
+        }}
+      >
+        Delete my astrology data
+      </Button>
+    </Card>
+  );
+}
+
 export function Settings() {
   const settings = useResource<SettingsData>("/settings");
   const sessions = useResource<SessionRow[]>("/settings/sessions");
@@ -91,6 +117,7 @@ export function Settings() {
               <Toggle label="Use Knot AI suggestions" description="When off, you'll only see hand-written suggestions from our team. AI never reads your chats either way." checked={s.aiEnabled} onChange={(v) => update({ aiEnabled: v })} />
             </div>
           </Card>
+          <AstroData />
           <Card className="p-6">
             <h2 className="text-xl">Blocked people</h2>
             {!blocks.data?.length ? (
