@@ -46,6 +46,23 @@ export function AppShell() {
     return () => window.removeEventListener("knot:counts", onRefresh);
   }, [refreshCounts]);
 
+  // The couple space appears in the navigation only while it is open.
+  const [together, setTogether] = useState(false);
+  const refreshCouple = useCallback(async () => {
+    try {
+      setTogether(!!(await api.get<unknown>("/couple/me")));
+    } catch {
+      /* best-effort, like the counts */
+    }
+  }, []);
+  useEffect(() => {
+    void refreshCouple();
+    window.addEventListener("knot:couple", refreshCouple);
+    return () => window.removeEventListener("knot:couple", refreshCouple);
+  }, [refreshCouple]);
+  useSocketEvent("couple:update", refreshCouple);
+  useSocketEvent("match:ended", refreshCouple);
+
   useSocketEvent("conversation:updated", refreshCounts);
   useSocketEvent<{ title: string; type: string }>(
     "notification",
@@ -63,6 +80,7 @@ export function AppShell() {
     { to: "/app/likes", label: "Likes", icon: "heart", mobile: true },
     { to: "/app/matches", label: "Matches", icon: "matches", mobile: true },
     { to: "/app/messages", label: "Chat", icon: "chat", badge: unreadChats, mobile: true },
+    ...(together ? [{ to: "/app/us", label: "Us", icon: "heart" as const }] : []),
     { to: "/app/compatibility", label: "Compatibility", icon: "spark" },
     { to: "/app/games", label: "Games", icon: "games" },
     { to: "/app/experts", label: "Experts", icon: "expert" },

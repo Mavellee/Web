@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Icon } from "../ui/Icon";
 import { Photo } from "../ui/Photo";
 import { IntentionBadges } from "../profile/ProfileCard";
+import { Badge } from "../ui/Badge";
 import { ConnectionSection } from "../compat/ConnectionSection";
 import { MediaFigure } from "../media/MediaFigure";
 import { MediaThumb } from "../media/MediaThumb";
@@ -139,6 +140,7 @@ export function EditorialProfile({
                 )}
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   <IntentionBadges intentions={p.intentions} />
+                  {p.zodiac && <Badge tone="gold">{p.zodiac.symbol} {p.zodiac.name}</Badge>}
                 </div>
               </div>
             </button>

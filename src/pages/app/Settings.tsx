@@ -13,7 +13,7 @@ import { useAuth } from "../../lib/auth";
 import { useResource } from "../../lib/useResource";
 import { timeAgo } from "../../lib/format";
 
-type SettingsData = { aiEnabled: boolean; readReceipts: boolean; typingIndicators: boolean; emailNotifications: boolean; showDistance: boolean; isDiscoverable: boolean; discoveryPaused: boolean };
+type SettingsData = { aiEnabled: boolean; readReceipts: boolean; typingIndicators: boolean; emailNotifications: boolean; showDistance: boolean; showZodiacSign: boolean; zodiac: { name: string; symbol: string } | null; isDiscoverable: boolean; discoveryPaused: boolean };
 type SessionRow = { id: string; userAgent: string | null; createdAt: string; lastUsedAt: string; current: boolean };
 type BlockRow = { userId: string; displayName: string; blockedAt: string };
 
@@ -101,6 +101,7 @@ export function Settings() {
               <Toggle label="Pause Discover" description="Stop appearing to new people. Your matches and chats stay." checked={s.discoveryPaused} onChange={(v) => update({ discoveryPaused: v })} />
               <Toggle label="Show me in Discover" description="Turn off to only be visible to people you like first." checked={s.isDiscoverable} onChange={(v) => update({ isDiscoverable: v })} />
               <Toggle label="Show approximate distance" description="Others see a range like “About 10 km away”, never your location." checked={s.showDistance} onChange={(v) => update({ showDistance: v })} />
+              {s.zodiac && <Toggle label={`Show my zodiac sign (${s.zodiac.symbol} ${s.zodiac.name})`} description="Just for fun: adds your sign to your profile, worked out from your birth date. Your birth date stays private, and signs never affect who you see or match with." checked={s.showZodiacSign} onChange={(v) => update({ showZodiacSign: v })} />}
             </div>
           </Card>
           <Card className="px-6 py-2">

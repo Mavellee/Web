@@ -21,6 +21,7 @@ import { EmptyState, ErrorState } from "../../components/ui/States";
 import { Spinner } from "../../components/ui/Spinner";
 import { useToast } from "../../components/ui/Toast";
 import { ReportDialog, SafetyMenu } from "../../components/app/SafetyActions";
+import { CoupleEntry } from "../../components/couple/CoupleEntry";
 import { AiPanel } from "../../components/app/AiPanel";
 
 export function Messages() {
@@ -105,6 +106,46 @@ function AstroEntry({ matchId }: { matchId: string }) {
       <Icon name="star" className="h-3.5 w-3.5" />
       <span className="hidden sm:inline">{data.hasReport ? "Your Cosmic Connection" : "Knot Astro"}</span>
     </Link>
+  );
+}
+
+type ZodiacPair = { mine: { name: string; symbol: string }; theirs: { name: string; symbol: string }; line: string; starter: string };
+
+/** Just for fun, and only when both people chose to show their sign. Dismissal is a per-device convenience. */
+function ZodiacCard({ matchId }: { matchId: string }) {
+  const { data } = useResource<ZodiacPair | null>(`/matches/${matchId}/zodiac`);
+  const key = `knot:zodiac-dismissed:${matchId}`;
+  const [dismissed, setDismissed] = useState(() => {
+    try {
+      return !!localStorage.getItem(key);
+    } catch {
+      return false;
+    }
+  });
+  if (!data || dismissed) return null;
+  return (
+    <aside className="flex items-start gap-3 border-b hairline bg-gold-soft/30 px-4 py-2.5 text-sm">
+      <span className="min-w-0 flex-1">
+        <span className="font-semibold">{data.mine.symbol} {data.mine.name} + {data.theirs.symbol} {data.theirs.name}</span>
+        <span className="text-ink-soft"> · {data.line}</span>
+        <span className="mt-0.5 block text-ink-muted">Ask them: {data.starter}</span>
+      </span>
+      <button
+        type="button"
+        aria-label="Dismiss"
+        className="shrink-0 rounded-full p-1 text-ink-muted hover:text-ink"
+        onClick={() => {
+          setDismissed(true);
+          try {
+            localStorage.setItem(key, "1");
+          } catch {
+            /* still hidden for this visit */
+          }
+        }}
+      >
+        <Icon name="close" className="h-4 w-4" />
+      </button>
+    </aside>
   );
 }
 
@@ -345,9 +386,11 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
         ) : (
           <Skeleton className="h-10 flex-1" />
         )}
+        {header.data && other && <CoupleEntry matchId={header.data.matchId} name={other.displayName} />}
         {header.data && <AstroEntry matchId={header.data.matchId} />}
         {other && header.data && <SafetyMenu userId={other.id} name={other.displayName} matchId={header.data.matchId} onEnded={() => navigate("/app/messages")} />}
       </header>
+      {header.data && <ZodiacCard matchId={header.data.matchId} />}
 
       <div
         ref={scroller}

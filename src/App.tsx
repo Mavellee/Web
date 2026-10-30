@@ -21,6 +21,7 @@ const Experts = named(() => import("./pages/app/Experts"), "Experts");
 const Games = named(() => import("./pages/app/Games"), "Games");
 const GameSession = named(() => import("./pages/app/GameSession"), "GameSession");
 const KnotAstro = named(() => import("./pages/app/KnotAstro"), "KnotAstro");
+const Us = named(() => import("./pages/app/Us"), "Us");
 const MyProfile = named(() => import("./pages/app/MyProfile"), "MyProfile");
 const Notifications = named(() => import("./pages/app/Notifications"), "Notifications");
 const Settings = named(() => import("./pages/app/Settings"), "Settings");
@@ -88,6 +89,7 @@ export function App() {
         <Route path="games" element={<Games />} />
         <Route path="games/:id" element={<GameSession />} />
         <Route path="astro/:matchId" element={<KnotAstro />} />
+        <Route path="us" element={<Us />} />
         <Route path="experts" element={<Experts />} />
         <Route path="profile" element={<MyProfile />} />
         <Route path="settings" element={<Settings />} />

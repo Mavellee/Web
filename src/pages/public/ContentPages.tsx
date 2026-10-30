@@ -238,6 +238,7 @@ export function Privacy() {
           <li>Optional compatibility answers, which are never shown to other members.</li>
           <li>If you and a match both choose Knot Astro: your birth date, time and place, stored encrypted and used only to calculate your chart. Your match sees sign-level results, never these details. If you both agree, sign-level results (without names or birth details) go to an external AI provider to write your reading. You can withdraw and delete this at any time.</li>
           <li>Activity needed to run the service: likes, matches, messages, reports, and basic security logs.</li>
+          <li>If you and a partner confirm you're together: that status, plus the doodles and couple games you create, visible only to the two of you. Closing the space hides them; they are deleted with your account.</li>
         </ul>
         <h2>What others can see</h2>
         <p>Your display name, age (not date of birth), photos, bio, interests, languages, city, intentions, and an approximate distance range. Never your email, exact location, or individual compatibility answers.</p>
