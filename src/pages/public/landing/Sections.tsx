@@ -7,7 +7,7 @@ import { cx } from "../../../lib/format";
 export function SectionHeader({ eyebrow, title, children, id, align = "left" }: { eyebrow: string; title: ReactNode; children?: ReactNode; id: string; align?: "left" | "center" }) {
   return (
     <div className={cx("max-w-2xl", align === "center" && "mx-auto text-center")}>
-      <p className="eyebrow">{eyebrow}</p>
+      <p className={cx("eyebrow", align === "center" && "justify-center")}>{eyebrow}</p>
       <h2 id={id} className="mt-4 text-[2rem] leading-[1.1] sm:text-[2.6rem]">
         {title}
       </h2>
@@ -51,15 +51,15 @@ const INTENTION_CARDS = [
 
 export function IntentionsSection() {
   return (
-    <section aria-labelledby="intentions-title" className="container-page py-24">
-      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-        <SectionHeader id="intentions-title" eyebrow="Three intentions" title="Every kind of connection is valid.">
+    <section aria-labelledby="intentions-title" className="container-page py-16 sm:py-24">
+      <div>
+        <SectionHeader align="center" id="intentions-title" eyebrow="Three intentions" title="Every kind of connection is valid.">
           Choose one or more. You'll only meet people whose intentions overlap with yours — and you can change yours whenever life does.
         </SectionHeader>
       </div>
-      <ul className="mt-14 grid gap-6 md:grid-cols-3">
-        {INTENTION_CARDS.map((c, i) => (
-          <li key={c.slug} className={cx(i === 1 && "md:mt-10")}>
+      <ul className="mx-auto mt-14 grid max-w-xl gap-6 md:max-w-none md:grid-cols-3">
+        {INTENTION_CARDS.map((c) => (
+          <li key={c.slug}>
             <Link
               to={`/intentions#${c.slug}`}
               className={cx("group flex h-full flex-col overflow-hidden rounded-[2rem] transition duration-300 hover:-translate-y-1 hover:shadow-lift focus-visible:-translate-y-1", c.surface)}
@@ -143,8 +143,8 @@ const STEPS: { title: string; copy: string; icon: IconName; vignette: ReactNode 
 export function JourneySection() {
   return (
     <section aria-labelledby="journey-title" className="border-y hairline bg-surface/55">
-      <div className="container-page py-24">
-        <SectionHeader id="journey-title" eyebrow="How Knot works" title="From first impression to real conversation." />
+      <div className="container-page py-16 sm:py-24">
+        <SectionHeader align="center" id="journey-title" eyebrow="How Knot works" title="From first impression to real conversation." />
         <ol className="relative mt-16 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           <span aria-hidden="true" className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-primary-200 to-transparent lg:block" />
           {STEPS.map((s, i) => (
@@ -168,8 +168,8 @@ export function JourneySection() {
 
 export function ExpertsSection() {
   return (
-    <section aria-labelledby="experts-title" className="container-page grid gap-14 py-24 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-      <div>
+    <section aria-labelledby="experts-title" className="container-page grid gap-14 py-16 sm:py-24 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <div className="mx-auto w-full max-w-2xl lg:max-w-none">
         <SectionHeader id="experts-title" eyebrow="Compatibility Experts · optional" title="A thoughtful second opinion, when you ask for one.">
           Vetted relationship coaches can help you reflect on what you're looking for or how you and a match might communicate — using only the details you choose to share.
         </SectionHeader>
@@ -182,7 +182,7 @@ export function ExpertsSection() {
           ))}
         </ul>
       </div>
-      <div className="relative">
+      <div className="relative mx-auto mb-8 w-full max-w-2xl lg:mb-0 lg:max-w-none">
         <img src="/images/cafe.jpg" alt="A quiet, warmly lit café with empty tables" loading="lazy" className="aspect-[5/4] w-full rounded-[2rem] object-cover" />
         <div className="absolute -bottom-8 left-4 right-4 rounded-3xl border hairline bg-parchment p-5 shadow-lift sm:left-auto sm:right-6 sm:w-72">
           <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-ink-muted">You decide what's shared</p>
@@ -215,8 +215,8 @@ const GAME_SAMPLES = [
 export function GamesSection() {
   return (
     <section aria-labelledby="games-title" className="bg-primary-800 text-surface">
-      <div className="container-page grid gap-16 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div>
+      <div className="container-page grid gap-16 py-16 sm:py-24 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="mx-auto w-full max-w-2xl lg:max-w-none">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Games & conversation</p>
           <h2 id="games-title" className="mt-4 text-[2rem] leading-[1.1] text-surface sm:text-[2.6rem]">
             Better questions than “hey, how's your week?”
@@ -255,14 +255,14 @@ const SAFETY: { icon: IconName; title: string; copy: string }[] = [
 
 export function SafetySection() {
   return (
-    <section aria-labelledby="safety-title" className="container-page py-24">
-      <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-        <SectionHeader id="safety-title" eyebrow="Safety & trust" title="You stay in control.">
+    <section aria-labelledby="safety-title" className="container-page py-16 sm:py-24">
+      <div className="space-y-12">
+        <SectionHeader align="center" id="safety-title" eyebrow="Safety & trust" title="You stay in control.">
           Safety on Knot isn't a settings page you find later. It's in every profile, match and conversation.
         </SectionHeader>
-        <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+        <ul className="mx-auto flex max-w-5xl flex-wrap justify-center gap-x-10 gap-y-8">
           {SAFETY.map((s) => (
-            <li key={s.title} className="flex gap-4">
+            <li key={s.title} className="flex w-full gap-4 sm:w-[calc(50%-1.25rem)] lg:w-[calc(33.333%-1.75rem)]">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary">
                 <Icon name={s.icon} />
               </span>
@@ -274,9 +274,11 @@ export function SafetySection() {
           ))}
         </ul>
       </div>
-      <Link to="/safety" className="mt-12 inline-flex items-center gap-2 font-semibold text-primary transition-all hover:gap-3">
-        Read our approach to safety <Icon name="arrow" className="h-4 w-4" />
-      </Link>
+      <div className="mt-12 text-center">
+        <Link to="/safety" className="inline-flex items-center gap-2 font-semibold text-primary transition-all hover:gap-3">
+          Read our approach to safety <Icon name="arrow" className="h-4 w-4" />
+        </Link>
+      </div>
     </section>
   );
 }
