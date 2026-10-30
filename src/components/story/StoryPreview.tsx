@@ -57,6 +57,7 @@ export function StoryPreviewCard({ profile: p }: { profile: Omit<PublicProfile, 
             <IntentionBadges intentions={p.intentions} />
           </div>
         )}
+        {p.bio && <p className="text-sm leading-relaxed text-ink-soft">{p.bio}</p>}
         {prompt ? (
           <div>
             <p className="text-xs text-ink-muted">{prompt.text}</p>

@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, ApiError } from "../../lib/api";
+import { useAutosave, type SaveStatus } from "../../lib/useAutosave";
 import { useResource } from "../../lib/useResource";
 import { cx } from "../../lib/format";
 import type { OwnProfile, PromptAnswer, PromptDef } from "../../lib/types";
@@ -10,23 +11,27 @@ import { LoadingBlock } from "../ui/Skeleton";
 
 const MAX = 6;
 const LIMIT = 250;
+const FIRST_CARDS = 6;
 
-/** Choose prompts and answer them one at a time, seeing how each will read on your profile. */
-export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; onSaved: (p: OwnProfile) => void }) {
+/**
+ * Choose prompts and answer them one at a time, seeing how each will read on your profile.
+ * With `autosave`, an answer also saves itself shortly after you stop typing.
+ */
+export function PromptWriter({ answers, onSaved, autosave = false, onStatus }: { answers: PromptAnswer[]; onSaved: (p: OwnProfile) => void; autosave?: boolean; onStatus?: (s: SaveStatus, retry?: () => void) => void }) {
   const catalogue = useResource<PromptDef[]>("/meta/prompts");
   const [list, setList] = useState<PromptAnswer[]>(answers);
   const [activeKey, setActiveKey] = useState<string | null>(answers[0]?.key ?? null);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(answers[0]?.answer ?? "");
+  const [showAll, setShowAll] = useState(false);
+  const writer = useRef<HTMLElement>(null);
   const [showIdeas, setShowIdeas] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => setList(answers), [answers]);
   const active = useMemo(() => catalogue.data?.find((p) => p.key === activeKey) ?? null, [catalogue.data, activeKey]);
-  useEffect(() => {
-    setDraft(list.find((x) => x.key === activeKey)?.answer ?? "");
-    setShowIdeas(false);
-  }, [activeKey, list]);
+  const listRef = useRef(list);
+  listRef.current = list;
 
   const persist = async (next: PromptAnswer[]) => {
     setSaving(true);
@@ -44,17 +49,44 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
     }
   };
 
+  const withAnswer = (key: string, text: string, answer: string) => {
+    const cur = listRef.current;
+    return cur.some((x) => x.key === key) ? cur.map((x) => (x.key === key ? { ...x, answer } : x)) : [...cur, { key, text, answer }];
+  };
+
+  const { flush } = useAutosave(
+    { key: activeKey, answer: draft.trim() },
+    async ({ key, answer }) => {
+      const cur = listRef.current;
+      const def = catalogue.data?.find((p) => p.key === key);
+      if (!key || !def || !answer || cur.find((x) => x.key === key)?.answer === answer) return;
+      if (cur.length >= MAX && !cur.some((x) => x.key === key)) return;
+      if (!(await persist(withAnswer(key, def.text, answer)))) throw new Error("not saved");
+    },
+    { enabled: autosave && !!catalogue.data, delay: 1200, onStatus },
+  );
+
+  const select = (key: string, list_ = list) => {
+    if (key !== activeKey) void flush();
+    setActiveKey(key);
+    setDraft(list_.find((x) => x.key === key)?.answer ?? "");
+    setShowIdeas(false);
+    if (key !== activeKey) writer.current?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+  };
+
   const saveAnswer = async () => {
     if (!active || !draft.trim()) return;
-    const exists = list.some((x) => x.key === active.key);
-    const next = exists ? list.map((x) => (x.key === active.key ? { ...x, answer: draft.trim() } : x)) : [...list, { key: active.key, text: active.text, answer: draft.trim() }];
+    const next = withAnswer(active.key, active.text, draft.trim());
     if (await persist(next)) {
       const nextOpen = catalogue.data?.find((p) => !next.some((x) => x.key === p.key));
-      if (next.length < 3 && nextOpen) setActiveKey(nextOpen.key);
+      if (next.length < 3 && nextOpen) select(nextOpen.key, next);
     }
   };
 
-  const remove = (key: string) => void persist(list.filter((x) => x.key !== key));
+  const remove = (key: string) => {
+    if (key === activeKey) setDraft("");
+    void persist(list.filter((x) => x.key !== key));
+  };
   const move = (i: number, d: number) => {
     const next = [...list];
     const [m] = next.splice(i, 1);
@@ -66,33 +98,13 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
   const answeredKeys = new Set(list.map((x) => x.key));
   const full = list.length >= MAX && !answeredKeys.has(activeKey ?? "");
 
-  return (
-    <div className="grid gap-8 xl:grid-cols-[16rem_minmax(0,1fr)] [&>*]:min-w-0">
-      <nav aria-label="Prompts">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Choose prompts · {list.length}/{MAX}</p>
-        <ul className="mt-3 space-y-1">
-          {catalogue.data?.map((p) => (
-            <li key={p.key}>
-              <button
-                type="button"
-                onClick={() => setActiveKey(p.key)}
-                aria-current={p.key === activeKey}
-                className={cx("flex w-full items-start gap-2 rounded-2xl px-3 py-2.5 text-left text-sm transition", p.key === activeKey ? "bg-primary text-surface" : "text-ink-soft hover:bg-surface")}
-              >
-                <span className={cx("mt-1 h-2 w-2 shrink-0 rounded-full", answeredKeys.has(p.key) ? "bg-accent" : "bg-transparent ring-1 ring-current")} aria-hidden="true" />
-                <span>
-                  {p.text}
-                  {answeredKeys.has(p.key) && <span className="sr-only"> (answered)</span>}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+  const all = catalogue.data ?? [];
+  const cards = showAll ? all : all.filter((p, i) => i < FIRST_CARDS || answeredKeys.has(p.key) || p.key === activeKey);
 
-      <div className="space-y-6">
+  return (
+    <div className="space-y-8">
         {active ? (
-          <section aria-label="Write your answer" className="rounded-[2rem] border hairline bg-surface p-6 sm:p-8">
+          <section ref={writer} aria-label="Write your answer" className="rounded-[2rem] border hairline bg-surface p-6 sm:p-8">
             <label htmlFor="prompt-answer" className="font-serif text-2xl leading-snug">
               {active.text}
             </label>
@@ -131,9 +143,11 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
               </p>
             )}
             <div className="mt-5 flex flex-wrap gap-2">
-              <Button onClick={saveAnswer} disabled={!draft.trim() || full} loading={saving}>
-                {answeredKeys.has(active.key) ? "Update answer" : "Save answer"}
-              </Button>
+              {!autosave && (
+                <Button onClick={saveAnswer} disabled={!draft.trim() || full} loading={saving}>
+                  {answeredKeys.has(active.key) ? "Update answer" : "Save answer"}
+                </Button>
+              )}
               {answeredKeys.has(active.key) && (
                 <Button variant="quiet" onClick={() => remove(active.key)} disabled={saving}>
                   Remove
@@ -142,7 +156,7 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
             </div>
           </section>
         ) : (
-          <p className="text-ink-soft">Pick a prompt to begin. Answer as many or as few as you like.</p>
+          <p className="rounded-[2rem] border border-dashed border-line-strong px-6 py-8 text-center font-serif text-xl text-ink-soft">Pick a prompt below to begin.</p>
         )}
 
         {list.length > 0 && (
@@ -158,17 +172,43 @@ export function PromptWriter({ answers, onSaved }: { answers: PromptAnswer[]; on
                   <div className="flex shrink-0 flex-col gap-1">
                     <IconButton icon="chevronLeft" className="rotate-90" size="sm" label={`Move "${x.text}" up`} disabled={i === 0 || saving} onClick={() => move(i, -1)} />
                     <IconButton icon="chevronRight" className="rotate-90" size="sm" label={`Move "${x.text}" down`} disabled={i === list.length - 1 || saving} onClick={() => move(i, 1)} />
-                    <IconButton icon="edit" size="sm" label={`Edit "${x.text}"`} onClick={() => setActiveKey(x.key)} />
+                    <IconButton icon="edit" size="sm" label={`Edit "${x.text}"`} onClick={() => select(x.key)} />
                   </div>
                 </li>
               ))}
             </ol>
           </section>
         )}
+        <nav aria-label="Prompts">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
+            Choose prompts · {list.length}/{MAX}
+          </p>
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+            {cards.map((p) => {
+              const answered = answeredKeys.has(p.key);
+              const on = p.key === activeKey;
+              return (
+                <li key={p.key}>
+                  <button type="button" onClick={() => select(p.key)} aria-current={on} className={cx("flex h-full min-h-20 w-full items-start gap-3 rounded-3xl border px-4 py-3.5 text-left font-serif text-lg leading-snug transition duration-150 active:scale-[0.99]", on ? "border-primary bg-primary text-surface shadow-soft" : "border-line bg-surface/80 text-ink hover:border-primary/40")}>
+                    <span className="min-w-0 flex-1">
+                      {p.text}
+                      {answered && <span className="sr-only"> (answered)</span>}
+                    </span>
+                    {answered && <Icon name="check" className={cx("mt-1 h-4 w-4 shrink-0", on ? "text-surface" : "text-primary")} />}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {!showAll && (catalogue.data?.length ?? 0) > cards.length && (
+            <button type="button" onClick={() => setShowAll(true)} className="mt-3 text-sm font-semibold text-primary">
+              Show more prompts
+            </button>
+          )}
+        </nav>
         <p className="flex items-center gap-1.5 text-xs text-ink-muted">
           <Icon name="check" className="h-3.5 w-3.5" /> Nothing here is required. Two or three good answers say more than six rushed ones.
         </p>
-      </div>
     </div>
   );
 }

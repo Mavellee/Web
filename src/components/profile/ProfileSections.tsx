@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api, ApiError } from "../../lib/api";
 import { GENDERS, INTENTIONS } from "../../lib/labels";
+import { useAutosave, type SaveStatus } from "../../lib/useAutosave";
 import { useResource } from "../../lib/useResource";
 import type { Gender, Intention, OwnProfile } from "../../lib/types";
 import { Button } from "../ui/Button";
@@ -197,12 +198,13 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
   );
 }
 
-export function IntentionSection({ profile, onSaved, submitLabel = "Save", secondary }: SectionProps) {
+export function IntentionSection({ profile, onSaved, submitLabel = "Save", secondary, autosave = false, onStatus }: SectionProps & { autosave?: boolean; onStatus?: (s: SaveStatus, retry?: () => void) => void }) {
   const [selected, setSelected] = useState<Intention[]>(profile.intentions);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const { error, save } = useSave(onSaved);
   const toggle = (v: Intention) => setSelected((s) => (s.includes(v) ? s.filter((x) => x !== v) : [...s, v]));
+  useAutosave(selected, async (v) => onSaved(await api.patch<OwnProfile>("/profiles/me", { intentions: v })), { enabled: autosave && selected.length > 0, delay: 500, baseline: profile.intentions, onStatus });
 
   return (
     <form
@@ -241,7 +243,7 @@ export function IntentionSection({ profile, onSaved, submitLabel = "Save", secon
         </div>
       </fieldset>
       <p className="text-sm text-ink-muted">You can choose more than one, and change this any time. It's shown on your profile.</p>
-      <FormFooter error={localError ?? error} submitting={submitting} submitLabel={submitLabel} secondary={secondary} />
+      {autosave ? profile.intentions.length > 0 && !selected.length && <p className="text-sm text-ink-muted">Keep at least one selected. Your last choice stays saved until you pick another.</p> : <FormFooter error={localError ?? error} submitting={submitting} submitLabel={submitLabel} secondary={secondary} />}
     </form>
   );
 }

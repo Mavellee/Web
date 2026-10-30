@@ -210,7 +210,7 @@ export function MediaWorkspace({ media, limits, onChange }: { media: OwnMediaIte
   };
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_15rem] [&>*]:min-w-0">
+    <div className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_15rem] [&>*]:min-w-0">
       <div
         onDragOver={(e) => e.dataTransfer.types.includes("Files") && e.preventDefault()}
         onDrop={(e) => {
@@ -220,14 +220,14 @@ export function MediaWorkspace({ media, limits, onChange }: { media: OwnMediaIte
           }
         }}
       >
-        <div className="flex flex-col gap-3 rounded-[1.75rem] border-2 border-dashed border-primary/25 bg-surface/60 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-[1.75rem] border-2 border-dashed border-primary/25 bg-surface/60 p-6 sm:py-9">
           <div>
             <p className="font-semibold">Add photos and short videos</p>
             <p className="text-sm text-ink-muted">
               {photos} of {limits.maxPhotos} photos · {videos} of {limits.maxVideos} videos (up to {limits.videoMaxSeconds} seconds, {mb(limits.videoMaxBytes)} MB). Drop files here, or:
             </p>
           </div>
-          <div className="flex shrink-0 gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button size="sm" onClick={() => photoInput.current?.click()} disabled={photos >= limits.maxPhotos} icon={<Icon name="image" className="h-4 w-4" />}>
               Add photos
             </Button>

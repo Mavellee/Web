@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/Button";
 import { Drawer } from "../../components/ui/Drawer";
@@ -6,84 +6,133 @@ import { Icon } from "../../components/ui/Icon";
 import { LogoLockup } from "../../components/ui/Logo";
 import { LoadingBlock } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/ui/States";
-import { BasicsSection, IntentionSection, PreferencesSection } from "../../components/profile/ProfileSections";
-import { QuestionCard, type Question } from "../../components/compat/QuestionCard";
+import { IntentionSection, PreferencesSection } from "../../components/profile/ProfileSections";
+import type { Question } from "../../components/compat/QuestionCard";
+import { IntroStep, type IntroDraft, type IntroHandle } from "../../components/story/IntroStep";
+import { LifestyleStep } from "../../components/story/LifestyleStep";
 import { MediaWorkspace } from "../../components/story/MediaWorkspace";
 import { PromptWriter } from "../../components/story/PromptWriter";
 import { InterestPicker } from "../../components/story/InterestPicker";
 import { EditorialProfile } from "../../components/story/EditorialProfile";
+import { StoryCompletion } from "../../components/story/StoryCompletion";
 import { StoryPreviewCard, toPreview } from "../../components/story/StoryPreview";
 import { api, ApiError } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
+import type { SaveStatus } from "../../lib/useAutosave";
 import { useResource } from "../../lib/useResource";
 import { cx } from "../../lib/format";
 import type { OwnProfile } from "../../lib/types";
 
 const STEPS = [
-  { key: "intro", title: "Introduction", short: "Intro", sub: "Tell us about yourself" },
-  { key: "photos", title: "Photos & videos", short: "Photos", sub: "Add your moments" },
-  { key: "words", title: "Prompts", short: "Your words", sub: "Share your thoughts" },
-  { key: "connection", title: "Relationship intentions", short: "Connection", sub: "What you're looking for" },
-  { key: "little", title: "Interests", short: "Little things", sub: "What you love" },
-  { key: "preview", title: "Preview", short: "Preview", sub: "See your complete profile" },
+  { key: "intro", title: "The Introduction", heading: "Let's start with hello.", lede: "A few easy questions. You can change any of this later." },
+  { key: "photos", title: "Your Photos & Videos", heading: "Show your world.", lede: "Add photos, and a short video if you like. Put them in your order, choose your main photo, and caption any of them." },
+  { key: "words", title: "Your Personality", heading: "The little things that make you, you.", lede: "Pick a prompt that sounds like you and answer in your own words. It's often what people respond to first." },
+  { key: "little", title: "Your Interests", heading: "What do you love?", lede: "Music, food, weekends, the topics you could go on about. Anything you share with someone gets highlighted for you both." },
+  { key: "connection", title: "Your Kind of Connection", heading: "What are you open to right now?", lede: "There's no right answer. It's a preference, never a label, and you can change it whenever you like." },
+  { key: "lifestyle", title: "Your Lifestyle", heading: "How you like to live.", lede: "Completely optional. Answer what feels useful and leave the rest." },
+  { key: "preview", title: "The Final Preview", heading: "Your story is coming together.", lede: "This is exactly what people see in Discover. Nothing is public until you publish." },
 ] as const;
 type StepKey = (typeof STEPS)[number]["key"];
 
-/** Resume where the saved data ends. */
+const stepStore = (id: string) => `knot:story-step:${id}`;
+const readStep = (id: string): StepKey | null => {
+  try {
+    const k = localStorage.getItem(stepStore(id));
+    return STEPS.some((s) => s.key === k) ? (k as StepKey) : null;
+  } catch {
+    return null;
+  }
+};
+const writeStep = (id: string, k: StepKey | null) => {
+  try {
+    if (k) localStorage.setItem(stepStore(id), k);
+    else localStorage.removeItem(stepStore(id));
+  } catch {
+    /* private mode: resume falls back to the first unfinished step */
+  }
+};
+
+/** The server creates a profile only once these exist; every other step saves onto that profile. */
+const hasProfile = (p: OwnProfile) => !!p.displayName && !!p.gender && p.interestedIn.length > 0;
+
+/** With nothing remembered on this device, resume where the saved data ends. */
 function firstIncomplete(p: OwnProfile): StepKey {
-  if (!p.displayName || !p.gender || !p.city || !p.interestedIn.length) return "intro";
-  if (!p.photos.length) return "photos";
-  if (!p.prompts.length && !p.bio) return "words";
+  if (!hasProfile(p)) return "intro";
+  if (!p.media.length) return "photos";
+  if (!p.prompts.length) return "words";
+  if (!p.interests.length) return "little";
   if (!p.intentions.length) return "connection";
-  if (p.interests.length < 3) return "little";
   return "preview";
 }
 
 export function Onboarding() {
   const { data, error, loading, reload, setData } = useResource<OwnProfile>("/profiles/me");
   const interests = useResource<{ slug: string; name: string }[]>("/meta/interests");
+  const questions = useResource<Question[]>("/compatibility/questions");
   const { account } = useAuth();
   const [step, setStep] = useState<StepKey | null>(null);
+  const [status, setStatus] = useState<{ s: SaveStatus; retry?: () => void }>({ s: "idle" });
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [draft, setDraft] = useState<IntroDraft>({});
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [continuing, setContinuing] = useState(false);
+  const intro = useRef<IntroHandle>(null);
+  const userId = account?.id ?? "me";
 
   useEffect(() => {
-    if (data && !step) setStep(firstIncomplete(data));
-  }, [data, step]);
+    if (!data || step) return;
+    const remembered = readStep(userId);
+    setStep(hasProfile(data) ? (remembered ?? firstIncomplete(data)) : "intro");
+  }, [data, step, userId]);
 
+  const report = (s: SaveStatus, retry?: () => void) => {
+    setStatus({ s, retry });
+    if (s === "saved") setSavedAt(new Date());
+  };
   const index = step ? STEPS.findIndex((s) => s.key === step) : 0;
-  // Any step up to the furthest point the saved data supports can be revisited directly.
-  const reachable = data ? Math.max(index, STEPS.findIndex((s) => s.key === firstIncomplete(data))) : 0;
+  const unlocked = !!data && hasProfile(data);
+  const answered = questions.data?.filter((q) => q.myAnswer && ["LIFESTYLE", "COMMUNICATION", "VALUES"].includes(q.dimension)).length ?? 0;
+  const done: Record<StepKey, boolean> = {
+    intro: unlocked,
+    photos: !!data?.media.length,
+    words: !!data?.prompts.length,
+    little: !!data?.interests.length,
+    connection: !!data?.intentions.length,
+    lifestyle: answered > 0,
+    preview: !!data?.isPublished,
+  };
+  const complete = Object.values(done).filter(Boolean).length;
+
   const go = (k: StepKey) => {
     setStep(k);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    writeStep(userId, k);
+    window.scrollTo?.({ top: 0, behavior: "smooth" });
   };
-  const saved = (p: OwnProfile, nextStep?: StepKey) => {
+  const saved = (p: OwnProfile) => {
     setData(p);
-    setSavedAt(new Date());
-    if (nextStep) go(nextStep);
+    report("saved");
   };
-  const preview = useMemo(() => (data ? toPreview(data, account?.id ?? "me", interests.data ?? []) : null), [data, account?.id, interests.data]);
-  const back = (k: StepKey) => (
-    <Button variant="quiet" onClick={() => go(k)}>
-      Back
-    </Button>
-  );
+  const next = STEPS[index + 1]?.key;
+  const onContinue = async () => {
+    if (step === "intro") {
+      setContinuing(true);
+      const ok = await intro.current?.submit();
+      setContinuing(false);
+      if (!ok) return;
+    }
+    if (next) go(next);
+  };
+  const preview = useMemo(() => (data ? toPreview(step === "intro" ? { ...data, ...draft } : data, userId, interests.data ?? []) : null), [data, draft, step, userId, interests.data]);
+  const current = STEPS[index];
+  const pendingMedia = data?.media.filter((m) => m.status === "PENDING").length ?? 0;
 
   return (
-    <div className="min-h-dvh">
+    <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-20 border-b hairline bg-parchment/90 backdrop-blur">
-        <div className="container-page grid grid-cols-[1fr_auto_1fr] items-center gap-4 py-3">
-          <div>
-            {index > 0 && (
-              <button type="button" onClick={() => go(STEPS[index - 1].key)} className="rounded-full p-2 text-ink-soft hover:bg-ink/5" aria-label="Previous step">
-                <Icon name="chevronLeft" />
-              </button>
-            )}
-          </div>
+        <div className="container-page flex items-center justify-between gap-3 py-3">
           <LogoLockup size="sm" />
-          <div className="flex items-center justify-end gap-3 text-sm">
-            <SaveIndicator at={savedAt} />
+          <div className="flex items-center gap-3 text-sm">
+            <SaveIndicator status={status} at={savedAt} />
             {step !== "preview" && preview && (
               <Button variant="secondary" size="sm" className="lg:hidden" onClick={() => setPreviewOpen(true)} icon={<Icon name="eye" className="h-4 w-4" />}>
                 Preview
@@ -91,193 +140,186 @@ export function Onboarding() {
             )}
           </div>
         </div>
-        <nav aria-label="Your story progress" className="container-page pb-3">
-          <div className="flex items-center gap-3">
-            <ol className="grid flex-1 grid-cols-6 gap-1">
-              {STEPS.map((s, i) => (
-                <li key={s.key}>
-                  <button
-                    type="button"
-                    disabled={!data || i > reachable}
-                    onClick={() => go(s.key)}
-                    aria-current={s.key === step ? "step" : undefined}
-                    aria-label={`Step ${i + 1}: ${s.title}`}
-                    className="block w-full py-1.5 disabled:cursor-default"
-                  >
-                    <span className={cx("block h-1.5 rounded-full transition-colors duration-500", i <= index ? "bg-primary" : i <= reachable ? "bg-primary-200" : "bg-line")} />
-                  </button>
-                </li>
-              ))}
-            </ol>
-            <span className="text-xs font-semibold tabular-nums text-ink-muted">
-              {index + 1}/{STEPS.length}
-            </span>
-          </div>
+        <nav aria-label="Your story progress" className="container-page pb-2.5">
+          <ol className="grid grid-cols-7 gap-1">
+            {STEPS.map((s, i) => (
+              <li key={s.key}>
+                <button type="button" disabled={!unlocked} onClick={() => go(s.key)} aria-current={s.key === step ? "step" : undefined} aria-label={`Step ${i + 1}: ${s.title}${done[s.key] ? " (complete)" : ""}`} className="block w-full py-1.5 text-left disabled:cursor-default">
+                  <span className={cx("block h-1.5 rounded-full transition-colors duration-500", s.key === step ? "bg-primary" : done[s.key] ? "bg-primary-200" : "bg-line")} />
+                  <span className={cx("mt-1.5 hidden truncate text-[11px] xl:block", s.key === step ? "font-semibold text-primary" : "text-ink-muted")}>{s.title}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-1 text-xs tabular-nums text-ink-muted">
+            Step {index + 1} of {STEPS.length} · {complete} complete · {STEPS.length - complete} to go
+          </p>
         </nav>
       </header>
 
-      <div className={cx("container-page grid gap-12 py-10", step !== "preview" && "lg:grid-cols-[minmax(0,1fr)_20rem]")}>
+      <div className={cx("container-page grid flex-1 gap-10 py-8 lg:py-10", step !== "preview" && "lg:grid-cols-[minmax(0,1fr)_22rem]")}>
         <main id="main" className="min-w-0">
           {loading && !data && <LoadingBlock label="Loading your story" />}
           {error && <ErrorState message={error.message} onRetry={reload} />}
-          {data && step && (
+          {data && step && preview && (
             <div key={step} className="animate-rise">
-              <p className="eyebrow">
-                Your story · {index + 1} of {STEPS.length}
-              </p>
-              {step === "intro" && (
-                <Step title="Let's start with hello." lede="The basics people see first. You can change any of this later.">
-                  <DobNote profile={data} />
-                  <BasicsSection profile={data} submitLabel="Save & continue" show={{ bio: false, interests: false }} onSaved={(p) => saved(p, "photos")} />
-                </Step>
-              )}
-              {step === "photos" && (
-                <Step title="Show your world." lede="Add photos — and a short video if you like. Give any of them a caption, put them in your order, and choose your main photo. Only photos are required.">
-                  <MediaWorkspace media={data.media} limits={data.mediaLimits} onChange={() => (void reload(), setSavedAt(new Date()))} />
-                  <Nav back={back("intro")} next={<Button size="lg" disabled={!data.photos.length} onClick={() => go("words")}>Continue</Button>} hint={!data.photos.length ? "Add at least one photo of yourself to continue." : undefined} />
-                </Step>
-              )}
-              {step === "words" && (
-                <Step title="More than a bio." lede="Pick a few prompts and answer in your own words. These are often what people respond to first.">
-                  <PromptWriter answers={data.prompts} onSaved={(p) => saved(p)} />
-                  <div className="mt-10 max-w-xl">
-                    <BasicsSection profile={data} submitLabel="Save & continue" show={{ interests: false }} secondary={back("photos")} onSaved={(p) => saved(p, "connection")} />
+              <p className="eyebrow">{current.title}</p>
+              <h1 className="mt-3 text-4xl sm:text-5xl">{current.heading}</h1>
+              <p className="mt-3 max-w-2xl text-lg text-ink-soft">{current.lede}</p>
+              <div className="mt-10">
+                {step === "intro" && <IntroStep ref={intro} profile={data} userId={userId} onSaved={setData} onDraft={setDraft} onStatus={report} />}
+                {step === "photos" && (
+                  <div className="space-y-10">
+                    <MediaWorkspace
+                      media={data.media}
+                      limits={data.mediaLimits}
+                      onChange={() => {
+                        void reload();
+                        setSavedAt(new Date());
+                        setStatus({ s: "saved" });
+                      }}
+                    />
+                    {data.media.length > 0 && (
+                      <section aria-labelledby="in-discover">
+                        <h2 id="in-discover" className="text-2xl">
+                          How this looks in Discover
+                        </h2>
+                        <p className="mt-1 text-sm text-ink-muted">Your gallery, in this order, with your captions.{pendingMedia > 0 && ` ${pendingMedia} ${pendingMedia === 1 ? "item is" : "items are"} still being checked and will appear once approved.`}</p>
+                        <div className="mt-4 max-w-lg rounded-[2rem] border hairline bg-surface/50 p-3 sm:p-5">
+                          <EditorialProfile profile={preview} preview />
+                        </div>
+                      </section>
+                    )}
                   </div>
-                </Step>
-              )}
-              {step === "connection" && (
-                <Step title="My kind of connection." lede="What you're open to right now, and who you'd like to meet. It's a preference, never a label.">
-                  <IntentionSection profile={data} submitLabel="Save intentions" onSaved={(p) => saved(p)} />
-                  <div className="mt-12">
-                    <h2 className="text-2xl">Who you'd like to meet</h2>
-                    <div className="mt-6">
-                      <PreferencesSection profile={data} submitLabel="Save & continue" secondary={back("words")} onSaved={(p) => saved(p, "little")} />
-                    </div>
+                )}
+                {step === "words" && <PromptWriter autosave answers={data.prompts} onSaved={setData} onStatus={report} />}
+                {step === "little" && <InterestPicker autosave selected={data.interests} onSaved={setData} onStatus={report} />}
+                {step === "connection" && (
+                  <div className="max-w-2xl space-y-8">
+                    <IntentionSection autosave profile={data} onSaved={setData} onStatus={report} />
+                    <details className="rounded-3xl border hairline bg-surface/70 p-5">
+                      <summary className="cursor-pointer font-serif text-xl">Who you'd like to see</summary>
+                      <div className="mt-5">
+                        <PreferencesSection profile={data} submitLabel="Save preferences" onSaved={saved} />
+                      </div>
+                    </details>
                   </div>
-                  <ValuesQuestions />
-                </Step>
-              )}
-              {step === "little" && (
-                <Step title="The little things." lede="Music, food, weekends, the topics you love. Shared ones are highlighted for people who have them too.">
-                  <InterestPicker selected={data.interests} submitLabel="Save & continue" secondary={back("connection")} onSaved={(p) => saved(p, "preview")} />
-                </Step>
-              )}
-              {step === "preview" && preview && <PreviewStep profile={data} preview={preview} onEdit={go} />}
+                )}
+                {step === "lifestyle" && <LifestyleStep questions={questions.data} loading={questions.loading} onChange={(q) => (questions.setData((l) => l!.map((x) => (x.id === q.id ? q : x))), report("saved"))} />}
+                {step === "preview" && <PreviewStep profile={data} preview={preview} onEdit={go} onPublished={() => writeStep(userId, null)} />}
+              </div>
             </div>
           )}
         </main>
         {step !== "preview" && preview && (
           <aside className="hidden lg:block" aria-label="Live preview">
-            <div className="sticky top-32 space-y-6">
-              <section aria-labelledby="create-profile">
-                <h2 id="create-profile" className="font-serif text-2xl">
-                  Create your profile
-                </h2>
-                <ol className="mt-3 space-y-1">
-                  {STEPS.map((s, i) => (
-                    <li key={s.key}>
-                      <button type="button" disabled={!data || i > reachable} onClick={() => go(s.key)} className={cx("flex w-full items-center gap-3 rounded-2xl px-2 py-1.5 text-left transition disabled:cursor-default", s.key === step ? "bg-surface shadow-soft" : "hover:bg-surface/60")}>
-                        <span className={cx("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold", i < index ? "bg-primary text-surface" : s.key === step ? "bg-primary-50 text-primary" : "bg-rose-mist text-ink-muted")}>{String(i + 1).padStart(2, "0")}</span>
-                        <span className="min-w-0">
-                          <span className={cx("block text-sm font-semibold", s.key === step ? "text-primary" : "text-ink")}>{s.title}</span>
-                          <span className="block text-xs text-ink-muted">{s.sub}</span>
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Live preview</p>
-              <StoryPreviewCard profile={preview} />
+            <div className="sticky top-36 max-h-[calc(100dvh-10rem)] space-y-5 overflow-y-auto pb-4">
+              <div>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Live preview</p>
+                <StoryPreviewCard profile={preview} />
+              </div>
+              {data && <StoryCompletion profile={data} onGo={go} />}
             </div>
           </aside>
         )}
       </div>
+
+      {data && step && (
+        <div className="sticky bottom-0 z-10 border-t hairline bg-parchment/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+          <div className="container-page flex items-center justify-between gap-2 py-3">
+            {index > 0 ? (
+              <Button variant="quiet" onClick={() => go(STEPS[index - 1].key)}>
+                Back
+              </Button>
+            ) : (
+              <span />
+            )}
+            {next && (
+              <div className="flex items-center gap-1 sm:gap-2">
+                {(step !== "intro" || unlocked) && (
+                  <Button variant="quiet" onClick={() => go(next)}>
+                    Skip for now
+                  </Button>
+                )}
+                <Button onClick={onContinue} loading={continuing}>
+                  Continue
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <Drawer open={previewOpen} onClose={() => setPreviewOpen(false)} title="Your profile so far">
-        <div className="p-5">{preview && <EditorialProfile profile={preview} preview />}</div>
+        <div className="space-y-6 p-5">
+          {preview && <EditorialProfile profile={preview} preview />}
+          {data && (
+            <StoryCompletion
+              profile={data}
+              onGo={(k) => {
+                setPreviewOpen(false);
+                if (unlocked) go(k);
+              }}
+            />
+          )}
+        </div>
       </Drawer>
     </div>
   );
 }
 
-function Step({ title, lede, children }: { title: string; lede?: string; children: ReactNode }) {
-  return (
-    <section>
-      <h1 className="mt-3 text-4xl sm:text-5xl">{title}</h1>
-      {lede && <p className="mt-3 max-w-2xl text-lg text-ink-soft">{lede}</p>}
-      <div className="mt-10">{children}</div>
-    </section>
-  );
-}
-
-function Nav({ back, next, hint }: { back: ReactNode; next: ReactNode; hint?: string }) {
-  return (
-    <div className="mt-10 border-t hairline pt-6">
-      {hint && <p className="mb-3 text-sm text-ink-muted">{hint}</p>}
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-        {back}
-        {next}
-      </div>
-    </div>
-  );
-}
-
-function SaveIndicator({ at }: { at: Date | null }) {
+function SaveIndicator({ status, at }: { status: { s: SaveStatus; retry?: () => void }; at: Date | null }) {
   const [, tick] = useState(0);
   useEffect(() => {
     const t = setInterval(() => tick((n) => n + 1), 30000);
     return () => clearInterval(t);
   }, []);
-  if (!at) return <span className="hidden text-ink-muted sm:inline">Progress saves as you go</span>;
+  const quiet = "hidden text-ink-muted sm:inline";
+  if (status.s === "saving")
+    return (
+      <span role="status" className="text-ink-muted">
+        Saving…
+      </span>
+    );
+  if (status.s === "dirty")
+    return (
+      <span role="status" className="text-ink-muted">
+        Unsaved changes
+      </span>
+    );
+  if (status.s === "local")
+    return (
+      <span role="status" className="text-ink-muted">
+        Saved on this device
+      </span>
+    );
+  if (status.s === "error")
+    return (
+      <span role="alert" className="inline-flex items-center gap-2 text-error">
+        Not saved
+        {status.retry && (
+          <button type="button" onClick={status.retry} className="font-semibold underline">
+            Retry
+          </button>
+        )}
+      </span>
+    );
+  if (!at) return <span className={quiet}>Progress saves as you go</span>;
   const secs = Math.round((Date.now() - at.getTime()) / 1000);
   return (
     <span role="status" className="inline-flex items-center gap-1.5 text-success">
-      <Icon name="check" className="h-4 w-4" /> Saved {secs < 30 ? "just now" : `${Math.round(secs / 60)} min ago`}
+      <Icon name="check" className="h-4 w-4" /> Saved{secs >= 30 && ` ${Math.max(1, Math.round(secs / 60))} min ago`}
     </span>
   );
 }
 
-/** Date of birth is set at sign-up; age is calculated on the server and only the age is shown. */
-function DobNote({ profile }: { profile: OwnProfile }) {
-  if (!profile.dateOfBirth) return null;
-  const d = new Date(`${profile.dateOfBirth}T00:00:00Z`);
-  return (
-    <p className="mb-8 rounded-2xl bg-surface/70 px-4 py-3 text-sm text-ink-soft">
-      Date of birth: <strong className="text-ink">{d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</strong> · others only see your age ({profile.age}). Contact support if it's wrong.
-    </p>
-  );
-}
-
-function ValuesQuestions() {
-  const { data, setData } = useResource<Question[]>("/compatibility/questions");
-  const picks = (data ?? []).filter((q) => ["COMMUNICATION", "VALUES", "LIFESTYLE"].includes(q.dimension)).slice(0, 3);
-  if (!picks.length) return null;
-  return (
-    <section className="mt-14" aria-labelledby="values-h">
-      <h2 id="values-h" className="text-2xl">
-        What you value <span className="font-sans text-base font-normal text-ink-muted">· optional</span>
-      </h2>
-      <p className="mt-1 text-ink-soft">A few quick questions that power compatibility. Skip any of them — your individual answers are never shown.</p>
-      <div className="mt-6 space-y-4">
-        {picks.map((q) => (
-          <QuestionCard key={q.id} q={q} onSaved={(nq) => setData((l) => l!.map((x) => (x.id === nq.id ? nq : x)))} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function PreviewStep({ profile, preview, onEdit }: { profile: OwnProfile; preview: ReturnType<typeof toPreview>; onEdit: (k: StepKey) => void }) {
+function PreviewStep({ profile, preview, onEdit, onPublished }: { profile: OwnProfile; preview: ReturnType<typeof toPreview>; onEdit: (k: StepKey) => void; onPublished: () => void }) {
   const { refresh } = useAuth();
   const navigate = useNavigate();
   const [discoverable, setDiscoverable] = useState(profile.isDiscoverable);
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const tips = [
-    profile.photos.length < 3 && { text: "Add a couple more photos", step: "photos" as StepKey },
-    profile.prompts.length < 2 && { text: "Answer another prompt — they're great conversation starters", step: "words" as StepKey },
-    profile.interests.length < 5 && { text: "Add a few more of the little things", step: "little" as StepKey },
-  ].filter(Boolean) as { text: string; step: StepKey }[];
+  const blockers = [!profile.displayName && "your name", !profile.photos.length && "a photo", !profile.intentions.length && "the kind of connection you're open to"].filter(Boolean);
 
   const publish = async () => {
     setPublishing(true);
@@ -286,6 +328,7 @@ function PreviewStep({ profile, preview, onEdit }: { profile: OwnProfile; previe
       if (discoverable !== profile.isDiscoverable) await api.post("/settings/discovery", { isDiscoverable: discoverable });
       await api.post("/profiles/me/publish");
       await refresh();
+      onPublished();
       navigate("/app/discover", { replace: true });
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Couldn't publish. Please try again.");
@@ -295,37 +338,23 @@ function PreviewStep({ profile, preview, onEdit }: { profile: OwnProfile; previe
   };
 
   return (
-    <section>
-      <h1 className="mt-3 text-4xl sm:text-5xl">This is your story.</h1>
-      <p className="mt-3 max-w-2xl text-lg text-ink-soft">It's exactly what others will see. Nothing is public until you publish.</p>
-      <div className="mt-10 grid gap-10 xl:grid-cols-[minmax(0,1fr)_18rem]">
+    <div>
+      <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="min-w-0 rounded-[2.5rem] border hairline bg-surface/50 p-4 sm:p-8">
           <EditorialProfile profile={preview} preview />
         </div>
         <aside className="space-y-5 xl:sticky xl:top-36 xl:self-start">
-          {tips.length > 0 && (
-            <div className="rounded-3xl bg-surface/80 p-5">
-              <p className="text-sm font-semibold">Optional finishing touches</p>
-              <ul className="mt-2 space-y-1">
-                {tips.map((t) => (
-                  <li key={t.text}>
-                    <button type="button" onClick={() => onEdit(t.step)} className="text-left text-sm text-primary hover:underline">
-                      {t.text}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <StoryCompletion profile={profile} onGo={onEdit} />
           <div className="rounded-3xl bg-surface/80 p-5">
-            <p className="text-sm font-semibold">Edit</p>
+            <p className="text-sm font-semibold">Edit a section</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {STEPS.slice(0, 5).map((s) => (
+              {STEPS.slice(0, 6).map((s) => (
                 <Button key={s.key} variant="secondary" size="sm" onClick={() => onEdit(s.key)}>
-                  {s.short}
+                  {s.title.replace(/^(The|Your) /, "")}
                 </Button>
               ))}
             </div>
+            <p className="mt-3 text-xs text-ink-muted">Your lifestyle answers stay private and aren't part of this preview.</p>
           </div>
           <label className="flex items-start gap-3 rounded-3xl bg-surface/80 p-5 text-sm">
             <input type="checkbox" className="mt-0.5 h-5 w-5 accent-primary" checked={discoverable} onChange={(e) => setDiscoverable(e.target.checked)} />
@@ -339,11 +368,14 @@ function PreviewStep({ profile, preview, onEdit }: { profile: OwnProfile; previe
               {error}
             </p>
           )}
-          <Button size="lg" className="w-full" onClick={publish} loading={publishing}>
-            {profile.isPublished ? "Save & return to Knot" : "Publish my story"}
+          {!profile.isPublished && <p className="font-serif text-xl leading-snug">Ready for someone to discover your kind of connection?</p>}
+          {blockers.length > 0 && <p className="text-sm text-ink-soft">Before you publish, add {blockers.join(" and ")}.</p>}
+          <Button size="lg" className="w-full" onClick={publish} loading={publishing} disabled={blockers.length > 0}>
+            {profile.isPublished ? "Save & return to Knot" : "Publish My Profile"}
           </Button>
+          <p className="text-xs text-ink-muted">Only photos and videos that have passed review are shown to others.</p>
         </aside>
       </div>
-    </section>
+    </div>
   );
 }
