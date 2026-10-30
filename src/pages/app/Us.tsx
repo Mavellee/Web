@@ -82,11 +82,14 @@ function DoodleStudio({ matchId, me }: { matchId: string; me: string }) {
       <div className="mt-4">
         {doodle ? (
           <>
-            <DoodleCanvas doodle={doodle} matchId={matchId} me={me} />
-            <div className="mt-2 text-right">
-              <Button size="sm" variant="quiet" onClick={() => setConfirmDelete(true)}>
-                Delete this doodle
-              </Button>
+            {/* Short enough that the canvas and its tools fit on screen together. */}
+            <div className="mx-auto max-w-[min(100%,calc(100dvh-14rem))]">
+              <DoodleCanvas doodle={doodle} matchId={matchId} me={me} />
+              <div className="mt-2 text-right">
+                <Button size="sm" variant="quiet" onClick={() => setConfirmDelete(true)}>
+                  Delete this doodle
+                </Button>
+              </div>
             </div>
           </>
         ) : list.data && !list.data.length ? (

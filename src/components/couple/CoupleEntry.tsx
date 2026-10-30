@@ -58,9 +58,10 @@ export function CoupleEntry({ matchId, name }: { matchId: string; name: string }
         </button>
       )}
       {data.status === "REQUESTED_BY_THEM" && (
-        <button type="button" onClick={() => setDialog("answer")} className={`${PILL} border-primary bg-primary text-surface`}>
+        <button type="button" onClick={() => setDialog("answer")} aria-label={`Answer ${name}`} className={`${PILL} border-primary bg-primary text-surface`}>
           <Icon name="heart" className="h-3.5 w-3.5" />
-          Answer {name}
+          <span className="sm:hidden">Answer</span>
+          <span className="hidden sm:inline">Answer {name}</span>
         </button>
       )}
       <ConfirmDialog
