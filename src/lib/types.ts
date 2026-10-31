@@ -52,7 +52,7 @@ export interface CompatResult {
 }
 
 export interface PublicProfile {
-  zodiac?: { name: string; symbol: string } | null;
+  zodiac?: { name: string; symbol: string; element: string } | null;
   id: string;
   displayName: string;
   age: number | null;

@@ -247,6 +247,14 @@ export function EditorialProfile({
                 <dd className="font-semibold">{p.city}</dd>
               </div>
             )}
+            {p.zodiac && (
+              <div>
+                <dt className="text-ink-muted">Zodiac sign</dt>
+                <dd className="font-semibold">
+                  {p.zodiac.symbol} {p.zodiac.name} · {p.zodiac.element} sign
+                </dd>
+              </div>
+            )}
             {p.interests.length > 0 && (
               <div>
                 <dt className="text-ink-muted">Interests</dt>

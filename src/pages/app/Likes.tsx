@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { AppPage, PageHeader } from "../../components/app/PageHeader";
 import { useConnectionActions } from "../../components/app/MatchDialog";
 import { IntentionBadges } from "../../components/profile/ProfileCard";
+import { Badge } from "../../components/ui/Badge";
 import { Button, ButtonLink } from "../../components/ui/Button";
 import { Photo } from "../../components/ui/Photo";
 import { Skeleton } from "../../components/ui/Skeleton";
@@ -74,6 +75,7 @@ export function Likes() {
                 <p className="text-sm text-ink-muted">{p.city}</p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   <IntentionBadges intentions={p.intentions} />
+                  {p.zodiac && <Badge tone="gold">{p.zodiac.symbol} {p.zodiac.name}</Badge>}
                 </div>
                 {detail && (
                   <figure className="mt-4 rounded-2xl bg-rose-mist/60 p-3">
