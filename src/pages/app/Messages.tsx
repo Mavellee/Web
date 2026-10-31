@@ -94,7 +94,7 @@ export function Messages() {
   );
 }
 
-/** Shown only where the server says Knot Astro applies to this match. */
+/** Shown only where the server says Mavelle Astro applies to this match. */
 function AstroEntry({ matchId }: { matchId: string }) {
   const { data, reload } = useResource<AstroState>(`/astro/matches/${matchId}`);
   useSocketEvent<{ matchId: string }>("astro:update", (e) => {
@@ -103,9 +103,9 @@ function AstroEntry({ matchId }: { matchId: string }) {
   if (!data?.available) return null;
   if (!data.hasReport && (data.status === "DECLINED" || !data.eligible)) return null;
   return (
-    <Link to={`/app/astro/${matchId}`} aria-label="Knot Astro" className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gold/50 bg-gold-soft/40 px-3 py-1.5 text-xs font-semibold text-gold-ink hover:bg-gold-soft">
+    <Link to={`/app/astro/${matchId}`} aria-label="Mavelle Astro" className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gold/50 bg-gold-soft/40 px-3 py-1.5 text-xs font-semibold text-gold-ink hover:bg-gold-soft">
       <Icon name="star" className="h-3.5 w-3.5" />
-      <span className="hidden sm:inline">{data.hasReport ? "Your Cosmic Connection" : "Knot Astro"}</span>
+      <span className="hidden sm:inline">{data.hasReport ? "Your Cosmic Connection" : "Mavelle Astro"}</span>
     </Link>
   );
 }

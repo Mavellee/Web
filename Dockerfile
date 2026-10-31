@@ -1,4 +1,4 @@
-# Knot web — static build served by Caddy, which also terminates HTTPS and proxies the API.
+# Mavelle web — static build served by Caddy, which also terminates HTTPS and proxies the API.
 #   docker build -f web/Dockerfile -t knot-web .
 FROM node:22-alpine AS build
 WORKDIR /app

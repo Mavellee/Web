@@ -144,7 +144,7 @@ export function JourneySection() {
   return (
     <section aria-labelledby="journey-title" className="border-y hairline bg-surface/55">
       <div className="container-page py-16 sm:py-24">
-        <SectionHeader align="center" id="journey-title" eyebrow="How Knot works" title="From first impression to real conversation." />
+        <SectionHeader align="center" id="journey-title" eyebrow="How Mavelle works" title="From first impression to real conversation." />
         <ol className="relative mt-16 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           <span aria-hidden="true" className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-primary-200 to-transparent lg:block" />
           {STEPS.map((s, i) => (
@@ -232,7 +232,7 @@ export function GamesSection() {
             ))}
           </ul>
         </div>
-        <div aria-label="Example prompts from Knot games" className="relative mx-auto grid w-full max-w-md gap-4 sm:max-w-none sm:grid-cols-3 sm:gap-3 sm:pt-6">
+        <div aria-label="Example prompts from Mavelle games" className="relative mx-auto grid w-full max-w-md gap-4 sm:max-w-none sm:grid-cols-3 sm:gap-3 sm:pt-6">
           {GAME_SAMPLES.map((g, i) => (
             <article key={g.deck} className={cx("rounded-[1.75rem] p-6 text-ink shadow-lift transition duration-300 hover:rotate-0 sm:min-h-72", g.tone, g.rotate, i === 1 && "sm:-mt-6")}>
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-ink-soft">{g.deck}</p>
@@ -258,7 +258,7 @@ export function SafetySection() {
     <section aria-labelledby="safety-title" className="container-page py-16 sm:py-24">
       <div className="space-y-12">
         <SectionHeader align="center" id="safety-title" eyebrow="Safety & trust" title="You stay in control.">
-          Safety on Knot isn't a settings page you find later. It's in every profile, match and conversation.
+          Safety on Mavelle isn't a settings page you find later. It's in every profile, match and conversation.
         </SectionHeader>
         <ul className="mx-auto flex max-w-5xl flex-wrap justify-center gap-x-10 gap-y-8">
           {SAFETY.map((s) => (

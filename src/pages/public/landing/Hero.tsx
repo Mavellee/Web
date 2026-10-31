@@ -12,14 +12,14 @@ export function Hero() {
             <span className="block italic text-primary">A connection that makes sense.</span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-ink-soft sm:text-xl">
-            Knot begins with what you're looking for — something open, something undefined, or something for life — and shows you why someone might fit, using only what you both chose to share.
+            Mavelle begins with what you're looking for — something open, something undefined, or something for life — and shows you why someone might fit, using only what you both chose to share.
           </p>
           <div className="mt-9 flex w-full flex-col justify-center gap-3 sm:flex-row">
             <ButtonLink to="/signup" size="lg">
               Find your connection
             </ButtonLink>
             <ButtonLink to="/how-it-works" size="lg" variant="secondary">
-              Discover how Knot works
+              Discover how Mavelle works
             </ButtonLink>
           </div>
         </div>
@@ -52,7 +52,7 @@ function HeroComposition() {
             <p className="text-xs text-surface/80">Data scientist · Bengaluru</p>
           </div>
         </div>
-        {/* Compatibility note: what Knot actually shows, in miniature */}
+        {/* Compatibility note: what Mavelle actually shows, in miniature */}
         <div className="order-last col-span-2 rounded-3xl border hairline bg-surface p-5 shadow-lift sm:p-6 md:order-none md:col-span-1">
           <div className="flex items-center justify-between">
             <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-ink-muted">Why you might connect</p>

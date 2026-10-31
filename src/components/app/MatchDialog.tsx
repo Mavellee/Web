@@ -54,7 +54,7 @@ function MatchDialog({ matched, onClose }: { matched: { profile: PublicProfile; 
           {matched.astro && (
             <div className="mt-5 rounded-3xl border border-gold/40 bg-gold-soft/40 p-4">
               <p className="font-serif text-lg leading-snug">You've found a connection. Shall we discover what the stars say?</p>
-              <p className="mt-1 text-sm text-ink-muted">Knot Astro is optional, and your chat is open either way.</p>
+              <p className="mt-1 text-sm text-ink-muted">Mavelle Astro is optional, and your chat is open either way.</p>
               <Button
                 className="mt-3 w-full"
                 variant="secondary"

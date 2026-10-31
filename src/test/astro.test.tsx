@@ -21,7 +21,7 @@ const show = () => renderWithProviders(
 const chart = (name: string) => ({ name, sun: "Mithuna", moon: "Karka", nakshatra: "Pushya", pada: 2, lagna: null, accuracy: "UNKNOWN", unavailable: [{ field: "Lagna and houses", reason: "These need a birth time." }] });
 const report = { status: "READY", failure: null, conversationId: "c1", version: "knot-vedic-1", me: chart("Asha"), them: chart("Vikram"), guna: { method: "ashtakoota-north-1", total: 24.5, max: 36, kootas: [{ key: "nadi", label: "Nadi", meaning: "Constitution", score: 8, max: 8 }] }, gunaUnavailableReason: null, themes: ["Both Moons are in water signs."], interpretationMine: "personA", model: "m", interpretation: { overview: "A warm start.", chartInsights: { personA: "Asha may value calm.", personB: "Vikram may value clarity." }, emotionalConnection: "Shared ground.", communication: "Talk it through.", attraction: "Worth exploring.", harmony: ["Water signs."], differences: ["Different Suns."], reflectionPrompts: ["What feels like home?"], narrative: "A story being written.", starters: ["What makes you feel understood?", "What does home mean?", "Where next?"] } };
 
-describe("Knot Astro", () => {
+describe("Mavelle Astro", () => {
   it("offers the invitation with both choices, and says it's optional", async () => {
     mockApi({ ...common, [`GET ${M}`]: { body: { data: base } } });
     const { container } = show();
@@ -34,14 +34,14 @@ describe("Knot Astro", () => {
   it("isn't offered when the match isn't eligible, and points back to chat", async () => {
     mockApi({ ...common, [`GET ${M}`]: { body: { data: { available: false } } } });
     show();
-    expect(await screen.findByText("Knot Astro isn't part of this match.")).toBeInTheDocument();
+    expect(await screen.findByText("Mavelle Astro isn't part of this match.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Explore Our Compatibility" })).not.toBeInTheDocument();
   });
 
   it("needs explicit consent, hides the time when unknown, and explains the effect", async () => {
     const { calls } = mockApi({ ...common, [`GET ${M}`]: { body: { data: { ...base, status: "COLLECTING", myState: "INTERESTED" } } }, [`POST ${M}/consent`]: { body: { data: { ...base, status: "COLLECTING", myState: "CONSENTED" } } } });
     show();
-    const send = await screen.findByRole("button", { name: "Send to Knot Astro" });
+    const send = await screen.findByRole("button", { name: "Send to Mavelle Astro" });
     expect(send).toBeDisabled();
     await userEvent.click(screen.getByRole("button", { name: "I don't know" }));
     expect(screen.queryByLabelText("Birth time")).not.toBeInTheDocument();

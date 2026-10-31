@@ -71,7 +71,7 @@ export const signupSchema = z.object({
   email: z.string().trim().email("Enter a valid email address."),
   password: passwordRule,
   // The server re-checks age; this is only for a friendly early message.
-  dateOfBirth: z.string().min(1, "Enter your date of birth.").refine(isAdult, "You must be 18 or older to join Knot."),
+  dateOfBirth: z.string().min(1, "Enter your date of birth.").refine(isAdult, "You must be 18 or older to join Mavelle."),
   ageConfirmed: z.literal(true, { errorMap: () => ({ message: "Please confirm you're 18 or older." }) }),
   acceptTerms: z.literal(true, { errorMap: () => ({ message: "Please accept the terms to continue." }) }),
 });
@@ -97,7 +97,7 @@ export function Signup() {
 
   return (
     <AuthLayout
-      title="Join Knot"
+      title="Join Mavelle"
       subtitle="Step 1 of 5 · Your account. You'll set up your profile next — nothing is public until you choose to publish."
       footer={
         <>
@@ -173,7 +173,7 @@ export function Login() {
       title="Welcome back"
       footer={
         <>
-          New to Knot?{" "}
+          New to Mavelle?{" "}
           <Link to="/signup" className="font-semibold text-primary underline-offset-4 hover:underline">
             Create an account
           </Link>

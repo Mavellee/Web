@@ -1,4 +1,4 @@
-// "The Eternal Rose": Knot's single source of colour truth.
+// "The Eternal Rose": Mavelle's single source of colour truth.
 // Tailwind reads these through CSS custom properties (see tailwind.config.ts), so every
 // value here is also available in CSS as --color-<name>.
 // Gold is decorative only: it does not meet text contrast on parchment.
@@ -47,7 +47,7 @@ export const tokens = {
 
 export type Token = keyof typeof tokens;
 
-/** Warm aubergine rather than grey, so dark mode still feels like Knot. */
+/** Warm aubergine rather than grey, so dark mode still feels like Mavelle. */
 export const darkTokens: Record<Token, string> = {
   ...tokens,
   background: "#1A1216",

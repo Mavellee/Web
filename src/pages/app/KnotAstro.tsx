@@ -17,7 +17,7 @@ const WORKING: Partial<Record<AstroStatus, string>> = {
   INTERPRETING: "Your charts are calculated. Writing your reading.",
 };
 
-/** The whole Knot Astro journey for one match. Every state comes from the server, so a refresh resumes correctly. */
+/** The whole Mavelle Astro journey for one match. Every state comes from the server, so a refresh resumes correctly. */
 export function KnotAstro() {
   const { matchId = "" } = useParams();
   const { data: state, setData, reload, error, loading } = useResource<AstroState>(`/astro/matches/${matchId}`);
@@ -45,7 +45,7 @@ export function KnotAstro() {
     }
   };
 
-  if (loading && !state) return <LoadingBlock label="Loading Knot Astro" />;
+  if (loading && !state) return <LoadingBlock label="Loading Mavelle Astro" />;
   if (error) return <ErrorState message={error.message} onRetry={reload} />;
   if (!state) return null;
   const chat = state.available && state.conversationId ? `/app/messages/${state.conversationId}` : "/app/messages";
@@ -58,7 +58,7 @@ export function KnotAstro() {
   if (!state.available)
     return (
       <Frame>
-        <h1 className="text-4xl">Knot Astro isn't part of this match.</h1>
+        <h1 className="text-4xl">Mavelle Astro isn't part of this match.</h1>
         <p className="mt-3 text-ink-soft">It's offered when both people are looking for a long-term relationship or marriage. Your match and chat work exactly the same.</p>
         <div className="mt-6">
           <ButtonLink to="/app/messages">Go to your messages</ButtonLink>
@@ -92,7 +92,7 @@ export function KnotAstro() {
   if (!state.eligible)
     return (
       <Frame>
-        <h1 className="text-4xl">Knot Astro isn't available right now.</h1>
+        <h1 className="text-4xl">Mavelle Astro isn't available right now.</h1>
         <p className="mt-3 text-ink-soft">It needs both people to be looking for a long-term relationship or marriage.</p>
         <div className="mt-6">{toChat}</div>
       </Frame>
@@ -101,7 +101,7 @@ export function KnotAstro() {
   if (!state.configured)
     return (
       <Frame>
-        <h1 className="text-4xl">Knot Astro isn't available right now.</h1>
+        <h1 className="text-4xl">Mavelle Astro isn't available right now.</h1>
         <p className="mt-3 text-ink-soft">Your match and chat aren't affected.</p>
         <div className="mt-6">{toChat}</div>
       </Frame>
@@ -111,7 +111,7 @@ export function KnotAstro() {
     return (
       <Frame>
         <h1 className="text-4xl">Your conversation is the reading.</h1>
-        <p className="mt-3 text-ink-soft">Knot Astro isn't going ahead for this match. That says nothing about the two of you, and your chat is open.</p>
+        <p className="mt-3 text-ink-soft">Mavelle Astro isn't going ahead for this match. That says nothing about the two of you, and your chat is open.</p>
         <div className="mt-6">
           <ButtonLink to={chat}>Start Your Conversation</ButtonLink>
         </div>
@@ -140,7 +140,7 @@ export function KnotAstro() {
   return (
     <Frame>
       <TwoCharts />
-      <p className="eyebrow mt-6 justify-center text-center">Knot Astro</p>
+      <p className="eyebrow mt-6 justify-center text-center">Mavelle Astro</p>
       <h1 className="mt-3 text-center text-4xl sm:text-5xl">You've found a connection. Shall we discover what the stars say?</h1>
       <p className="mt-4 text-center text-lg text-ink-soft">{state.theirState === "INTERESTED" || state.theirState === "CONSENTED" ? "Your match would like to explore this with you. " : ""}It's optional, and it never affects your match or your chat.</p>
       <div className="mt-8 flex flex-col justify-center gap-2 sm:flex-row">
@@ -198,7 +198,7 @@ function Report({ matchId, state, onRetry, onWithdrawn, acting }: { matchId: str
       <header className="relative overflow-hidden rounded-[2.5rem] bg-primary-800 px-6 py-12 text-center text-surface sm:px-12">
         <Constellation className="!text-gold/50" />
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Knot Astro</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Mavelle Astro</p>
           <h1 className="mt-3 text-4xl text-surface sm:text-5xl">Your Cosmic Connection</h1>
           <p className="mt-3 font-serif text-xl text-surface/85">
             {r.me.name} &amp; {r.them.name}
@@ -277,7 +277,7 @@ function Report({ matchId, state, onRetry, onWithdrawn, acting }: { matchId: str
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-xs text-ink-muted">Calculated with the eight-koota (Ashtakoota) North Indian method from your Moon placements. Schools differ on some tables. This is an astrological tradition, not a scientific assessment of a relationship, and nothing on Knot depends on it.</p>
+            <p className="mt-4 text-xs text-ink-muted">Calculated with the eight-koota (Ashtakoota) North Indian method from your Moon placements. Schools differ on some tables. This is an astrological tradition, not a scientific assessment of a relationship, and nothing on Mavelle depends on it.</p>
           </div>
         ) : (
           <p className="mt-6 rounded-3xl bg-surface/80 p-5 text-sm text-ink-soft">{r.gunaUnavailableReason}</p>

@@ -20,7 +20,7 @@ function DraftNotice() {
     <div role="note" className="mb-10 flex gap-3 rounded-3xl border border-gold/50 bg-gold-soft/60 p-5 text-sm text-gold-ink">
       <Icon name="flag" className="mt-0.5 h-5 w-5 shrink-0" />
       <p>
-        <strong>Draft for review.</strong> This page describes how Knot is designed to work. It has not yet been reviewed by legal counsel and is not a binding legal document. It will be replaced before public launch.
+        <strong>Draft for review.</strong> This page describes how Mavelle is designed to work. It has not yet been reviewed by legal counsel and is not a binding legal document. It will be replaced before public launch.
       </p>
     </div>
   );
@@ -37,12 +37,12 @@ export function HowItWorks() {
     ["Answer what you like", "Optional compatibility questions cover communication, lifestyle and values. Skip any you want; skipped answers are never counted against you."],
     ["Preview, then publish", "See exactly how your profile looks to others before it goes live. Edit anything at any time."],
     ["Discover and like", "Browse profiles that fit both your preferences and theirs. A match only happens when you both like each other."],
-    ["Talk and play", "Chat in real time and, if you like, play a curated question game together. Knot AI can suggest an opener — or stay out of the way."],
+    ["Talk and play", "Chat in real time and, if you like, play a curated question game together. Mavelle AI can suggest an opener — or stay out of the way."],
   ];
   return (
     <>
-      <PageIntro eyebrow="How Knot works" title="A calmer way to meet people.">
-        Knot is designed around honesty about intentions, readable compatibility, and conversations that go somewhere.
+      <PageIntro eyebrow="How Mavelle works" title="A calmer way to meet people.">
+        Mavelle is designed around honesty about intentions, readable compatibility, and conversations that go somewhere.
       </PageIntro>
       <section className="container-page">
         <ol className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -101,17 +101,17 @@ export function Intentions() {
 
 export function Safety() {
   const items = [
-    ["Adults only", "Knot is for people aged 18 and over. Age is calculated on our servers from your date of birth, which is never shown to anyone. Reports of possible under-18 accounts are prioritised and the account is restricted while we review it."],
+    ["Adults only", "Mavelle is for people aged 18 and over. Age is calculated on our servers from your date of birth, which is never shown to anyone. Reports of possible under-18 accounts are prioritised and the account is restricted while we review it."],
     ["Your location stays approximate", "We store your city or a rounded position (about 1 km) and show others only a distance range. We remove location data embedded in photos before storing them."],
     ["Blocking and reporting", "Block or report from any profile or message. Blocking ends the match, closes the conversation, and hides you from each other. Reports go to trained moderators; we don't tell the other person who reported them."],
-    ["Your messages are yours", "Only you and your match can read your conversation. Moderators see a specific message only if one of you reports it. Experts and Knot AI never have access to chats."],
+    ["Your messages are yours", "Only you and your match can read your conversation. Moderators see a specific message only if one of you reports it. Experts and Mavelle AI never have access to chats."],
     ["Control your visibility", "Pause Discover, hide your profile from new people, turn off read receipts and typing indicators, or delete your account."],
     ["Secure by design", "Passwords are hashed with Argon2id, sessions use secure HTTP-only cookies, and sensitive actions are rate-limited and logged for audit."],
   ];
   return (
     <>
       <PageIntro eyebrow="Safety & privacy" title="Your safety isn't a feature. It's the foundation.">
-        Here's what Knot does to protect you, and what you can do to stay in control.
+        Here's what Mavelle does to protect you, and what you can do to stay in control.
       </PageIntro>
       <section className="container-page grid gap-5 md:grid-cols-2">
         {items.map(([t, d]) => (
@@ -142,15 +142,15 @@ export function Safety() {
 export function About() {
   return (
     <>
-      <PageIntro eyebrow="About Knot" title="We think dating should feel less like a slot machine.">
-        Knot is built for people who want to be clear about what they're looking for and kind about how they look for it.
+      <PageIntro eyebrow="About Mavelle" title="We think dating should feel less like a slot machine.">
+        Mavelle is built for people who want to be clear about what they're looking for and kind about how they look for it.
       </PageIntro>
       <section className="container-page grid gap-10 md:grid-cols-2 md:items-center">
         <img src="/images/friends.jpg" alt="Friends with arms around each other watching a sunset on a hillside" className="aspect-[4/3] w-full rounded-4xl object-cover shadow-lift" loading="lazy" />
         <div className="space-y-4 text-lg leading-relaxed text-ink-soft">
-          <p>Most dating apps are optimised for time spent in the app. We'd rather optimise for good first conversations — and for people leaving Knot because it worked.</p>
+          <p>Most dating apps are optimised for time spent in the app. We'd rather optimise for good first conversations — and for people leaving Mavelle because it worked.</p>
           <p>That's why we don't show inflated match counts, invent likes, or use urgency to keep you scrolling. What you see is real.</p>
-          <p>Knot is an early-stage product. We're building carefully, listening to members, and publishing how our features work — including how compatibility is calculated.</p>
+          <p>Mavelle is an early-stage product. We're building carefully, listening to members, and publishing how our features work — including how compatibility is calculated.</p>
         </div>
       </section>
       <section className="container-page mt-16 grid gap-5 sm:grid-cols-3">
@@ -172,9 +172,9 @@ export function About() {
 export function Guidelines() {
   return (
     <>
-      <PageIntro eyebrow="Community guidelines" title="How we treat each other on Knot." />
+      <PageIntro eyebrow="Community guidelines" title="How we treat each other on Mavelle." />
       <Prose>
-        <p>Knot works when people feel safe being honest. These guidelines apply to profiles, photos, messages, games and anything else you share.</p>
+        <p>Mavelle works when people feel safe being honest. These guidelines apply to profiles, photos, messages, games and anything else you share.</p>
         <h2>Be yourself — truthfully</h2>
         <ul>
           <li>Use your own recent photos and your real age. You must be 18 or over.</li>
@@ -208,10 +208,10 @@ export function Terms() {
       <PageIntro eyebrow="Terms of service" title="Terms of service" />
       <Prose>
         <DraftNotice />
-        <h2>Who can use Knot</h2>
+        <h2>Who can use Mavelle</h2>
         <p>You must be at least 18 years old and able to form a binding agreement. You're responsible for keeping your login details secure.</p>
         <h2>Your content</h2>
-        <p>You keep ownership of what you post. You give Knot permission to store and display it to other members as needed to run the service. You confirm you have the right to share any photos you upload.</p>
+        <p>You keep ownership of what you post. You give Mavelle permission to store and display it to other members as needed to run the service. You confirm you have the right to share any photos you upload.</p>
         <h2>Acceptable use</h2>
         <p>You agree to follow the <Link className="text-primary underline" to="/guidelines">community guidelines</Link>. We may restrict or close accounts that break them.</p>
         <h2>Compatibility, experts and AI</h2>
@@ -236,7 +236,7 @@ export function Privacy() {
           <li>Account details: email, password (stored only as a secure hash), date of birth.</li>
           <li>Profile details you choose to add: name, photos, bio, gender, interests, languages, city, intentions, preferences.</li>
           <li>Optional compatibility answers, which are never shown to other members.</li>
-          <li>If you and a match both choose Knot Astro: your birth date, time and place, stored encrypted and used only to calculate your chart. Your match sees sign-level results, never these details. If you both agree, sign-level results (without names or birth details) go to an external AI provider to write your reading. You can withdraw and delete this at any time.</li>
+          <li>If you and a match both choose Mavelle Astro: your birth date, time and place, stored encrypted and used only to calculate your chart. Your match sees sign-level results, never these details. If you both agree, sign-level results (without names or birth details) go to an external AI provider to write your reading. You can withdraw and delete this at any time.</li>
           <li>Activity needed to run the service: likes, matches, messages, reports, and basic security logs.</li>
           <li>If a match agrees, you can show their profile to one friend through a private link that expires after 7 days. The friend sees their name, age, photos and profile answers, but no location or chats. Their reply is visible only to you, and is erased if the match ends.</li>
           <li>If you and a partner confirm you're together: that status, plus the doodles and couple games you create, visible only to the two of you. Closing the space hides them; they are deleted with your account.</li>
@@ -244,9 +244,9 @@ export function Privacy() {
         <h2>What others can see</h2>
         <p>Your display name, age (not date of birth), photos, bio, interests, languages, city, intentions, and an approximate distance range. Never your email, exact location, or individual compatibility answers.</p>
         <h2>How we use it</h2>
-        <p>To show you relevant people, calculate compatibility from information you've chosen to share, deliver messages, keep members safe, and improve Knot. We don't sell personal data.</p>
+        <p>To show you relevant people, calculate compatibility from information you've chosen to share, deliver messages, keep members safe, and improve Mavelle. We don't sell personal data.</p>
         <h2>AI features</h2>
-        <p>Knot AI is optional. When used, only the minimum context needed (such as shared interests) is sent to the AI provider. Private chat histories are never sent. We record usage counts and timing, not the text.</p>
+        <p>Mavelle AI is optional. When used, only the minimum context needed (such as shared interests) is sent to the AI provider. Private chat histories are never sent. We record usage counts and timing, not the text.</p>
         <h2>Experts</h2>
         <p>An expert only sees the specific information you tick when you request a review, captured at that moment. Experts can never access your messages.</p>
         <h2>Your choices</h2>
@@ -266,9 +266,9 @@ export function Contact() {
       </PageIntro>
       <section className="container-page grid gap-5 md:grid-cols-3">
         {[
-          ["Account & technical help", "support@knot.example", "Login problems, verification emails, bugs."],
-          ["Safety concerns", "safety@knot.example", "Anything that made you feel unsafe on or off Knot."],
-          ["Privacy requests", "privacy@knot.example", "Questions about your data or this policy."],
+          ["Account & technical help", "support@mavelle.example", "Login problems, verification emails, bugs."],
+          ["Safety concerns", "safety@mavelle.example", "Anything that made you feel unsafe on or off Mavelle."],
+          ["Privacy requests", "privacy@mavelle.example", "Questions about your data or this policy."],
         ].map(([t, email, d]) => (
           <div key={t} className="rounded-4xl border hairline bg-surface/70 p-7 shadow-soft">
             <h2 className="text-2xl">{t}</h2>
@@ -307,7 +307,7 @@ export function NotFound() {
       <h1 className="mt-4 text-5xl">This thread came loose.</h1>
       <p className="mt-4 max-w-md text-ink-soft">The page you're looking for doesn't exist or has moved.</p>
       <ButtonLink to="/" className="mt-8">
-        Back to Knot
+        Back to Mavelle
       </ButtonLink>
     </div>
   );

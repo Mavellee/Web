@@ -37,7 +37,7 @@ function SharedPhoto({ id, token, alt }: { id: string; token: string; alt: strin
   return src ? <img src={src} alt={alt} className="aspect-[4/5] w-full rounded-3xl object-cover" /> : <div className="aspect-[4/5] w-full animate-pulse rounded-3xl bg-rose-soft" />;
 }
 
-/** Opened by a friend with no Knot account. The link is the only credential. */
+/** Opened by a friend with no Mavelle account. The link is the only credential. */
 export function FriendReview() {
   const [token, setToken] = useState(() => window.location.hash.slice(1));
   const [data, setData] = useState<Shared | null>(null);

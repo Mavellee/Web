@@ -61,7 +61,7 @@ export function ProfileCard({ profile, actions, preview, linkToProfile = true }:
         <div className="flex flex-wrap gap-1.5">
           <IntentionBadges intentions={profile.intentions} />
           {profile.zodiac && <Badge tone="gold">{profile.zodiac.symbol} {profile.zodiac.name}</Badge>}
-          {profile.isApprovedExpert && <Badge tone="gold">Knot expert</Badge>}
+          {profile.isApprovedExpert && <Badge tone="gold">Mavelle expert</Badge>}
         </div>
         {profile.bio && <p className="leading-relaxed text-ink-soft">{profile.bio}</p>}
         {profile.interests.length > 0 && (

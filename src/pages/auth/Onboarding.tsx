@@ -371,7 +371,7 @@ function PreviewStep({ profile, preview, onEdit, onPublished }: { profile: OwnPr
           {!profile.isPublished && <p className="font-serif text-xl leading-snug">Ready for someone to discover your kind of connection?</p>}
           {blockers.length > 0 && <p className="text-sm text-ink-soft">Before you publish, add {blockers.join(" and ")}.</p>}
           <Button size="lg" className="w-full" onClick={publish} loading={publishing} disabled={blockers.length > 0}>
-            {profile.isPublished ? "Save & return to Knot" : "Publish My Profile"}
+            {profile.isPublished ? "Save & return to Mavelle" : "Publish My Profile"}
           </Button>
           <p className="text-xs text-ink-muted">Only photos and videos that have passed review are shown to others.</p>
         </aside>

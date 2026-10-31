@@ -88,7 +88,7 @@ describe("Landing page", () => {
     const { container } = renderWithProviders(<Landing />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Not just a match.A connection that makes sense.");
     for (const cta of screen.getAllByRole("link", { name: "Find your connection" })) expect(cta).toHaveAttribute("href", "/signup");
-    expect(screen.getByRole("link", { name: "Discover how Knot works" })).toHaveAttribute("href", "/how-it-works");
+    expect(screen.getByRole("link", { name: "Discover how Mavelle works" })).toHaveAttribute("href", "/how-it-works");
     for (const name of [/Every kind of connection is valid/, /From first impression/, /thoughtful second opinion/, /Better questions/, /You stay in control/, /Start with what you're looking for/]) {
       expect(screen.getByRole("heading", { name })).toBeInTheDocument();
     }

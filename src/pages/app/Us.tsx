@@ -232,7 +232,7 @@ export function Us() {
   const since = new Date(data.startedAt).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
   return (
     <AppPage>
-      <PageHeader title={`You & ${data.partner.displayName}`} lede={`Together on Knot since ${since}.`} />
+      <PageHeader title={`You & ${data.partner.displayName}`} lede={`Together on Mavelle since ${since}.`} />
       <div className="space-y-10">
         <DoodleStudio matchId={data.matchId} me={account!.id} />
         <CoupleGames space={data} />

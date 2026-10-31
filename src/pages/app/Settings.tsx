@@ -35,14 +35,14 @@ function Toggle({ label, description, checked, onChange }: { label: string; desc
   );
 }
 
-/** Only appears for people who have actually given birth details to Knot Astro. */
+/** Only appears for people who have actually given birth details to Mavelle Astro. */
 function AstroData() {
   const { data, reload } = useResource<{ hasBirthDetails: boolean; retentionDays: number }>("/astro/me");
   const toast = useToast();
   if (!data?.hasBirthDetails) return null;
   return (
     <Card className="p-6">
-      <h2 className="text-xl">Knot Astro</h2>
+      <h2 className="text-xl">Mavelle Astro</h2>
       <p className="mt-2 text-sm text-ink-muted">Your encrypted birth details and chart. They're removed automatically after {data.retentionDays} days without use. Deleting them also removes any joint reports they were used for.</p>
       <Button
         className="mt-4"
@@ -138,9 +138,9 @@ export function Settings() {
             </div>
           </Card>
           <Card className="px-6 py-2">
-            <h2 className="pt-4 text-xl">Knot AI</h2>
+            <h2 className="pt-4 text-xl">Mavelle AI</h2>
             <div className="divide-y hairline">
-              <Toggle label="Use Knot AI suggestions" description="When off, you'll only see hand-written suggestions from our team. AI never reads your chats either way." checked={s.aiEnabled} onChange={(v) => update({ aiEnabled: v })} />
+              <Toggle label="Use Mavelle AI suggestions" description="When off, you'll only see hand-written suggestions from our team. AI never reads your chats either way." checked={s.aiEnabled} onChange={(v) => update({ aiEnabled: v })} />
             </div>
           </Card>
           <AstroData />

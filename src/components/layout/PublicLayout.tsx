@@ -46,13 +46,13 @@ export function PublicLayout() {
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle className="text-ink-soft hover:bg-ink/5" />
             {account ? (
-              <ButtonLink to="/app">Open Knot</ButtonLink>
+              <ButtonLink to="/app">Open Mavelle</ButtonLink>
             ) : (
               <>
                 <ButtonLink to="/login" variant="ghost">
                   Log in
                 </ButtonLink>
-                <ButtonLink to="/signup">Join Knot</ButtonLink>
+                <ButtonLink to="/signup">Join Mavelle</ButtonLink>
               </>
             )}
           </div>
@@ -75,14 +75,14 @@ export function PublicLayout() {
             <div className="mt-4 grid grid-cols-2 gap-2">
               {account ? (
                 <ButtonLink to="/app" className="col-span-2">
-                  Open Knot
+                  Open Mavelle
                 </ButtonLink>
               ) : (
                 <>
                   <ButtonLink to="/login" variant="secondary">
                     Log in
                   </ButtonLink>
-                  <ButtonLink to="/signup">Join Knot</ButtonLink>
+                  <ButtonLink to="/signup">Join Mavelle</ButtonLink>
                 </>
               )}
             </div>
@@ -99,7 +99,7 @@ export function PublicLayout() {
 
 function Footer() {
   const cols = [
-    { title: "Knot", links: [["How it works", "/how-it-works"], ["Relationship intentions", "/intentions"], ["About Knot", "/about"]] },
+    { title: "Mavelle", links: [["How it works", "/how-it-works"], ["Relationship intentions", "/intentions"], ["About Mavelle", "/about"]] },
     { title: "Trust", links: [["Safety & privacy", "/safety"], ["Community guidelines", "/guidelines"], ["Contact & support", "/contact"]] },
     { title: "Legal", links: [["Terms of service", "/terms"], ["Privacy policy", "/privacy"]] },
   ];
@@ -127,7 +127,7 @@ function Footer() {
         ))}
       </div>
       <div className="container-page flex flex-col gap-2 border-t border-surface/15 py-6 text-xs text-surface/70 sm:flex-row sm:justify-between">
-        <p>© {new Date().getFullYear()} Knot. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Mavelle. All rights reserved.</p>
         <p>Legal pages are drafts pending professional legal review.</p>
       </div>
     </footer>

@@ -22,7 +22,7 @@ describe("Sign up", () => {
     renderWithProviders(<Signup />);
     await userEvent.type(screen.getByLabelText("Date of birth"), yearsAgo(16));
     await userEvent.click(screen.getByRole("button", { name: "Create account" }));
-    expect(await screen.findByText("You must be 18 or older to join Knot.")).toBeInTheDocument();
+    expect(await screen.findByText("You must be 18 or older to join Mavelle.")).toBeInTheDocument();
   });
 
   it("submits valid details and shows server-side field errors", async () => {

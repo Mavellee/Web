@@ -105,7 +105,7 @@ export function SafetyMenu({ userId, name, matchId, onEnded }: { userId: string;
         open={open === "block"}
         onClose={() => setOpen(null)}
         title={`Block ${name}?`}
-        body="You won't see each other anywhere on Knot, and any match or conversation will end. They won't be told."
+        body="You won't see each other anywhere on Mavelle, and any match or conversation will end. They won't be told."
         confirmLabel="Block"
         danger
         onConfirm={async () => {

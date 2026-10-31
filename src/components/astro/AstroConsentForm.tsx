@@ -127,7 +127,7 @@ export function AstroConsentForm({ matchId, hasSaved, defaultDate, onDone }: { m
         </p>
       )}
       <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={!ready} loading={busy}>
-        Send to Knot Astro
+        Send to Mavelle Astro
       </Button>
     </form>
   );

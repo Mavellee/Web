@@ -5,7 +5,7 @@ import { cx } from "../../lib/format";
 type Tone = "default" | "light";
 
 /**
- * The Knot seal: a burgundy medallion with an antique-gold rim, holding two interlaced rings — a love knot.
+ * The Mavelle seal: a burgundy medallion with an antique-gold rim, holding two interlaced rings — a love knot.
  * Each ring passes over the other once and under it once, so it reads as a real knot, not two circles.
  * `light` is for burgundy backgrounds (app sidebar, footer).
  */
@@ -50,14 +50,14 @@ export function LogoMark({ className = "h-9 w-9", tone = "default" }: { classNam
   );
 }
 
-/** "Knot" set in Fraunces at display size, with its soft, slightly wonky letterforms. */
+/** "Mavelle" set in Fraunces at display size, with its soft, slightly wonky letterforms. */
 export function Wordmark({ className, tone = "default" }: { className?: string; tone?: Tone }) {
   return (
     <span
       className={cx("font-serif font-semibold leading-none tracking-[-0.025em]", tone === "light" ? "text-surface" : "text-primary", className)}
       style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100, "WONK" 1' }}
     >
-      Knot
+      Mavelle
     </span>
   );
 }
@@ -81,7 +81,7 @@ export function LogoLockup({ tone = "default", size = "md", className }: { tone?
 
 export function Logo({ to = "/", tone = "default", size = "md" }: { to?: string; tone?: Tone; size?: keyof typeof SIZES }) {
   return (
-    <Link to={to} className={cx("group inline-flex items-center rounded-full", tone === "light" && "focus-visible:ring-gold focus-visible:ring-offset-primary")} aria-label="Knot home">
+    <Link to={to} className={cx("group inline-flex items-center rounded-full", tone === "light" && "focus-visible:ring-gold focus-visible:ring-offset-primary")} aria-label="Mavelle home">
       <LogoLockup tone={tone} size={size} />
     </Link>
   );

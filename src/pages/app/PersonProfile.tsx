@@ -43,7 +43,7 @@ export function PersonProfile() {
           <ErrorState message={error.message} onRetry={reload} />
         ) : (
           <EmptyState title="This profile isn't available" action={<ButtonLink to="/app/discover">Back to Discover</ButtonLink>}>
-            They may have paused their profile, or it may no longer be on Knot.
+            They may have paused their profile, or it may no longer be on Mavelle.
           </EmptyState>
         )}
       </AppPage>

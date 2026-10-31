@@ -5,7 +5,7 @@ import { Button } from "../ui/Button";
 import { Icon } from "../ui/Icon";
 import { cx } from "../../lib/format";
 
-/** Shows optional Knot AI / curated suggestions. Always labelled, always dismissible. */
+/** Shows optional Mavelle AI / curated suggestions. Always labelled, always dismissible. */
 export function AiPanel({ request, title, onUse, className, autoLoad = false }: { request: object; title: string; onUse?: (text: string) => void; className?: string; autoLoad?: boolean }) {
   const [data, setData] = useState<Suggestion | null>(null);
   const [loading, setLoading] = useState(false);

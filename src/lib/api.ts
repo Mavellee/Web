@@ -1,4 +1,4 @@
-// Thin fetch wrapper for the Knot API. Cookies carry the session; nothing secret lives in the browser.
+// Thin fetch wrapper for the Mavelle API. Cookies carry the session; nothing secret lives in the browser.
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -23,7 +23,7 @@ async function request<T>(method: Method, path: string, body?: unknown): Promise
       body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
   } catch {
-    throw new ApiError(0, "NETWORK", "We couldn't reach Knot. Check your connection and try again.");
+    throw new ApiError(0, "NETWORK", "We couldn't reach Mavelle. Check your connection and try again.");
   }
   const json = await res.json().catch(() => null);
   if (!res.ok) {

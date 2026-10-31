@@ -70,7 +70,7 @@ export function Experts() {
                 <p className="mt-3 text-xs text-ink-muted">
                   {e.experienceYears} years' experience · {e.specialties.join(", ")}
                 </p>
-                <p className="mt-2 text-xs text-ink-muted">{e.credentialsVerified ? "✓ Credentials verified by Knot" : "Credentials are self-declared and not independently verified."}</p>
+                <p className="mt-2 text-xs text-ink-muted">{e.credentialsVerified ? "✓ Credentials verified by Mavelle" : "Credentials are self-declared and not independently verified."}</p>
               </li>
             ))}
             {experts.data?.length === 0 && <p className="text-ink-soft">No experts are available right now.</p>}
