@@ -7,10 +7,10 @@ import type { MediaItem } from "../../lib/types";
 
 /**
  * One gallery item inside a profile: shown at its own aspect ratio (tall portraits are capped and
- * cropped around the owner's focal point), with its caption beneath so it never covers the photo.
+ * cropped around the owner's focal point) or in a given frame, with its caption beneath so it never covers the photo.
  * Tapping opens the full viewer; videos only ever show their still frame here.
  */
-export function MediaFigure({ item, label, onOpen, action, className }: { item: MediaItem; label: string; onOpen: () => void; action?: ReactNode; className?: string }) {
+export function MediaFigure({ item, label, onOpen, action, className, frame }: { item: MediaItem; label: string; onOpen: () => void; action?: ReactNode; className?: string; frame?: string }) {
   const [state, setState] = useState<"loading" | "loaded" | "error">("loading");
   return (
     <figure className={cx("space-y-3", className)}>
@@ -18,7 +18,7 @@ export function MediaFigure({ item, label, onOpen, action, className }: { item: 
         type="button"
         onClick={onOpen}
         aria-label={`Open ${label}${item.caption ? `: ${item.caption}` : ""}`}
-        className="group relative block w-full overflow-hidden rounded-[2rem] bg-parchment-deep text-left"
+        className="group relative block w-full overflow-hidden rounded-[1.75rem] bg-parchment-deep text-left"
       >
         {item.kind === "IMAGE" ? (
           state === "error" ? (
@@ -34,7 +34,7 @@ export function MediaFigure({ item, label, onOpen, action, className }: { item: 
               onLoad={() => setState("loaded")}
               onError={() => setState("error")}
               style={{ objectPosition: `${item.focusX}% ${item.focusY}%` }}
-              className={cx("block max-h-[85vh] w-full object-cover transition duration-500 group-hover:scale-[1.01]", state === "loading" ? "aspect-[4/5] opacity-0" : "h-auto opacity-100")}
+              className={cx("block max-h-[85vh] w-full object-cover transition duration-500 group-hover:scale-[1.01]", frame, state === "loading" ? cx(!frame && "aspect-[4/5]", "opacity-0") : cx(!frame && "h-auto", "opacity-100"))}
             />
           )
         ) : (

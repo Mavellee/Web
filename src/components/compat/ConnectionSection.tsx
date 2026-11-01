@@ -25,20 +25,22 @@ export function ConnectionSection({ id, userId, name, result, sharedInterests, p
   const headline = !scored ? "Still discovering your compatibility" : score >= 80 ? "You're very aligned" : score >= 60 ? "You're well aligned" : score >= 40 ? "Some real common ground" : "Quite different so far";
 
   return (
-    <section id={id} aria-labelledby={`${id ?? "connection"}-title`} className="scroll-mt-24 rounded-[2rem] border hairline bg-surface/85 p-6 shadow-soft sm:p-8">
-      <h3 id={`${id ?? "connection"}-title`} className="font-serif text-3xl">
+    <section id={id} aria-labelledby={`${id ?? "connection"}-title`} className="scroll-mt-24">
+      <div className="rounded-[1.75rem] bg-panel p-6 text-paper sm:p-8">
+      <h3 id={`${id ?? "connection"}-title`} className="font-serif text-3xl text-paper">
         Compatibility
       </h3>
       <div className="mt-5 flex items-center gap-5">
         <ScoreRing score={scored ? score : null} />
         <div className="min-w-0">
-          <h4 className="font-serif text-xl leading-snug">{headline}</h4>
-          <p className="mt-1 text-sm text-ink-muted">
+          <h4 className="font-serif text-xl leading-snug text-paper">{headline}</h4>
+          <p className="mt-1 text-sm text-paper/80">
             {scored ? `${score}% overlap with ${name}. ${CONFIDENCE_LABEL[result!.confidence]} you both chose to give.` : "There aren't enough answers you've both given to compare yet."}
           </p>
         </div>
       </div>
-      <p className="mt-3 text-xs text-ink-muted">It reflects stated preferences only — it can't predict how things will go.</p>
+      <p className="mt-3 text-xs text-paper/80">It reflects stated preferences only — it can't predict how things will go.</p>
+      </div>
 
       {sharedInterests.length > 0 && (
         <div className="mt-6">
@@ -123,10 +125,10 @@ function ScoreRing({ score }: { score: number | null }) {
   return (
     <div className="relative h-24 w-24 shrink-0" role="img" aria-label={score === null ? "No score yet" : `${score}% overlap`}>
       <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90" aria-hidden="true">
-        <circle cx="40" cy="40" r={r} fill="none" strokeWidth="6" className="stroke-parchment-deep" />
-        {score !== null && <circle cx="40" cy="40" r={r} fill="none" strokeWidth="6" strokeLinecap="round" className="stroke-primary transition-[stroke-dashoffset] duration-700" strokeDasharray={c} strokeDashoffset={c * (1 - score / 100)} />}
+        <circle cx="40" cy="40" r={r} fill="none" strokeWidth="6" className="stroke-paper/20" />
+        {score !== null && <circle cx="40" cy="40" r={r} fill="none" strokeWidth="6" strokeLinecap="round" className="stroke-gold transition-[stroke-dashoffset] duration-700" strokeDasharray={c} strokeDashoffset={c * (1 - score / 100)} />}
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center font-serif text-2xl text-primary">{score === null ? "—" : `${score}%`}</span>
+      <span className="absolute inset-0 flex items-center justify-center font-serif text-2xl text-paper">{score === null ? "—" : `${score}%`}</span>
     </div>
   );
 }

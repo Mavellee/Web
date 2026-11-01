@@ -211,7 +211,6 @@ export function Discover() {
             <div key={ready.id} className="animate-rise">
               <EditorialProfile
                 profile={ready}
-                onLike={() => act(current, "like")}
                 onRespond={(t) => setDetail({ profile: current, target: t })}
                 connectionId={connectionId}
                 connectionOpen={compatOpen}
@@ -350,8 +349,8 @@ function DetailPicker({ open, profile, onClose, onPick }: { open: boolean; profi
 
 function ProfileSkeleton() {
   return (
-    <div role="status" aria-label="Loading profile" className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-end">
-      <Skeleton className="aspect-[4/5] w-full rounded-[2rem]" />
+    <div role="status" aria-label="Loading profile" className="mx-auto max-w-2xl space-y-8">
+      <Skeleton className="aspect-[4/5] max-h-[78dvh] w-full rounded-[1.75rem]" />
       <div className="space-y-4">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-7 w-2/3" />

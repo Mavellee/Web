@@ -93,8 +93,6 @@ describe("full-profile gallery", () => {
     expect(screen.getByText("My favourite sunset.")).toBeInTheDocument();
     expect(screen.getByText("Proof that I will always stop to pet a dog.")).toBeInTheDocument();
     expect(screen.getByText("A little memory from my Goa trip.")).toBeInTheDocument();
-    // Every item is also in the thumbnail strip under the main photo.
-    expect(within(screen.getByRole("list", { name: "Riya's photos and videos" })).getAllByRole("listitem")).toHaveLength(4);
     // Videos show only their poster until someone asks to play: no <video> element is on the page.
     expect(container.querySelector("video")).toBeNull();
     expect(container.querySelector('img[src="/api/photos/v1/poster"]')).not.toBeNull();

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { buildStory } from "../lib/profileStory";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EditorialProfile, type EditorialData } from "../components/story/EditorialProfile";
@@ -56,7 +57,7 @@ describe("editorial profile", () => {
     expect(screen.getByText("You both enjoy Hiking and Coffee.")).toBeInTheDocument();
     // Every photo is on the page, not only the first.
     expect(screen.getByRole("button", { name: "Open Photo 2 of Isha" })).toBeInTheDocument();
-    await userEvent.click(screen.getAllByRole("button", { name: /Respond/ })[0]);
+    await userEvent.click(screen.getAllByRole("button", { name: "Respond" })[0]);
     expect(onRespond).toHaveBeenCalledWith({ kind: "PROMPT", ref: "ideal_sunday", label: "My ideal Sunday looks like…", quote: "A long drive, coffee and absolutely no plans." });
     expect(await axeViolations(container)).toEqual([]);
   });
@@ -136,5 +137,21 @@ describe("story preview", () => {
     renderWithProviders(<StoryPreviewCard profile={{ ...person, photos: [], photoIds: [], prompts: [] }} />);
     expect(screen.getByText(/Placeholder — your photo goes here/)).toBeInTheDocument();
     expect(screen.getByText(/Your prompt answers will appear here/)).toBeInTheDocument();
+  });
+});
+
+describe("profile story order", () => {
+  const prompt = (key: string) => ({ key, text: key, answer: key });
+  const media = (id: string) => ({ id, kind: "IMAGE" as const, caption: null, isPrimary: id === "m0", focusX: 50, focusY: 50, durationMs: null, hasPoster: false });
+  const base = { bio: "Hi", interests: [], intentions: ["MARRIAGE" as const], city: "Delhi", languages: [], zodiac: null };
+
+  it("interleaves photos, words and details, and keeps alternating anything extra", () => {
+    const story = buildStory({ ...base, media: ["m0", "m1", "m2", "m3"].map(media), prompts: ["a", "b", "c"].map(prompt) });
+    expect(story.map((c) => (c.type === "media" ? c.item.id : c.type === "prompt" ? c.prompt.key : c.type))).toEqual(["about", "m1", "a", "m2", "details", "b", "m3", "c", "lookingFor"]);
+  });
+
+  it("leaves out anything missing instead of showing a gap", () => {
+    expect(buildStory({ bio: null, interests: [], intentions: [], city: null, languages: [], zodiac: null, media: [], prompts: [] })).toEqual([]);
+    expect(buildStory({ ...base, media: [media("m0")], prompts: [] }).map((c) => c.type)).toEqual(["about", "details", "lookingFor"]);
   });
 });
