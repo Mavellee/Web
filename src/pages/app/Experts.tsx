@@ -183,6 +183,7 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
       setBusy(false);
     }
   };
+  const missing = !topic ? "Choose a topic to continue." : question.trim().length < 10 ? "Write at least 10 characters about what you'd like help with." : !consent ? "Tick the box above to continue." : null;
   const items: [keyof typeof share, string][] = [
     ["profile", "My profile summary (name, age, city, bio, interests)"],
     ["intentions", "My relationship intentions"],
@@ -226,7 +227,8 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
             {error}
           </p>
         )}
-        <Button className="w-full" onClick={submit} loading={busy} disabled={!topic || question.trim().length < 10 || !consent}>
+        {missing && <p className="text-center text-sm text-ink-soft">{missing}</p>}
+        <Button className="w-full" onClick={submit} loading={busy} disabled={!!missing}>
           Send request
         </Button>
       </div>
