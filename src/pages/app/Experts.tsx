@@ -98,10 +98,12 @@ export function Experts() {
   );
 }
 
-function RequestItem({ r, onChange }: { r: MyRequest; onChange: () => void }) {
+export function RequestItem({ r, onChange }: { r: MyRequest; onChange: () => void }) {
   const [reply, setReply] = useState("");
   const toast = useToast();
   const st = REQUEST_STATUS[r.status];
+  const advice = r.reviews.find((e) => e.action === "COMPLETED" && e.message);
+  const steps = r.reviews.filter((e) => e !== advice);
   return (
     <li className="rounded-3xl border hairline bg-surface/75 p-5 shadow-soft">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -114,19 +116,26 @@ function RequestItem({ r, onChange }: { r: MyRequest; onChange: () => void }) {
         <span className={cx("rounded-full px-2.5 py-1 text-xs font-semibold", st.cls)}>{st.label}</span>
       </div>
       <p className="mt-3 text-sm text-ink-soft">“{r.question}”</p>
-      {r.reviews.length > 0 && (
+      {steps.length > 0 && (
         <ol className="mt-4 space-y-2 border-l-2 border-primary-100 pl-4">
-          {r.reviews.map((e) => (
+          {steps.map((e) => (
             <li key={e.id} className="text-sm">
               <p className="text-xs font-semibold text-ink-muted">
-                {e.aiWritten ? "Written by Mavelle AI, not a person" : ACTION_LABEL[e.action]} · {timeAgo(e.createdAt)}
+                {ACTION_LABEL[e.action]} · {timeAgo(e.createdAt)}
               </p>
               {e.message && <p className="mt-0.5 whitespace-pre-wrap text-ink">{e.message}</p>}
             </li>
           ))}
         </ol>
       )}
-      {r.status === "COMPLETED" && <p className="mt-3 text-xs text-ink-muted">A review is guidance, not a decision. It doesn't change your matches.</p>}
+      {advice && (
+        <section aria-label="Your review" className="mt-4 rounded-2xl bg-rose-soft/70 p-4 sm:p-5">
+          <p className="text-sm font-semibold text-primary-text">{advice.aiWritten ? "Advice from Mavelle AI, not a person" : r.expertName ? `Expert advice from ${r.expertName}` : "Expert advice"}</p>
+          <p className="mt-0.5 text-xs text-ink-muted">{timeAgo(advice.createdAt)}</p>
+          <p className="mt-3 whitespace-pre-wrap leading-relaxed text-ink">{advice.message}</p>
+          <p className="mt-4 border-t border-primary-text/15 pt-3 text-xs text-ink-muted">This is guidance, not a decision. It doesn't change your matches.</p>
+        </section>
+      )}
       {r.status === "INFO_REQUESTED" && (
         <div className="mt-4 space-y-2">
           <Textarea label="Your reply" value={reply} onChange={(e) => setReply(e.target.value)} maxLength={1500} />
