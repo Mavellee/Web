@@ -5,8 +5,8 @@ import { Button } from "../ui/Button";
 import { Icon } from "../ui/Icon";
 import { cx } from "../../lib/format";
 
-/** Shows optional Mavelle AI / curated suggestions. Always labelled, always dismissible. */
-export function AiPanel({ request, title, onUse, className, autoLoad = false }: { request: object; title: string; onUse?: (text: string) => void; className?: string; autoLoad?: boolean }) {
+/** Shows optional Mavelle AI / curated suggestions. Always labelled, always dismissible. `reading` shows one explanation as prose, not a list of ideas. */
+export function AiPanel({ request, title, onUse, className, autoLoad = false, reading = false }: { request: object; title: string; onUse?: (text: string) => void; className?: string; autoLoad?: boolean; reading?: boolean }) {
   const [data, setData] = useState<Suggestion | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +30,38 @@ export function AiPanel({ request, title, onUse, className, autoLoad = false }: 
       <Button variant="secondary" size="sm" onClick={load} icon={<Icon name="spark" className="h-4 w-4" />} className={className}>
         {title}
       </Button>
+    );
+
+  if (reading)
+    return (
+      <section aria-label={title} className={cx("rounded-[1.75rem] bg-rose-soft/70 px-6 py-7 sm:px-8", className)}>
+        <div className="flex items-start justify-between gap-3">
+          <p className="flex items-center gap-2 text-sm font-semibold text-primary-text">
+            <Icon name="spark" className="h-4 w-4" />
+            {data?.source === "ai" ? data.label : "In plain words"}
+          </p>
+          <button type="button" onClick={() => setDismissed(true)} className="-m-1 rounded-full p-1 text-ink-muted hover:text-ink" aria-label="Dismiss suggestions">
+            <Icon name="close" className="h-4 w-4" />
+          </button>
+        </div>
+        {loading && <p className="mt-4 text-ink-muted">Putting it into words…</p>}
+        {error && (
+          <p role="alert" className="mt-4 text-sm text-error">
+            {error}
+          </p>
+        )}
+        {data && !loading && (
+          <>
+            {data.suggestions[0] && <p className="mt-4 font-serif text-2xl leading-snug text-ink">{data.suggestions[0]}</p>}
+            {data.suggestions.slice(1).map((s) => (
+              <p key={s} className="mt-3 leading-relaxed text-ink-soft">
+                {s}
+              </p>
+            ))}
+            {data.note && <p className="mt-5 border-t border-primary-text/15 pt-4 text-xs text-ink-muted">{data.note}</p>}
+          </>
+        )}
+      </section>
     );
 
   return (

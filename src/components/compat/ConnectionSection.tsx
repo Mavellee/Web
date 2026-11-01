@@ -91,7 +91,7 @@ export function ConnectionSection({ id, userId, name, result, sharedInterests, p
       {result && open && (
         <div className="mt-5 space-y-5">
           <CompatibilityBreakdown result={result} otherName={name} />
-          {!preview && result.score !== null && <AiPanel title="Explain this in plain words" request={{ feature: "explain_compatibility", userId }} />}
+          {!preview && result.score !== null && <AiPanel reading title="Explain this in plain words" request={{ feature: "explain_compatibility", userId }} />}
         </div>
       )}
     </section>
