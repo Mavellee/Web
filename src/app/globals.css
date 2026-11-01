@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * Design tokens for Iceberg (pink / rose / plum, from the design board).
+ * RULE: components use these tokens (bg-primary, text-muted-foreground ...),
+ * never raw hex values, so a re-brand is a change to this one block.
+ */
+:root {
+  color-scheme: light;
+
+  --background: #fff7f4;
+  --foreground: #2b1a25;
+  --card: #ffffff;
+  --card-foreground: #2b1a25;
+  --popover: #ffffff;
+  --popover-foreground: #2b1a25;
+
+  --primary: #8f4a68; /* plum-rose: main buttons */
+  --primary-foreground: #ffffff;
+  --secondary: #f6e6e8;
+  --secondary-foreground: #6b3550;
+  --muted: #f8ecec;
+  --muted-foreground: #7c6571;
+  --accent: #fbe3ea;
+  --accent-foreground: #6b3550;
+  --heart: #e8527f; /* like button, match percentage */
+  --success: #2f9e6f; /* verified tick, "approved" */
+
+  --destructive: #c0392b;
+  --border: #ecd9db;
+  --input: #ecd9db;
+  --ring: #c47a99;
+
+  --radius: 0.875rem;
+
+  --sidebar: #fffaf8;
+  --sidebar-foreground: #2b1a25;
+  --sidebar-primary: #8f4a68;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fbe3ea;
+  --sidebar-accent-foreground: #6b3550;
+  --sidebar-border: #ecd9db;
+  --sidebar-ring: #c47a99;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans-var), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif-var), ui-serif, Georgia, serif;
+  --font-heading: var(--font-serif-var), ui-serif, Georgia, serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-heart: var(--heart);
+  --color-success: var(--success);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Soft blush backdrop used by hero / splash screens. */
+.bg-blush {
+  background:
+    radial-gradient(120% 80% at 50% 0%, #fde6e9 0%, transparent 60%),
+    radial-gradient(90% 60% at 100% 100%, #f3dfef 0%, transparent 55%),
+    var(--background);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
