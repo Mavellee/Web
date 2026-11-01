@@ -62,6 +62,16 @@ describe("editorial profile", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("only invites a response when responding is possible", () => {
+    mockApi({});
+    const { unmount } = renderWithProviders(<EditorialProfile profile={person} onRespond={() => {}} actions={<button type="button">Like</button>} />);
+    expect(screen.getByText(/Respond to a photo/)).toBeInTheDocument();
+    unmount();
+    renderWithProviders(<EditorialProfile profile={person} actions={<button type="button">Message Isha</button>} />);
+    expect(screen.queryByText(/Respond to a photo/)).toBeNull();
+    expect(screen.getByRole("button", { name: "Message Isha" })).toBeInTheDocument();
+  });
+
   it("never invents a score: without enough shared answers it says so and shows only genuine overlaps", () => {
     mockApi({});
     const { unmount } = renderWithProviders(<EditorialProfile profile={person} />);

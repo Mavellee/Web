@@ -107,9 +107,13 @@ export function EditorialProfile({
 
       {actions && (
         <section aria-label="Next step" className="text-center">
-          <p className="font-serif text-2xl">Something here you'd like to ask {p.displayName} about?</p>
-          <p className="mt-1 text-sm text-ink-muted">Respond to a photo, a prompt or an interest above, or simply like their profile.</p>
-          <div className="mt-6">{actions}</div>
+          {onRespond && (
+            <div className="mb-6">
+              <p className="font-serif text-2xl">Something here you'd like to ask {p.displayName} about?</p>
+              <p className="mt-1 text-sm text-ink-muted">Respond to a photo, a prompt or an interest above, or simply like their profile.</p>
+            </div>
+          )}
+          {actions}
         </section>
       )}
 
