@@ -247,8 +247,8 @@ export function Privacy() {
         <p>To show you relevant people, calculate compatibility from information you've chosen to share, deliver messages, keep members safe, and improve Mavelle. We don't sell personal data.</p>
         <h2>AI features</h2>
         <p>Mavelle AI is optional. When used, only the minimum context needed (such as shared interests) is sent to the AI provider. Private chat histories are never sent. We record usage counts and timing, not the text.</p>
-        <h2>Experts</h2>
-        <p>An expert only sees the specific information you tick when you request a review, captured at that moment. Experts can never access your messages.</p>
+        <h2>Expert and AI reviews</h2>
+        <p>When you request a review, Mavelle AI reads only the specific information you tick, captured at that moment, through our AI provider. If AI isn't available or you've turned it off, an approved expert sees that information instead. Neither can ever access your messages.</p>
         <h2>Your choices</h2>
         <p>You can edit or remove profile information, download a copy of your data, turn off AI, pause Discover, and delete your account in Settings.</p>
         <h2>Retention</h2>

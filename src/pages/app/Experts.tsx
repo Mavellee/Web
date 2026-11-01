@@ -13,7 +13,7 @@ import { cx, timeAgo } from "../../lib/format";
 type MatchLite = { id: string; profile: { displayName: string } };
 
 type Expert = { userId: string; displayName: string; headline: string; bio: string; experienceYears: number; specialties: string[]; credentials: string | null; credentialsVerified: boolean };
-type ReviewEvent = { id: string; action: string; message: string | null; createdAt: string; authorId: string | null };
+type ReviewEvent = { id: string; action: string; message: string | null; aiWritten: boolean; createdAt: string; authorId: string | null };
 type MyRequest = { id: string; topic: string; question: string; status: string; sharedFields: string[]; createdAt: string; expertName: string | null; reviews: ReviewEvent[] };
 
 const REQUEST_STATUS: Record<string, { label: string; cls: string }> = {
@@ -37,7 +37,7 @@ export function Experts() {
     <AppPage wide>
       <PageHeader
         title="Compatibility Experts"
-        lede="Optional reflections from vetted relationship coaches, based only on what you choose to share. Experts never see your chats, and a review never decides who you match with."
+        lede="Optional reflections from Mavelle AI, based only on what you choose to share. If AI isn't available, a vetted relationship coach can pick up your request. Your chats are never shared, and a review never decides who you match with."
         actions={<Button onClick={() => setOpen("request")}>Request a review</Button>}
       />
       <div className="grid gap-10 grid-cols-1 lg:grid-cols-[1.2fr_1fr] [&>*]:min-w-0">
@@ -119,7 +119,7 @@ function RequestItem({ r, onChange }: { r: MyRequest; onChange: () => void }) {
           {r.reviews.map((e) => (
             <li key={e.id} className="text-sm">
               <p className="text-xs font-semibold text-ink-muted">
-                {ACTION_LABEL[e.action]} · {timeAgo(e.createdAt)}
+                {e.aiWritten ? "Written by Mavelle AI, not a person" : ACTION_LABEL[e.action]} · {timeAgo(e.createdAt)}
               </p>
               {e.message && <p className="mt-0.5 whitespace-pre-wrap text-ink">{e.message}</p>}
             </li>
@@ -173,8 +173,8 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
     setBusy(true);
     setError(null);
     try {
-      await api.post("/experts/requests", { topic, question, share: { ...share, matchId: matchId || undefined }, consent });
-      toast("Request sent");
+      const created = await api.post<{ status: string }>("/experts/requests", { topic, question, share: { ...share, matchId: matchId || undefined }, consent });
+      toast(created.status === "COMPLETED" ? "Your AI review is ready" : "Request sent. An expert will pick it up.");
       onCreated();
       onClose();
     } catch (e) {
@@ -183,14 +183,14 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
       setBusy(false);
     }
   };
-  const missing = !topic ? "Choose a topic to continue." : question.trim().length < 10 ? "Write at least 10 characters about what you'd like help with." : !consent ? "Tick the box above to continue." : null;
+  const missing = busy ? "Writing your review. This can take up to 30 seconds." : !topic ? "Choose a topic to continue." : question.trim().length < 10 ? "Write at least 10 characters about what you'd like help with." : !consent ? "Tick the box above to continue." : null;
   const items: [keyof typeof share, string][] = [
     ["profile", "My profile summary (name, age, city, bio, interests)"],
     ["intentions", "My relationship intentions"],
     ["compatibilityAnswers", "My compatibility answers"],
   ];
   return (
-    <Dialog open={open} onClose={onClose} title="Request an expert review" description="An expert will only see what you tick below, captured right now.">
+    <Dialog open={open} onClose={onClose} title="Request an expert review" description="Mavelle AI writes your review using only what you tick below, captured right now.">
       <div className="space-y-4">
         <Select label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)}>
           <option value="">Choose…</option>
@@ -200,7 +200,7 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
         </Select>
         <Textarea label="What would you like help thinking through?" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={1500} />
         <fieldset className="space-y-2 rounded-3xl bg-surface/60 p-4">
-          <legend className="mb-1 text-sm font-semibold">Share with the expert</legend>
+          <legend className="mb-1 text-sm font-semibold">Share for your review</legend>
           {items.map(([k, label]) => (
             <label key={k} className="flex items-center gap-3 text-sm">
               <input type="checkbox" className="h-5 w-5 accent-primary" checked={share[k]} onChange={(e) => setShare((s) => ({ ...s, [k]: e.target.checked }))} />
@@ -220,7 +220,7 @@ function RequestDialog({ open, onClose, matches, onCreated }: { open: boolean; o
           <p className="pt-1 text-xs text-ink-muted">Your private messages are never shared.</p>
         </fieldset>
         <label className="flex items-start gap-3 text-sm">
-          <input type="checkbox" className="mt-0.5 h-5 w-5 accent-primary" checked={consent} onChange={(e) => setConsent(e.target.checked)} />I understand an approved expert will see the information I've selected, and that their review is guidance only.
+          <input type="checkbox" className="mt-0.5 h-5 w-5 accent-primary" checked={consent} onChange={(e) => setConsent(e.target.checked)} />I understand Mavelle AI, through our AI provider, will read the information I've selected. If AI isn't available, an approved expert will see it instead. The review is guidance only.
         </label>
         {error && (
           <p role="alert" className="text-sm text-error">
