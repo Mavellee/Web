@@ -9,6 +9,7 @@ import { Photo } from "../../components/ui/Photo";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { EmptyState, ErrorState } from "../../components/ui/States";
 import { Tabs } from "../../components/ui/Tabs";
+import { useSocketEvent } from "../../lib/socket";
 import { useResource } from "../../lib/useResource";
 import { timeAgo } from "../../lib/format";
 import { DetailMediaThumb } from "../../components/media/MediaThumb";
@@ -21,12 +22,13 @@ export function Likes() {
   const { data, error, loading, reload, setData } = useResource<LikeEntry[]>(`/likes/${tab}`);
   const remove = useCallback((id: string) => setData((d) => d?.filter((x) => x.profile.id !== id) ?? null), [setData]);
   const { act, busy, dialog } = useConnectionActions(remove);
+  useSocketEvent("match:new", reload);
 
   return (
     <AppPage wide>
       <PageHeader
         title="Likes"
-        lede="Likes are one-sided until both of you say yes. Like someone back to match — matches live in Matches."
+        lede="Likes stay here until both of you say yes. When it's mutual, you'll get a notification and your chat opens."
         actions={
           <ButtonLink to="/app/matches" variant="secondary" size="sm">
             View matches
@@ -52,10 +54,10 @@ export function Likes() {
       ) : error ? (
         <ErrorState message={error.message} onRetry={reload} />
       ) : !data?.length ? (
-        <EmptyState title={tab === "received" ? "No new likes yet" : "You haven't liked anyone yet"} action={<ButtonLink to="/app/discover">Go to Discover</ButtonLink>}>
+        <EmptyState title={tab === "received" ? "No new likes yet" : "No likes waiting"} action={<ButtonLink to="/app/discover">Go to Discover</ButtonLink>}>
           {tab === "received"
             ? "When someone likes you, they'll appear here. A complete profile with a few answered questions helps the right people find you — we never invent likes."
-            : "People you like stay here until they like you back. Then you'll find them in Matches."}
+            : "People you like stay here until they like you back. Then they move to Chat, and we'll let you know."}
         </EmptyState>
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -97,7 +99,7 @@ export function Likes() {
                     </Button>
                   </div>
                 ) : (
-                  <p className="mt-auto pt-5 text-sm text-ink-muted">Waiting — you'll match if they like you too.</p>
+                  <p className="mt-auto pt-5 text-sm text-ink-muted">Waiting for them to like you back.</p>
                 )}
               </div>
             </li>

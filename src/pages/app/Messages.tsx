@@ -29,6 +29,7 @@ export function Messages() {
   const { id } = useParams();
   const { data, error, loading, reload } = useResource<ConversationSummary[]>("/conversations");
   useSocketEvent("conversation:updated", reload);
+  useSocketEvent("match:new", reload);
   useSocketEvent("match:ended", reload);
 
   return (

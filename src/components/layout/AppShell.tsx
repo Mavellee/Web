@@ -65,6 +65,7 @@ export function AppShell() {
   useSocketEvent("match:ended", refreshCouple);
 
   useSocketEvent("conversation:updated", refreshCounts);
+  useSocketEvent("match:new", refreshCounts);
   useSocketEvent<{ title: string; type: string }>(
     "notification",
     useCallback(
