@@ -85,7 +85,7 @@ export function EditorialProfile({
   const keyOf = (c: Chapter) => (c.type === "media" ? c.item.id : c.type === "prompt" ? c.prompt.key : c.type);
 
   return (
-    <article aria-label={`${p.displayName}'s profile`} className="mx-auto max-w-2xl space-y-14 sm:space-y-20">
+    <article aria-label={`${p.displayName}'s profile`} className="mx-auto max-w-2xl space-y-9 sm:space-y-12">
       <ProfileHero p={p} lead={lead ?? undefined} onOpen={() => lead && openAt(lead.id)} action={lead && respondTo(mediaTarget(lead), "Like this photo")} />
 
       {buildStory(p).map((c) => (

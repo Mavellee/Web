@@ -85,7 +85,7 @@ export function PersonProfile() {
       {isMe && <p className="mb-6 rounded-2xl bg-rose-mist px-4 py-3 text-sm text-primary-700">This is how your profile appears to other members.</p>}
       <EditorialProfile profile={data} onRespond={canAct ? setDetail : undefined} actions={cta} astro={match && <AstroChapter matchId={match.id} name={data.displayName} />} />
       {match && (
-        <div className="mx-auto mt-14 max-w-2xl">
+        <div className="mx-auto mt-9 max-w-2xl sm:mt-12">
           <FriendReviewPanel matchId={match.id} name={data.displayName} />
         </div>
       )}

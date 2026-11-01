@@ -93,7 +93,7 @@ describe("editorial profile", () => {
     expect(screen.getByRole("img", { name: "72% overlap" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "You're well aligned" })).toBeInTheDocument();
     expect(screen.getByText(/72% overlap with Isha/)).toBeInTheDocument();
-    expect(screen.getByText("Both open to: Exploring connections")).toBeInTheDocument();
+    expect(screen.getByText("Exploring connections")).toBeInTheDocument();
     expect(screen.getByText(/can't predict how things will go/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "See compatibility details" }));
     expect(screen.getByRole("heading", { name: "72 / 100 overlap" })).toBeInTheDocument();

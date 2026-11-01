@@ -13,7 +13,6 @@ type Respond = (d: DetailTarget) => void;
 
 /** The first impression: one large photo and who this is, with nothing else competing for attention. */
 export function ProfileHero({ p, lead, onOpen, action }: { p: Person; lead?: MediaItem; onOpen: () => void; action?: ReactNode }) {
-  const quick = [...p.intentions.map(intentionLabel), ...(p.zodiac ? [`${p.zodiac.symbol} ${p.zodiac.name}`] : [])];
   return (
     <header>
       <div className="relative -mx-4 sm:mx-0">
@@ -36,7 +35,21 @@ export function ProfileHero({ p, lead, onOpen, action }: { p: Person; lead?: Med
         </div>
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        {quick.length > 0 && <p className="text-sm font-semibold text-ink-soft">{quick.join("  ·  ")}</p>}
+        {(p.intentions.length > 0 || p.zodiac) && (
+          <ul className="flex flex-wrap gap-2">
+            {p.intentions.map((i, k) => (
+              <li key={i} className={cx("inline-flex min-h-8 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold", k === 0 ? "bg-primary text-paper" : "border border-primary-text/40 text-primary-text")}>
+                {k === 0 && <Icon name="heart" filled className="h-3.5 w-3.5 text-gold" />}
+                {intentionLabel(i)}
+              </li>
+            ))}
+            {p.zodiac && (
+              <li className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-gold/60 bg-gold-soft/60 px-3.5 text-sm font-semibold text-gold-ink">
+                {p.zodiac.symbol} {p.zodiac.name}
+              </li>
+            )}
+          </ul>
+        )}
         {action}
       </div>
       {lead?.caption && <p className="mt-3 font-serif text-lg italic leading-snug text-ink-soft">{lead.caption}</p>}
@@ -68,7 +81,7 @@ function InterestChips({ items, onRespond }: { items: Person["interests"]; onRes
 export function AboutChapter({ p, onRespond }: { p: Person; onRespond?: Respond }) {
   const shared = sharedSentence(p);
   return (
-    <section aria-label={`About ${p.displayName}`} className="space-y-6">
+    <section aria-label={`About ${p.displayName}`} className="space-y-4">
       {p.bio && <p className="font-serif text-2xl leading-snug text-ink sm:text-[1.75rem]">{p.bio}</p>}
       {p.interests.length > 0 && <InterestChips items={p.interests.slice(0, LEAD_INTERESTS)} onRespond={onRespond} />}
       {shared && <p className="text-sm font-semibold text-primary-text">{shared}</p>}
