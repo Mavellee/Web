@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Routes, Route } from "react-router-dom";
-import { Login, Signup } from "../pages/auth/AuthPages";
+import { Login, ResetPassword, Signup, VerifyEmail } from "../pages/auth/AuthPages";
 import { axeViolations, mockApi, renderWithProviders } from "./utils";
 
 const yearsAgo = (n: number) => `${new Date().getFullYear() - n}-01-01`;
@@ -72,5 +72,31 @@ describe("Log in", () => {
     await userEvent.type(screen.getByLabelText("Password"), "whatever123");
     await userEvent.click(screen.getByRole("button", { name: "Log in" }));
     await waitFor(() => expect(screen.getByText("Discover page")).toBeInTheDocument());
+  });
+});
+
+describe("Email links", () => {
+  it("reads the verification token from the fragment and removes it from the address bar", async () => {
+    window.history.replaceState(null, "", "/verify-email#token=frag-token-123");
+    const { calls } = mockApi({ "POST /auth/verify-email": { body: { data: { verified: true } } } });
+    renderWithProviders(<VerifyEmail />, { route: "/verify-email" });
+    await waitFor(() => expect(calls.find((c) => c.key === "POST /auth/verify-email")?.body).toEqual({ token: "frag-token-123" }));
+    expect(window.location.hash).toBe("");
+  });
+
+  it("still accepts older links with the token in the query string", async () => {
+    window.history.replaceState(null, "", "/reset-password");
+    const { calls } = mockApi({ "POST /auth/reset-password": { body: { data: { reset: true } } } });
+    renderWithProviders(
+      <Routes>
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/login" element={<p>Login page</p>} />
+      </Routes>,
+      { route: "/reset-password?token=query-token-456" },
+    );
+    await userEvent.type(screen.getByLabelText("New password"), "CorrectHorse42!");
+    await userEvent.type(screen.getByLabelText("Confirm password"), "CorrectHorse42!");
+    await userEvent.click(screen.getByRole("button", { name: "Save password" }));
+    await waitFor(() => expect(calls.find((c) => c.key === "POST /auth/reset-password")?.body).toMatchObject({ token: "query-token-456" }));
   });
 });

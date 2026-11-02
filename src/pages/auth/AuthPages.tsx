@@ -238,9 +238,22 @@ export function ForgotPassword() {
   );
 }
 
-export function ResetPassword() {
+/**
+ * Email links carry their token in the URL fragment, which browsers never send to a server, so it stays out of
+ * web server logs. Older links used the query string and still work. Either way the token is removed from the
+ * address bar once read.
+ */
+function useLinkToken() {
   const [params] = useSearchParams();
-  const token = params.get("token") ?? "";
+  const [token] = useState(() => new URLSearchParams(window.location.hash.slice(1)).get("token") ?? params.get("token"));
+  useEffect(() => {
+    if (token) window.history.replaceState(window.history.state, "", window.location.pathname);
+  }, [token]);
+  return token;
+}
+
+export function ResetPassword() {
+  const token = useLinkToken() ?? "";
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string | null>(null);
   const schema = z.object({ password: passwordRule, confirm: z.string() }).refine((v) => v.password === v.confirm, { message: "Passwords don't match.", path: ["confirm"] });
@@ -273,8 +286,7 @@ export function ResetPassword() {
 }
 
 export function VerifyEmail() {
-  const [params] = useSearchParams();
-  const token = params.get("token");
+  const token = useLinkToken();
   const { account, refresh } = useAuth();
   const navigate = useNavigate();
   const [state, setState] = useState<"idle" | "verifying" | "done" | "error">(token ? "verifying" : "idle");
