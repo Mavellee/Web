@@ -208,7 +208,7 @@ function Report({ matchId, state, onRetry, onWithdrawn, acting }: { matchId: str
       </header>
 
       <section aria-labelledby="charts">
-        <h2 id="charts" className="text-3xl">
+        <h2 id="charts" className="font-serif text-3xl">
           Your charts
         </h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -238,7 +238,7 @@ function Report({ matchId, state, onRetry, onWithdrawn, acting }: { matchId: str
       )}
 
       <section aria-labelledby="dimensions">
-        <h2 id="dimensions" className="text-3xl">
+        <h2 id="dimensions" className="font-serif text-3xl">
           Compatibility dimensions
         </h2>
         {r.themes.length > 0 && (
@@ -301,7 +301,7 @@ function Report({ matchId, state, onRetry, onWithdrawn, acting }: { matchId: str
           <Prose title="Your story so far">{i.narrative}</Prose>
           <ListCard title="Something to reflect on" items={i.reflectionPrompts} />
           <section aria-labelledby="starters">
-            <h2 id="starters" className="text-3xl">
+            <h2 id="starters" className="font-serif text-3xl">
               Questions to explore together
             </h2>
             <p className="mt-1 text-sm text-ink-muted">Nothing is sent until you choose to send it.</p>
@@ -344,7 +344,7 @@ function ChartCard({ c, note }: { c: ChartSummary; note: string | null }) {
   ];
   return (
     <div className="rounded-3xl border hairline bg-surface/80 p-5">
-      <h3 className="text-2xl">{c.name}</h3>
+      <h3 className="font-serif text-2xl">{c.name}</h3>
       <dl className="mt-3 space-y-1.5 text-sm">
         {rows.map(([k, v]) => (
           <div key={k} className="flex justify-between gap-3">
@@ -360,7 +360,7 @@ function ChartCard({ c, note }: { c: ChartSummary; note: string | null }) {
 
 const Prose = ({ title, children }: { title: string; children: ReactNode }) => (
   <section>
-    <h2 className="text-3xl">{title}</h2>
+    <h2 className="font-serif text-3xl">{title}</h2>
     <p className="mt-3 text-lg leading-relaxed text-ink-soft">{children}</p>
   </section>
 );

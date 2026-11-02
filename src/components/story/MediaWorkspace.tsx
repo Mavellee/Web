@@ -444,7 +444,7 @@ function ItemSheet({ item, index, total, max, onClose, onSaved, onMove, onPrimar
             {draft.trim() ? (
               <>
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">On your profile: </span>
-                <span className="font-serif text-base italic text-ink-soft">{draft.trim()}</span>
+                <span className="font-serif text-lg italic text-ink-soft">{draft.trim()}</span>
               </>
             ) : (
               <span className="text-xs text-ink-muted">Captions are optional.</span>

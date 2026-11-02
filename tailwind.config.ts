@@ -46,9 +46,11 @@ export default {
       ringColor: brandForeground,
       stroke: brandForeground,
       fill: brandForeground,
+      // Both families come from the typography tokens in styles.css (DM Serif Display and DM Sans).
       fontFamily: {
-        serif: ['"Fraunces Variable"', "Georgia", "serif"],
-        sans: ['"Manrope Variable"', "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        serif: ["var(--font-display)"],
+        display: ["var(--font-display)"],
+        sans: ["var(--font-ui)"],
       },
       boxShadow: {
         soft: "0 1px 2px rgba(48,35,42,0.04), 0 8px 24px -12px rgba(48,35,42,0.12)",

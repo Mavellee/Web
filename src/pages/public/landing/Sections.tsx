@@ -8,7 +8,7 @@ export function SectionHeader({ eyebrow, title, children, id, align = "left" }: 
   return (
     <div className={cx("max-w-2xl", align === "center" && "mx-auto text-center")}>
       <p className={cx("eyebrow", align === "center" && "justify-center")}>{eyebrow}</p>
-      <h2 id={id} className="mt-4 text-[2rem] leading-[1.1] sm:text-[2.6rem]">
+      <h2 id={id} className="font-serif mt-4 text-[2rem] leading-[1.1] sm:text-[2.6rem]">
         {title}
       </h2>
       {children && <p className="mt-4 text-lg leading-relaxed text-ink-soft">{children}</p>}
@@ -218,7 +218,7 @@ export function GamesSection() {
       <div className="container-page grid gap-16 py-16 sm:py-24 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div className="mx-auto w-full max-w-2xl lg:max-w-none">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">Games & conversation</p>
-          <h2 id="games-title" className="mt-4 text-[2rem] leading-[1.1] text-surface sm:text-[2.6rem]">
+          <h2 id="games-title" className="font-serif mt-4 text-[2rem] leading-[1.1] text-surface sm:text-[2.6rem]">
             Better questions than “hey, how's your week?”
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-surface/75">
@@ -288,7 +288,7 @@ export function ClosingCta() {
     <section className="container-page pb-24">
       <div className="grid overflow-hidden rounded-[2.5rem] bg-primary text-surface md:grid-cols-[1.2fr_1fr]">
         <div className="p-10 sm:p-14">
-          <h2 className="text-[2rem] leading-tight text-surface sm:text-[2.6rem]">Start with what you're looking for.</h2>
+          <h2 className="font-serif text-[2rem] leading-tight text-surface sm:text-[2.6rem]">Start with what you're looking for.</h2>
           <p className="mt-4 max-w-md text-surface/80">It takes about five minutes to create a profile, and nothing is visible until you choose to publish it.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonLink to="/signup" size="lg" className="!bg-parchment !text-primary hover:!bg-surface">

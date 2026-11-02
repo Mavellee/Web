@@ -5,7 +5,7 @@ export function EmptyState({ title, children, action, art }: { title: string; ch
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-4 py-14 text-center animate-rise">
       <div className="mb-6">{art ?? <KnotArt />}</div>
-      <h2 className="text-2xl">{title}</h2>
+      <h2 className="font-serif text-2xl">{title}</h2>
       {children && <div className="mt-2 text-ink-soft">{children}</div>}
       {action && <div className="mt-6">{action}</div>}
     </div>

@@ -141,7 +141,7 @@ function RequestDetail({ id, onDone }: { id: string; onDone: () => void }) {
   return (
     <Card className="p-6 sm:p-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h2 className="text-3xl">{data.topic}</h2>
+        <h2 className="font-serif text-3xl">{data.topic}</h2>
         <StatusPill status={data.status} />
       </div>
       <p className="mt-3 font-serif text-lg">“{data.question}”</p>

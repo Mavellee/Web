@@ -50,12 +50,11 @@ export function LogoMark({ className = "h-9 w-9", tone = "default" }: { classNam
   );
 }
 
-/** "Mavelle" set in Fraunces at display size, with its soft, slightly wonky letterforms. */
+/** "Mavelle" in DM Serif Display, set a touch tighter than body display type so the wordmark reads as one shape. */
 export function Wordmark({ className, tone = "default" }: { className?: string; tone?: Tone }) {
   return (
     <span
-      className={cx("font-serif font-semibold leading-none tracking-[-0.025em]", tone === "light" ? "text-surface" : "text-primary", className)}
-      style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100, "WONK" 1' }}
+      className={cx("font-serif leading-none !tracking-[-0.02em]", tone === "light" ? "text-surface" : "text-primary", className)}
     >
       Mavelle
     </span>

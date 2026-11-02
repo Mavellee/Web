@@ -182,7 +182,7 @@ export function AppShell() {
             .filter((i) => i.mobile)
             .map((i) => (
               <li key={i.to}>
-                <NavLink to={i.to} className={({ isActive }) => cx("relative flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-semibold transition-colors", isActive ? "text-primary" : "text-ink-muted")}>
+                <NavLink to={i.to} className={({ isActive }) => cx("relative flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-medium transition-colors", isActive ? "text-primary" : "text-ink-muted")}>
                   {({ isActive }) => (
                     <>
                       <Icon name={i.icon} className="h-6 w-6" filled={isActive && i.icon !== "discover"} />

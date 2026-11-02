@@ -17,7 +17,7 @@ export function CompatibilityBreakdown({ result, otherName }: { result: CompatRe
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Compatibility</p>
-          <h2 id="compat-title" className="mt-2 text-3xl">
+          <h2 id="compat-title" className="font-serif mt-2 text-3xl">
             {result.score === null ? "Not enough to compare yet" : `${result.score} / 100 overlap`}
           </h2>
           <p className="mt-1 text-sm text-ink-muted">{CONFIDENCE_LABEL[result.confidence]}. This reflects stated preferences only — it doesn't predict how things will go.</p>

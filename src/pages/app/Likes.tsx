@@ -85,7 +85,7 @@ export function Likes() {
                       {tab === "received" ? "Responded to your" : "You responded to their"} {detail.kind === "PROMPT" ? `answer: ${detail.label}` : detail.kind === "MEDIA" ? detail.label.toLowerCase() : "interest"}
                     </figcaption>
                     {detail.kind === "MEDIA" && detail.mediaId && <DetailMediaThumb id={detail.mediaId} kind={detail.mediaKind} className="mt-2 h-24 w-20" />}
-                    {detail.quote && <blockquote className="mt-0.5 font-serif leading-snug">{detail.quote}</blockquote>}
+                    {detail.quote && <blockquote className="mt-0.5 leading-snug text-ink-soft">{detail.quote}</blockquote>}
                     {comment && <p className="mt-2 border-t border-primary/10 pt-2 text-sm text-ink">“{comment}”</p>}
                   </figure>
                 )}

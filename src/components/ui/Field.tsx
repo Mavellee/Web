@@ -16,7 +16,7 @@ interface FieldShellProps {
 export function FieldShell({ label, hint, error, id, children, optional }: FieldShellProps) {
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="flex items-baseline justify-between text-sm font-semibold text-ink">
+      <label htmlFor={id} className="flex items-baseline justify-between text-sm font-medium text-ink">
         <span>{label}</span>
         {optional && <span className="text-xs font-normal text-ink-muted">Optional</span>}
       </label>

@@ -125,7 +125,7 @@ export function FriendReview() {
             <h1 className="mt-2 text-3xl">{data.requesterName} wants your honest opinion</h1>
             <p className="mt-2 text-ink-soft">{p.displayName} agreed to let {data.requesterName} share this with one trusted friend. Please keep it to yourself. No account is needed.</p>
             <section aria-label={`${p.displayName}'s profile`} className="mt-6 space-y-4">
-              <h2 className="text-2xl">
+              <h2 className="font-serif text-2xl">
                 {p.displayName}
                 {p.age != null && <span className="font-normal">, {p.age}</span>}
               </h2>

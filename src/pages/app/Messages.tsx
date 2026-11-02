@@ -459,7 +459,7 @@ function Conversation({ id, onActivity }: { id: string; onActivity: () => void }
                             <figure className={cx("mb-2 rounded-2xl px-3 py-2 text-xs", mine ? "bg-parchment/15 text-surface/90" : "bg-parchment-deep text-ink-soft")}>
                               <figcaption className="font-semibold">{d.kind === "PROMPT" ? d.label : d.kind === "MEDIA" ? `About ${mine ? "their" : "your"} ${d.label.toLowerCase()}` : "Interest"}</figcaption>
                               {d.kind === "MEDIA" && d.mediaId && <DetailMediaThumb id={d.mediaId} kind={d.mediaKind} className="my-1.5 h-20 w-16" />}
-                              {d.quote && <blockquote className="mt-0.5 font-serif text-sm">{d.quote}</blockquote>}
+                              {d.quote && <blockquote className="mt-0.5 text-sm text-ink-soft">{d.quote}</blockquote>}
                             </figure>
                           ) : null;
                         })()}

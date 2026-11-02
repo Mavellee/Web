@@ -21,7 +21,7 @@ export function Dialog({ open, onClose, title, children, description }: { open: 
         <div className="p-6 sm:p-8">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
-              <h2 id="dialog-title" className="text-2xl">
+              <h2 id="dialog-title" className="font-serif text-2xl">
                 {title}
               </h2>
               {description && <p className="mt-1 text-sm text-ink-soft">{description}</p>}

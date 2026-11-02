@@ -113,7 +113,7 @@ export function GameSession() {
 
       {finished ? (
         <section className="mt-12 animate-rise">
-          <h2 className="text-3xl">{data.status === "ENDED" ? "Game ended" : "That's the whole deck"}</h2>
+          <h2 className="font-serif text-3xl">{data.status === "ENDED" ? "Game ended" : "That's the whole deck"}</h2>
           <p className="mt-2 text-ink-soft">{data.status === "ENDED" ? "You can start a new game any time." : "Here's what you said along the way."}</p>
           {!!data.recap?.length && (
             <ol className="mt-6 space-y-3">

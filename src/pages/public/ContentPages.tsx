@@ -55,7 +55,7 @@ export function HowItWorks() {
           ))}
         </ol>
         <div className="mt-16 rounded-4xl bg-rose-mist p-8 sm:p-12">
-          <h2 className="text-3xl">About compatibility scores</h2>
+          <h2 className="font-serif text-3xl">About compatibility scores</h2>
           <p className="mt-3 max-w-3xl leading-relaxed text-ink-soft">
             Scores compare only what both people chose to share: intentions, interests and optional answers, weighted by how important each person said a question is. We show what lines up, what differs, and what's missing. A score describes overlap in stated preferences; it can't predict whether a relationship will work, and we never use your photos or private messages to calculate it.
           </p>
@@ -81,7 +81,7 @@ export function Intentions() {
           <article key={i.value} id={i.value.toLowerCase()} className="scroll-mt-28 grid gap-6 rounded-4xl border hairline bg-surface/70 p-8 shadow-soft md:grid-cols-[14rem_1fr] md:p-10">
             <div>
               <span className={["inline-block rounded-full px-3 py-1 text-xs font-semibold", idx === 0 ? "bg-rose-soft text-accent" : idx === 1 ? "bg-gold-soft text-gold-ink" : "bg-primary-50 text-primary-700"].join(" ")}>{i.short}</span>
-              <h2 className="mt-4 text-3xl">{i.title}</h2>
+              <h2 className="font-serif mt-4 text-3xl">{i.title}</h2>
             </div>
             <div className="space-y-3 leading-relaxed text-ink-soft">
               <p>{i.description}</p>
@@ -124,7 +124,7 @@ export function Safety() {
       </section>
       <section className="container-page mt-14">
         <div className="rounded-4xl border hairline bg-surface p-8 sm:p-10">
-          <h2 className="text-3xl">Meeting in person</h2>
+          <h2 className="font-serif text-3xl">Meeting in person</h2>
           <ul className="mt-4 grid gap-3 text-ink-soft sm:grid-cols-2">
             {["Meet somewhere public for the first few dates.", "Tell a friend where you're going and when.", "Arrange your own transport.", "Never send money to someone you haven't met.", "Trust your instincts — it's okay to leave.", "Report anyone who makes you feel unsafe."].map((t) => (
               <li key={t} className="flex gap-2">
@@ -281,7 +281,7 @@ export function Contact() {
       </section>
       <p className="container-page mt-6 text-sm text-ink-muted">These addresses are placeholders for this preview build and will be replaced with monitored inboxes before launch.</p>
       <section className="container-page mt-14">
-        <h2 className="text-3xl">Common questions</h2>
+        <h2 className="font-serif text-3xl">Common questions</h2>
         <dl className="mt-6 divide-y hairline rounded-4xl border hairline bg-surface/60">
           {[
             ["I didn't get my verification email.", "Check spam, then use “Resend email” on the verification screen. Links expire after 24 hours."],
