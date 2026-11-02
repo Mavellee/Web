@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 import { api, ApiError } from "../../lib/api";
 import { GENDERS, INTENTIONS } from "../../lib/labels";
@@ -11,7 +12,6 @@ import { Button } from "../ui/Button";
 import { Chip } from "../ui/Chip";
 import { Input, Select, Textarea } from "../ui/Field";
 import { Icon } from "../ui/Icon";
-import { Skeleton } from "../ui/Skeleton";
 import { cx } from "../../lib/format";
 
 const LANGUAGES = ["English", "Hindi", "Bengali", "Marathi", "Telugu", "Tamil", "Gujarati", "Kannada", "Malayalam", "Punjabi", "Urdu", "Odia", "French", "Spanish", "Arabic"];
@@ -65,7 +65,6 @@ const basicsSchema = z.object({
   displayName: z.string().trim().min(1, "Add the name you'd like people to see.").max(40),
   gender: z.string().min(1, "Choose the option that fits you best."),
   interestedIn: z.array(z.string()).min(1, "Choose at least one."),
-  city: z.string().min(1, "Choose your city."),
   bio: z.string().max(500, "Keep it under 500 characters."),
   languages: z.array(z.string()).max(8),
   interests: z.array(z.string()).max(12, "Choose up to 12."),
@@ -75,18 +74,14 @@ type Basics = z.infer<typeof basicsSchema>;
 export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondary, show = {} }: SectionProps) {
   const showBio = show.bio !== false;
   const showInterests = show.interests !== false;
-  const cities = useResource<{ name: string; region: string }[]>("/meta/cities");
   const interests = useResource<{ slug: string; name: string; category: string }[]>("/meta/interests");
   const { error, save } = useSave(onSaved);
-  const [approx, setApprox] = useState<{ lat: number; lon: number } | null>(null);
-  const [locState, setLocState] = useState<string | null>(null);
   const { register, control, handleSubmit, watch, formState } = useForm<Basics>({
     resolver: zodResolver(basicsSchema),
     defaultValues: {
       displayName: profile.displayName,
       gender: profile.gender ?? "",
       interestedIn: profile.interestedIn,
-      city: profile.city ?? "",
       bio: profile.bio ?? "",
       languages: profile.languages,
       interests: profile.interests,
@@ -94,27 +89,13 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
   });
   const bio = watch("bio") ?? "";
 
-  const useLocation = () => {
-    if (!navigator.geolocation) return setLocState("Location isn't available in this browser.");
-    setLocState("Finding your approximate area…");
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        // Rounded here as well as on the server; precise coordinates never leave the device.
-        setApprox({ lat: Math.round(pos.coords.latitude * 100) / 100, lon: Math.round(pos.coords.longitude * 100) / 100 });
-        setLocState("Approximate area saved with your profile (about 1 km precision).");
-      },
-      () => setLocState("We couldn't get your location. Your chosen city will be used instead."),
-      { enableHighAccuracy: false, timeout: 8000 },
-    );
-  };
-
   const byCategory = (interests.data ?? []).reduce<Record<string, { slug: string; name: string }[]>>((acc, i) => {
     (acc[i.category] ??= []).push(i);
     return acc;
   }, {});
 
   return (
-    <form onSubmit={handleSubmit((v) => save({ ...v, bio: v.bio || null, approxLocation: approx ?? undefined }))} noValidate className="space-y-8">
+    <form onSubmit={handleSubmit((v) => save({ ...v, bio: v.bio || null }))} noValidate className="space-y-8">
       <div className="grid gap-5 sm:grid-cols-2">
         <Input label="Display name" autoComplete="given-name" error={formState.errors.displayName?.message} {...register("displayName")} />
         <Select label="Gender" error={formState.errors.gender?.message} {...register("gender")}>
@@ -133,29 +114,13 @@ export function BasicsSection({ profile, onSaved, submitLabel = "Save", secondar
           <ChipGroup<Gender> label="I'd like to meet" hint="Choose all that apply." options={GENDERS} value={field.value as Gender[]} onChange={field.onChange} error={fieldState.error?.message} />
         )}
       />
-      <div className="space-y-2">
-        {/* Rendered only once the options exist, so the saved city stays selected. */}
-        {cities.data ? (
-          <Select label="City" hint="Others see your city and a distance range — never your exact location." error={formState.errors.city?.message} {...register("city")}>
-            <option value="">Choose your city…</option>
-            {(cities.data ?? []).map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name}, {c.region}
-              </option>
-            ))}
-          </Select>
-        ) : (
-          <Skeleton className="h-20" />
-        )}
-        <button type="button" onClick={useLocation} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-          <Icon name="location" className="h-4 w-4" /> Use my approximate location for distance instead
-        </button>
-        {locState && (
-          <p role="status" className="text-sm text-ink-muted">
-            {locState}
-          </p>
-        )}
-      </div>
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl bg-surface/70 px-4 py-3 text-sm">
+        <Icon name="location" className="h-4 w-4 text-primary-text" />
+        <span className="font-semibold">{profile.city ?? (profile.hasApproxLocation ? "Approximate area set" : "No location set")}</span>
+        <Link to="/app/settings#location" className="font-semibold text-primary-text underline-offset-4 hover:underline">
+          {profile.city || profile.hasApproxLocation ? "Change in Settings" : "Set it in Settings"}
+        </Link>
+      </p>
       {showBio && <Textarea label="In a sentence or two" optional placeholder="A short line about you. Prompts do the rest." hint={`${bio.length}/500`} error={formState.errors.bio?.message} {...register("bio")} />}
       <Controller
         control={control}
@@ -249,6 +214,7 @@ export function IntentionSection({ profile, onSaved, submitLabel = "Save", secon
 }
 
 const DISTANCES = [
+  { value: "5", label: "Within 5 km" },
   { value: "10", label: "Within 10 km" },
   { value: "25", label: "Within 25 km" },
   { value: "50", label: "Within 50 km" },
@@ -279,7 +245,7 @@ export function PreferencesSection({ profile, onSaved, submitLabel = "Save", sec
           <Input label="To" type="number" inputMode="numeric" min={18} max={100} error={formState.errors.ageMax?.message} {...register("ageMax")} />
         </div>
       </fieldset>
-      <Select label="Distance" hint="Measured from your city or approximate area." {...register("maxDistanceKm")}>
+      <Select label="Distance" hint={profile.city || profile.hasApproxLocation ? "Measured on our servers from your place. Nobody sees where you are." : "Set your location in Settings to use distance."} {...register("maxDistanceKm")}>
         {DISTANCES.map((d) => (
           <option key={d.label} value={d.value}>
             {d.label}

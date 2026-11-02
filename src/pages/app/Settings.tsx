@@ -5,6 +5,8 @@ import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Dialog } from "../../components/ui/Dialog";
 import { Input } from "../../components/ui/Field";
+import { Toggle } from "../../components/ui/Toggle";
+import { LocationSettings } from "../../components/location/LocationSettings";
 import { LoadingBlock } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/Toast";
@@ -18,22 +20,6 @@ import { timeAgo } from "../../lib/format";
 type SettingsData = { aiEnabled: boolean; readReceipts: boolean; typingIndicators: boolean; emailNotifications: boolean; showDistance: boolean; showZodiacSign: boolean; zodiac: { name: string; symbol: string; element: string } | null; isDiscoverable: boolean; discoveryPaused: boolean };
 type SessionRow = { id: string; userAgent: string | null; createdAt: string; lastUsedAt: string; current: boolean };
 type BlockRow = { userId: string; displayName: string; blockedAt: string };
-
-function Toggle({ label, description, checked, onChange }: { label: string; description?: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label className="flex cursor-pointer items-start justify-between gap-6 py-4">
-      <span>
-        <span className="block font-semibold">{label}</span>
-        {description && <span className="mt-0.5 block text-sm text-ink-muted">{description}</span>}
-      </span>
-      <span className="relative mt-1 inline-flex shrink-0">
-        <input type="checkbox" role="switch" className="peer sr-only" checked={checked} onChange={(e) => onChange(e.target.checked)} />
-        <span className="h-7 w-12 rounded-full bg-line transition peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2" />
-        <span className="absolute left-1 top-1 h-5 w-5 rounded-full bg-paper shadow transition peer-checked:translate-x-5" />
-      </span>
-    </label>
-  );
-}
 
 /** Only appears for people who have actually given birth details to Mavelle Astro. */
 function AstroData() {
@@ -120,12 +106,12 @@ export function Settings() {
       ) : s ? (
         <div className="space-y-6">
           <Appearance />
+          <LocationSettings onChanged={() => void refresh()} />
           <Card className="px-6 py-2">
             <h2 className="pt-4 text-xl">Visibility</h2>
             <div className="divide-y hairline">
               <Toggle label="Pause Discover" description="Stop appearing to new people. Your matches and chats stay." checked={s.discoveryPaused} onChange={(v) => update({ discoveryPaused: v })} />
               <Toggle label="Show me in Discover" description="Turn off to only be visible to people you like first." checked={s.isDiscoverable} onChange={(v) => update({ isDiscoverable: v })} />
-              <Toggle label="Show approximate distance" description="Others see a range like “About 10 km away”, never your location." checked={s.showDistance} onChange={(v) => update({ showDistance: v })} />
               {s.zodiac && <Toggle label={`Show my zodiac sign (${s.zodiac.symbol} ${s.zodiac.name})`} description="Just for fun: others see your sign and its type on your profile, including in Discover. It's worked out from your birth date, which stays private, and it never affects who you see or match with. Turn this off to hide it." checked={s.showZodiacSign} onChange={(v) => update({ showZodiacSign: v })} />}
             </div>
           </Card>

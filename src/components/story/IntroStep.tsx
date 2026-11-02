@@ -1,22 +1,23 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { api, ApiError } from "../../lib/api";
+import { api } from "../../lib/api";
 import { GENDERS } from "../../lib/labels";
 import { useAutosave, type SaveStatus } from "../../lib/useAutosave";
 import { useResource } from "../../lib/useResource";
 import type { Gender, OwnProfile } from "../../lib/types";
 import { Chip } from "../ui/Chip";
 import { Input, Select, Textarea } from "../ui/Field";
-import { Icon } from "../ui/Icon";
+import { LocationSetup } from "../location/LocationSetup";
+import type { LocationView } from "../../lib/location";
 import { Skeleton } from "../ui/Skeleton";
 
 const LANGUAGES = ["English", "Hindi", "Bengali", "Marathi", "Telugu", "Tamil", "Gujarati", "Kannada", "Malayalam", "Punjabi", "Urdu", "Odia", "French", "Spanish", "Arabic"];
 const BIO_MAX = 500;
 
-type Values = { displayName: string; gender: string; interestedIn: string[]; city: string; bio: string; languages: string[] };
+type Values = { displayName: string; gender: string; interestedIn: string[]; bio: string; languages: string[] };
 export type IntroDraft = Partial<Pick<OwnProfile, "displayName" | "bio" | "city" | "languages">>;
 export type IntroHandle = { submit: () => Promise<boolean> };
 
-const fromProfile = (p: OwnProfile): Values => ({ displayName: p.displayName, gender: p.gender ?? "", interestedIn: p.interestedIn, city: p.city ?? "", bio: p.bio ?? "", languages: p.languages });
+const fromProfile = (p: OwnProfile): Values => ({ displayName: p.displayName, gender: p.gender ?? "", interestedIn: p.interestedIn, bio: p.bio ?? "", languages: p.languages });
 const draftKey = (id: string) => `knot:intro-draft:${id}`;
 const readDraft = (id: string): Values | null => {
   try {
@@ -40,10 +41,10 @@ const writeDraft = (id: string, v: Values | null) => {
  * gender and who you'd like to meet); until then the draft is kept on this device so nothing is lost.
  */
 export const IntroStep = forwardRef<IntroHandle, { profile: OwnProfile; userId: string; onSaved: (p: OwnProfile) => void; onDraft: (d: IntroDraft) => void; onStatus: (s: SaveStatus, retry?: () => void) => void }>(function IntroStep({ profile, userId, onSaved, onDraft, onStatus }, ref) {
-  const cities = useResource<{ name: string; region: string }[]>("/meta/cities");
+  const location = useResource<LocationView>(profile.displayName ? "/location/me" : null);
   const [v, setV] = useState<Values>(() => (!profile.displayName && readDraft(userId)) || fromProfile(profile));
   const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
-  const [locState, setLocState] = useState<string | null>(null);
+  const [locationSkipped, setLocationSkipped] = useState(false);
   const latestProfile = useRef(profile);
   latestProfile.current = profile;
   const set = <K extends keyof Values>(k: K, val: Values[K]) => {
@@ -55,15 +56,14 @@ export const IntroStep = forwardRef<IntroHandle, { profile: OwnProfile; userId: 
   const { flush } = useAutosave(
     v,
     async (val) => {
-      const city = val.city !== (latestProfile.current.city ?? "") ? { city: val.city || null } : {}; // re-sending the city would overwrite an approximate location
-      onSaved(await api.patch<OwnProfile>("/profiles/me", { displayName: val.displayName.trim(), gender: val.gender, interestedIn: val.interestedIn, bio: val.bio.trim() || null, languages: val.languages, ...city }));
+      onSaved(await api.patch<OwnProfile>("/profiles/me", { displayName: val.displayName.trim(), gender: val.gender, interestedIn: val.interestedIn, bio: val.bio.trim() || null, languages: val.languages }));
       writeDraft(userId, null);
     },
     { enabled: canSave, baseline: fromProfile(profile), onStatus },
   );
 
   useEffect(() => {
-    onDraft({ displayName: v.displayName, bio: v.bio, city: v.city || null, languages: v.languages });
+    onDraft({ displayName: v.displayName, bio: v.bio, city: latestProfile.current.city, languages: v.languages });
     if (!canSave && !profile.displayName && (v.displayName || v.gender || v.bio)) {
       writeDraft(userId, v);
       onStatus("local");
@@ -83,26 +83,6 @@ export const IntroStep = forwardRef<IntroHandle, { profile: OwnProfile; userId: 
       return flush();
     },
   }));
-
-  const useLocation = () => {
-    if (!navigator.geolocation) return setLocState("Location isn't available in this browser.");
-    setLocState("Finding your approximate area…");
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        // Rounded here as well as on the server; precise coordinates never leave the device.
-        const approx = { lat: Math.round(pos.coords.latitude * 100) / 100, lon: Math.round(pos.coords.longitude * 100) / 100 };
-        if (!latestProfile.current.displayName) return setLocState("Add your name first, then try this again.");
-        try {
-          onSaved(await api.patch<OwnProfile>("/profiles/me", { approxLocation: approx }));
-          setLocState("Approximate area saved (about 1 km precision). Others only see a distance range.");
-        } catch (err) {
-          setLocState(err instanceof ApiError ? err.message : "Couldn't save your location.");
-        }
-      },
-      () => setLocState("We couldn't get your location. Your chosen city will be used instead."),
-      { enableHighAccuracy: false, timeout: 8000 },
-    );
-  };
 
   return (
     <div className="max-w-xl space-y-9">
@@ -136,28 +116,27 @@ export const IntroStep = forwardRef<IntroHandle, { profile: OwnProfile; userId: 
           </p>
         )}
       </fieldset>
-      <div className="space-y-2">
-        {cities.data ? (
-          <Select label="Where are you based?" optional hint="Others see your city and a distance range, never your exact location." value={v.city} onChange={(e) => set("city", e.target.value)}>
-            <option value="">Choose your city…</option>
-            {cities.data.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name}, {c.region}
-              </option>
-            ))}
-          </Select>
-        ) : (
-          <Skeleton className="h-20" />
-        )}
-        <button type="button" onClick={useLocation} className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-          <Icon name="location" className="h-4 w-4" /> Use my approximate location for distance
-        </button>
-        {locState && (
-          <p role="status" className="text-sm text-ink-muted">
-            {locState}
-          </p>
-        )}
-      </div>
+      {!profile.displayName ? (
+        <p className="rounded-2xl bg-surface/70 px-4 py-3 text-sm text-ink-soft">Once you've added your name and who you'd like to meet, you can set where you're looking for connection. It's optional.</p>
+      ) : locationSkipped && !location.data?.hasLocation ? (
+        <p className="text-sm text-ink-muted">
+          No location for now. Discover will show people anywhere.{" "}
+          <button type="button" className="font-semibold text-primary-text underline-offset-4 hover:underline" onClick={() => setLocationSkipped(false)}>
+            Set it now
+          </button>
+        </p>
+      ) : location.data ? (
+        <LocationSetup
+          value={location.data}
+          onSkip={() => setLocationSkipped(true)}
+          onChange={async (view) => {
+            location.setData(view);
+            onSaved(await api.get<OwnProfile>("/profiles/me"));
+          }}
+        />
+      ) : (
+        <Skeleton className="h-48" />
+      )}
       <Textarea label="Tell us a little about yourself." optional rows={3} placeholder="How would your friends describe you?" hint={`${v.bio.length}/${BIO_MAX}`} value={v.bio} onChange={(e) => set("bio", e.target.value)} error={errors.bio} />
       <fieldset>
         <legend className="text-sm font-semibold">

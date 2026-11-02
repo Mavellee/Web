@@ -78,7 +78,7 @@ export function DiscoverFilters({ me, value, onApply, interestNames }: { me: Own
           <Input label="To" type="number" inputMode="numeric" min={me.ageMin} max={me.ageMax} placeholder={String(me.ageMax)} error={ageError} value={draft.ageMax ?? ""} onChange={(e) => setDraft((d) => ({ ...d, ageMax: e.target.value ? Number(e.target.value) : undefined }))} />
         </div>
       </fieldset>
-      <Select label="Location" hint={me.maxDistanceKm ? `Your saved limit is ${me.maxDistanceKm} km.` : "From your city or approximate area."} value={draft.maxDistanceKm ?? ""} onChange={(e) => setDraft((d) => ({ ...d, maxDistanceKm: e.target.value ? Number(e.target.value) : undefined }))}>
+      <Select label="Location" hint={!me.city && !me.hasApproxLocation ? "Set your location in Settings to filter by distance." : me.maxDistanceKm ? `Your saved limit is ${me.maxDistanceKm} km.` : "From your place, measured privately on our servers."} value={draft.maxDistanceKm ?? ""} onChange={(e) => setDraft((d) => ({ ...d, maxDistanceKm: e.target.value ? Number(e.target.value) : undefined }))}>
         <option value="">{me.maxDistanceKm ? `Within ${me.maxDistanceKm} km (saved)` : "Anywhere"}</option>
         {distances.map((d) => (
           <option key={d} value={d}>
