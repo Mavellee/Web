@@ -18,7 +18,7 @@ import { useResource } from "../../lib/useResource";
 import { timeAgo } from "../../lib/format";
 
 type SettingsData = { aiEnabled: boolean; readReceipts: boolean; typingIndicators: boolean; emailNotifications: boolean; showDistance: boolean; showZodiacSign: boolean; zodiac: { name: string; symbol: string; element: string } | null; isDiscoverable: boolean; discoveryPaused: boolean };
-type SessionRow = { id: string; userAgent: string | null; createdAt: string; lastUsedAt: string; current: boolean };
+type SessionRow = { id: string; userAgent: string | null; client?: "WEB" | "MOBILE"; createdAt: string; lastUsedAt: string; current: boolean };
 type BlockRow = { userId: string; displayName: string; blockedAt: string };
 
 /** Only appears for people who have actually given birth details to Mavelle Astro. */
@@ -76,7 +76,8 @@ export function Settings() {
   const toast = useToast();
   const { refresh, setAccount } = useAuth();
   const navigate = useNavigate();
-  const [dialog, setDialog] = useState<"password" | "delete" | null>(null);
+  const [dialog, setDialog] = useState<"password" | "delete" | "everywhere" | null>(null);
+  const [signOutDevice, setSignOutDevice] = useState<SessionRow | null>(null);
 
   const update = async (patch: Partial<SettingsData>) => {
     const prev = settings.data;
@@ -162,26 +163,25 @@ export function Settings() {
               {sessions.data?.map((x) => (
                 <li key={x.id} className="flex items-center justify-between gap-4 py-3 text-sm">
                   <span className="min-w-0">
-                    <span className="block truncate">{x.userAgent ?? "Unknown device"}</span>
+                    <span className="block truncate">
+                      {x.client === "MOBILE" && <span className="mr-1.5 rounded-full bg-rose-mist px-2 py-0.5 text-xs font-medium text-primary-text">App</span>}
+                      {x.userAgent ?? "Unknown device"}
+                    </span>
                     <span className="text-xs text-ink-muted">Last active {timeAgo(x.lastUsedAt)}</span>
                   </span>
                   {x.current ? (
                     <span className="text-xs font-semibold text-success">This device</span>
                   ) : (
-                    <Button
-                      variant="quiet"
-                      size="sm"
-                      onClick={async () => {
-                        await api.delete(`/settings/sessions/${x.id}`);
-                        sessions.reload();
-                      }}
-                    >
+                    <Button variant="quiet" size="sm" onClick={() => setSignOutDevice(x)}>
                       Sign out
                     </Button>
                   )}
                 </li>
               ))}
             </ul>
+            <Button variant="secondary" size="sm" className="mt-3" onClick={() => setDialog("everywhere")}>
+              Sign out everywhere
+            </Button>
           </Card>
           <Card className="space-y-3 p-6">
             <h2 className="text-xl">Account</h2>
@@ -200,6 +200,31 @@ export function Settings() {
         </div>
       ) : null}
       <PasswordDialog open={dialog === "password"} onClose={() => setDialog(null)} />
+      <ConfirmWithPassword
+        open={!!signOutDevice}
+        title="Sign out this device?"
+        description={`${signOutDevice?.userAgent ?? "That device"} will need to log in again.`}
+        confirmLabel="Sign it out"
+        onClose={() => setSignOutDevice(null)}
+        onConfirm={async (password) => {
+          await api.delete(`/settings/sessions/${signOutDevice!.id}`, { password });
+          setSignOutDevice(null);
+          toast("Signed out");
+          void sessions.reload();
+        }}
+      />
+      <ConfirmWithPassword
+        open={dialog === "everywhere"}
+        title="Sign out everywhere?"
+        description="Every device, including this one, will need to log in again. Use this if you think someone else has your password or a device you've lost."
+        confirmLabel="Sign out everywhere"
+        onClose={() => setDialog(null)}
+        onConfirm={async (password) => {
+          await api.post("/auth/logout-all", { password });
+          setAccount(null);
+          navigate("/login", { replace: true });
+        }}
+      />
       <DeleteDialog
         open={dialog === "delete"}
         onClose={() => setDialog(null)}
@@ -247,6 +272,53 @@ function PasswordDialog({ open, onClose }: { open: boolean; onClose: () => void 
         <Button type="submit" className="w-full" loading={busy}>
           Update password
         </Button>
+      </form>
+    </Dialog>
+  );
+}
+
+/** Security actions ask for the password again, so a borrowed or stolen session can't use them. */
+function ConfirmWithPassword({ open, title, description, confirmLabel, onClose, onConfirm }: { open: boolean; title: string; description: string; confirmLabel: string; onClose: () => void; onConfirm: (password: string) => Promise<void> }) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const close = () => {
+    setPassword("");
+    setError(null);
+    onClose();
+  };
+  return (
+    <Dialog open={open} onClose={close} title={title} description={description}>
+      <form
+        className="space-y-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          setError(null);
+          try {
+            await onConfirm(password);
+            setPassword("");
+          } catch (err) {
+            setError(err instanceof ApiError ? err.message : "That didn't work. Please try again.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <Input label="Confirm with your password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        {error && (
+          <p role="alert" className="text-sm text-error">
+            {error}
+          </p>
+        )}
+        <div className="flex justify-end gap-2">
+          <Button variant="quiet" onClick={close}>
+            Cancel
+          </Button>
+          <Button type="submit" loading={busy} disabled={!password}>
+            {confirmLabel}
+          </Button>
+        </div>
       </form>
     </Dialog>
   );

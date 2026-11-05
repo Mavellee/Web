@@ -78,7 +78,6 @@ export const signupSchema = z.object({
 type SignupValues = z.infer<typeof signupSchema>;
 
 export function Signup() {
-  const { setAccount } = useAuth();
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string | null>(null);
   const { register, handleSubmit, setError, formState } = useForm<SignupValues>({ resolver: zodResolver(signupSchema) });
@@ -87,9 +86,9 @@ export function Signup() {
   const onSubmit = async (v: SignupValues) => {
     setFormError(null);
     try {
-      const account = await api.post<Account>("/auth/register", v);
-      setAccount(account);
-      navigate("/verify-email");
+      // The answer is the same whether or not the address already has an account; the email says which.
+      await api.post("/auth/register", v);
+      navigate("/verify-email", { state: { email: v.email.trim() } });
     } catch (e) {
       applyServerErrors(e, setError, setFormError);
     }
@@ -309,9 +308,11 @@ export function VerifyEmail() {
       });
   }, [token, refresh]);
 
+  const location = useLocation();
+  const sentTo = account?.email ?? (location.state as { email?: string } | null)?.email ?? null;
   const resend = async () => {
     try {
-      await api.post("/auth/resend-verification");
+      await api.post("/auth/resend-verification", account ? {} : { email: sentTo });
       setResent(true);
     } catch (e) {
       setMessage(e instanceof ApiError ? e.message : "Couldn't resend right now.");
@@ -334,14 +335,22 @@ export function VerifyEmail() {
     );
 
   return (
-    <AuthLayout title="Check your email" subtitle={account ? <>We sent a confirmation link to <strong className="text-ink">{account.email}</strong>.</> : "Open the link we sent to confirm your address."}>
+    <AuthLayout title="Check your email" subtitle={sentTo ? <>We sent a link to <strong className="text-ink">{sentTo}</strong>.</> : "Open the link we sent to confirm your address."}>
       {state === "error" && <FormError message={message} />}
       <div className="space-y-4 rounded-3xl bg-surface/60 p-6">
         <p className="text-ink-soft">The link expires in 24 hours. Once confirmed, you'll set up your profile.</p>
-        {account && account.status === "PENDING_VERIFICATION" && (
+        {((account && account.status === "PENDING_VERIFICATION") || (!account && sentTo)) && (
           <Button variant="secondary" onClick={resend} disabled={resent}>
             {resent ? "Sent — check your inbox" : "Resend email"}
           </Button>
+        )}
+        {!account && (
+          <p className="text-sm text-ink-muted">
+            Already have an account with this email? We've sent a note there instead.{" "}
+            <Link to="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
+              Log in
+            </Link>
+          </p>
         )}
         {account?.status === "ACTIVE" && <ButtonLink to="/onboarding">Continue</ButtonLink>}
       </div>

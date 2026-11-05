@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { io, type Socket } from "socket.io-client";
 import { useAuth } from "./auth";
+import { renewSession } from "./api";
 
 type Status = "connecting" | "connected" | "reconnecting" | "offline";
 const SocketContext = createContext<{ socket: Socket | null; status: Status }>({ socket: null, status: "offline" });
@@ -23,7 +24,17 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       // The server only drops a socket itself when its session was revoked (logout elsewhere, suspension).
       if (reason === "io server disconnect") void refresh();
     });
-    s.on("connect_error", () => setStatus("reconnecting"));
+    // An expired access token is refused at the handshake: renew it, then try again (a few times at most).
+    let renewals = 0;
+    s.on("connect_error", (err) => {
+      setStatus("reconnecting");
+      if (err.message !== "UNAUTHENTICATED" || renewals >= 3) return;
+      renewals++;
+      renewSession()
+        .then((ok) => (ok ? s.connect() : void refresh()))
+        .catch(() => {});
+    });
+    s.on("connect", () => (renewals = 0));
     return () => {
       s.close();
       setSocket(null);
