@@ -9,6 +9,7 @@ import { Checkbox, Input } from "../../components/ui/Field";
 import { Spinner } from "../../components/ui/Spinner";
 import { api, ApiError } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
+import { signInWithGoogle } from "../../lib/firebase";
 import type { Account } from "../../lib/types";
 
 function AuthLayout({ title, subtitle, children, footer }: { title: string; subtitle?: ReactNode; children: ReactNode; footer?: ReactNode }) {
@@ -67,6 +68,127 @@ function isAdult(dob: string) {
   return age >= 18;
 }
 
+function routeAfterSignIn(account: Account, navigate: ReturnType<typeof useNavigate>, from?: string) {
+  if (account.status === "PENDING_VERIFICATION") navigate("/verify-email");
+  else if (!account.onboarded && account.role !== "ADMIN" && account.role !== "MODERATOR") navigate("/onboarding");
+  else navigate(from ?? "/app/discover", { replace: true });
+}
+
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z" />
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 7 29.6 5 24 5c-7.6 0-14.1 4.3-17.4 10.6z" />
+      <path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.1-5.1l-6.5-5.5c-2.1 1.5-4.8 2.5-7.6 2.5-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.8 39.6 16.3 44 24 44z" />
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.5 5.5C40.9 36.6 44 30.9 44 24c0-1.3-.1-2.7-.4-3.5z" />
+    </svg>
+  );
+}
+
+/** "Continue with Google": used on both Login and Signup, since Google sign-in is sign-up and sign-in combined. */
+function GoogleSignInButton({ onSignedIn }: { onSignedIn: (account: Account) => void }) {
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [pending, setPending] = useState<{ idToken: string; email: string; name: string | null } | null>(null);
+  const { register, handleSubmit, setError, formState } = useForm<GoogleProfileValues>({ resolver: zodResolver(googleProfileSchema) });
+
+  async function submitToken(idToken: string, extra: Partial<GoogleProfileValues> = {}) {
+    const result = await api.post<Account & { needsProfile?: boolean; email?: string; name?: string | null }>("/auth/google", { idToken, ...extra });
+    if (result.needsProfile) {
+      setPending({ idToken, email: result.email ?? "", name: result.name ?? null });
+      return;
+    }
+    onSignedIn(result);
+  }
+
+  const start = async () => {
+    setFormError(null);
+    setLoading(true);
+    try {
+      const idToken = await signInWithGoogle();
+      if (idToken) await submitToken(idToken); // null = the visitor closed the popup; nothing to show
+    } catch {
+      setFormError("Google sign-in didn't work. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onFinishProfile = async (v: GoogleProfileValues) => {
+    setFormError(null);
+    try {
+      await submitToken(pending!.idToken, v);
+    } catch (e) {
+      applyServerErrors(e, setError, setFormError);
+    }
+  };
+
+  if (pending) {
+    return (
+      <div className="space-y-4 rounded-3xl bg-surface/60 p-4">
+        <p className="text-sm text-ink-soft">
+          Almost there{pending.name ? `, ${pending.name}` : ""}. Mavelle is for adults 18 and over, so we need one more thing before creating your account.
+        </p>
+        <FormError message={formError} />
+        <form onSubmit={handleSubmit(onFinishProfile)} noValidate className="space-y-4">
+          <Input label="Date of birth" type="date" autoComplete="bday" hint="Kept private. Others only see your age." error={formState.errors.dateOfBirth?.message} {...register("dateOfBirth")} />
+          <Checkbox label="I confirm I am 18 years of age or older." error={formState.errors.ageConfirmed?.message} {...register("ageConfirmed")} />
+          <Checkbox
+            label={
+              <>
+                I agree to the{" "}
+                <Link to="/terms" target="_blank" className="text-primary underline">
+                  terms
+                </Link>
+                ,{" "}
+                <Link to="/privacy" target="_blank" className="text-primary underline">
+                  privacy policy
+                </Link>{" "}
+                and{" "}
+                <Link to="/guidelines" target="_blank" className="text-primary underline">
+                  community guidelines
+                </Link>
+                .
+              </>
+            }
+            error={formState.errors.acceptTerms?.message}
+            {...register("acceptTerms")}
+          />
+          <Button type="submit" size="lg" className="w-full" loading={formState.isSubmitting}>
+            Finish creating your account
+          </Button>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <FormError message={formError} />
+      <Button type="button" variant="secondary" size="lg" className="w-full" icon={<GoogleIcon className="h-4 w-4" />} loading={loading} onClick={start}>
+        Continue with Google
+      </Button>
+    </div>
+  );
+}
+
+function OrDivider() {
+  return (
+    <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+      <span className="h-px flex-1 bg-border" />
+      or
+      <span className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
+
+const googleProfileSchema = z.object({
+  dateOfBirth: z.string().min(1, "Enter your date of birth.").refine(isAdult, "You must be 18 or older to join Mavelle."),
+  ageConfirmed: z.literal(true, { errorMap: () => ({ message: "Please confirm you're 18 or older." }) }),
+  acceptTerms: z.literal(true, { errorMap: () => ({ message: "Please accept the terms to continue." }) }),
+});
+type GoogleProfileValues = z.infer<typeof googleProfileSchema>;
+
 export const signupSchema = z.object({
   email: z.string().trim().email("Enter a valid email address."),
   password: passwordRule,
@@ -79,6 +201,7 @@ type SignupValues = z.infer<typeof signupSchema>;
 
 export function Signup() {
   const navigate = useNavigate();
+  const { setAccount } = useAuth();
   const [formError, setFormError] = useState<string | null>(null);
   const { register, handleSubmit, setError, formState } = useForm<SignupValues>({ resolver: zodResolver(signupSchema) });
   const { errors, isSubmitting } = formState;
@@ -140,6 +263,13 @@ export function Signup() {
           Create account
         </Button>
       </form>
+      <OrDivider />
+      <GoogleSignInButton
+        onSignedIn={(account) => {
+          setAccount(account);
+          routeAfterSignIn(account, navigate);
+        }}
+      />
     </AuthLayout>
   );
 }
@@ -159,9 +289,7 @@ export function Login() {
     try {
       const account = await api.post<Account>("/auth/login", v);
       setAccount(account);
-      if (account.status === "PENDING_VERIFICATION") navigate("/verify-email");
-      else if (!account.onboarded && account.role !== "ADMIN" && account.role !== "MODERATOR") navigate("/onboarding");
-      else navigate(location.state?.from ?? "/app/discover", { replace: true });
+      routeAfterSignIn(account, navigate, location.state?.from);
     } catch (e) {
       applyServerErrors(e, setError, setFormError);
     }
@@ -192,6 +320,13 @@ export function Login() {
           Log in
         </Button>
       </form>
+      <OrDivider />
+      <GoogleSignInButton
+        onSignedIn={(account) => {
+          setAccount(account);
+          routeAfterSignIn(account, navigate, location.state?.from);
+        }}
+      />
     </AuthLayout>
   );
 }

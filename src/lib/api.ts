@@ -14,7 +14,7 @@ export class ApiError extends Error {
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 // Calls that must not trigger a renewal (they are the renewal, or happen while signed out).
-const NO_REFRESH = /^\/auth\/(login|register|refresh|logout|verify-email|forgot-password|reset-password|resend-verification|mobile\/)/;
+const NO_REFRESH = /^\/auth\/(login|register|google|refresh|logout|verify-email|forgot-password|reset-password|resend-verification|mobile\/)/;
 
 let renewing: Promise<boolean> | null = null;
 
