@@ -1,7 +1,7 @@
 import { mediaOf, primaryOf } from "./profile";
 import type { MediaItem, PublicProfile } from "./types";
 
-type StorySource = Pick<PublicProfile, "bio" | "interests" | "intentions" | "city" | "languages" | "zodiac"> & Partial<Pick<PublicProfile, "media" | "photoIds" | "photos" | "prompts">>;
+type StorySource = Pick<PublicProfile, "bio" | "interests" | "intentions" | "city" | "languages" | "zodiac"> & Partial<Pick<PublicProfile, "media" | "photoIds" | "photos" | "prompts" | "vitals">>;
 type Prompt = NonNullable<PublicProfile["prompts"]>[number];
 
 export type Chapter =
@@ -36,7 +36,7 @@ export function buildStory(p: StorySource): Chapter[] {
   const out: Chapter[] = [];
   if (p.bio || p.interests.length > 0) out.push({ type: "about" });
   out.push(...nextMedia(), ...nextPrompt(), ...nextMedia());
-  if (p.city || p.languages.length > 0 || p.zodiac || p.interests.length > LEAD_INTERESTS) out.push({ type: "details" });
+  if (p.city || p.languages.length > 0 || p.zodiac || (p.vitals?.length ?? 0) > 0 || p.interests.length > LEAD_INTERESTS) out.push({ type: "details" });
   out.push(...nextPrompt());
   while (photos.length || prompts.length) out.push(...nextMedia(), ...nextPrompt());
   if (p.intentions.length > 0) out.push({ type: "lookingFor" });

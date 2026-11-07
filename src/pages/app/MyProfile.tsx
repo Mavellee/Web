@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppPage, PageHeader } from "../../components/app/PageHeader";
 import { AiPanel } from "../../components/app/AiPanel";
 import { BasicsSection, IntentionSection, PreferencesSection } from "../../components/profile/ProfileSections";
+import { DealbreakersSection, VitalsSection } from "../../components/profile/VitalsSections";
 import { MediaWorkspace } from "../../components/story/MediaWorkspace";
 import { PromptWriter } from "../../components/story/PromptWriter";
 import { InterestPicker } from "../../components/story/InterestPicker";
@@ -19,9 +20,10 @@ import { useAuth } from "../../lib/auth";
 import { useResource } from "../../lib/useResource";
 import type { OwnProfile } from "../../lib/types";
 
-type Tab = "details" | "photos" | "words" | "little" | "intentions" | "preferences";
+type Tab = "details" | "about" | "photos" | "words" | "little" | "intentions" | "preferences";
 const TABS: { value: Tab; label: string }[] = [
   { value: "details", label: "Details" },
+  { value: "about", label: "About you" },
   { value: "photos", label: "Photos" },
   { value: "words", label: "Your words" },
   { value: "little", label: "Little things" },
@@ -89,11 +91,19 @@ export function MyProfile() {
                   </div>
                 </>
               )}
+              {tab === "about" && <VitalsSection profile={data} onSaved={saved} />}
               {tab === "photos" && <MediaWorkspace media={data.media} limits={data.mediaLimits} onChange={reload} />}
               {tab === "words" && <PromptWriter answers={data.prompts} onSaved={saved} />}
               {tab === "little" && <InterestPicker selected={data.interests} onSaved={saved} />}
               {tab === "intentions" && <IntentionSection profile={data} onSaved={saved} />}
-              {tab === "preferences" && <PreferencesSection profile={data} onSaved={saved} />}
+              {tab === "preferences" && (
+                <>
+                  <PreferencesSection profile={data} onSaved={saved} />
+                  <div className="mt-12 border-t hairline pt-10">
+                    <DealbreakersSection profile={data} onSaved={saved} />
+                  </div>
+                </>
+              )}
             </div>
           </section>
         </div>

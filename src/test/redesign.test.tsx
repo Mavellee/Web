@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { Tabs } from "../components/ui/Tabs";
 import { completionItems } from "../components/profile/Completion";
 import { DiscoverFilters, filtersFromParams, filtersToQuery, EMPTY_FILTERS, type Filters } from "../pages/app/discover/DiscoverFilters";
@@ -24,6 +25,9 @@ const me: OwnProfile = {
   ageMin: 24,
   ageMax: 38,
   maxDistanceKm: 60,
+  vitals: { heightCm: null, jobTitle: null, education: null, religion: null, motherTongue: null, diet: null, drinking: null, smoking: null, children: null, familyPlans: null },
+  hiddenVitals: [],
+  dealbreakers: { includeUnstated: true },
   isPublished: true,
   isDiscoverable: true,
   discoveryPaused: false,
@@ -80,7 +84,11 @@ describe("Discover filters", () => {
 
   it("only offers options within saved preferences and applies the selection", async () => {
     let applied: Filters | null = null;
-    const { container } = render(<DiscoverFilters me={me} value={EMPTY_FILTERS} onApply={(f) => (applied = f)} interestNames={new Map([["coffee", "Coffee"], ["hiking", "Hiking"]])} />);
+    const { container } = render(
+      <MemoryRouter>
+        <DiscoverFilters me={me} value={EMPTY_FILTERS} onApply={(f) => (applied = f)} interestNames={new Map([["coffee", "Coffee"], ["hiking", "Hiking"]])} />
+      </MemoryRouter>,
+    );
     // Intentions outside "what I'm open to" (Casual) are not offered.
     expect(screen.queryByRole("checkbox", { name: /Casual/ })).toBeNull();
     // Distances can only be tighter than the saved 60 km.

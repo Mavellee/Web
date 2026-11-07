@@ -4,6 +4,8 @@ import { Chip } from "../../../components/ui/Chip";
 import { Input, Select } from "../../../components/ui/Field";
 import { INTENTIONS } from "../../../lib/labels";
 import type { Intention, OwnProfile } from "../../../lib/types";
+import { Link } from "react-router-dom";
+import { activeDealbreakers } from "../../../components/profile/VitalsSections";
 
 export interface Filters {
   intentions: Intention[];
@@ -48,6 +50,7 @@ export function DiscoverFilters({ me, value, onApply, interestNames }: { me: Own
   const allowedIntentions = me.soughtIntentions.length ? me.soughtIntentions : me.intentions;
   const distances = [5, 10, 25, 50, 100].filter((d) => !me.maxDistanceKm || d < me.maxDistanceKm);
   const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
+  const dealbreakers = me.dealbreakers ? activeDealbreakers(me.dealbreakers) : 0;
   const ageError = draft.ageMin && draft.ageMax && draft.ageMax < draft.ageMin ? "Must be at least the minimum." : undefined;
 
   return (
@@ -98,6 +101,12 @@ export function DiscoverFilters({ me, value, onApply, interestNames }: { me: Own
           </div>
         </fieldset>
       )}
+      <p className="rounded-2xl bg-surface/70 px-4 py-3 text-sm text-ink-soft">
+        {dealbreakers > 0 ? `Your ${dealbreakers === 1 ? "saved dealbreaker also applies" : `${dealbreakers} saved dealbreakers also apply`}.` : "Height, religion, mother tongue, diet and more can be set as dealbreakers."}{" "}
+        <Link to="/app/profile?tab=preferences" className="font-semibold text-primary-text underline-offset-4 hover:underline">
+          {dealbreakers > 0 ? "Edit" : "Set them"}
+        </Link>
+      </p>
       <div className="flex gap-2 border-t hairline pt-5">
         <Button type="submit" className="flex-1">
           Show results

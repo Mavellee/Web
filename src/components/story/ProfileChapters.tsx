@@ -112,6 +112,7 @@ export function DetailsChapter({ p, onRespond }: { p: Person; onRespond?: Respon
     ...(p.languages.length ? ([["Speaks", p.languages.join(", ")]] as [string, ReactNode][]) : []),
     ...(p.zodiac ? ([["Zodiac sign", `${p.zodiac.symbol} ${p.zodiac.name} · ${p.zodiac.element} sign`]] as [string, ReactNode][]) : []),
     ["Gender", genderLabel(p.gender)],
+    ...(p.vitals ?? []).map((v) => [v.label, v.value] as [string, ReactNode]),
   ];
   const more = p.interests.slice(LEAD_INTERESTS);
   return (

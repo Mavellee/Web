@@ -61,6 +61,8 @@ export interface PublicProfile {
   distance: string | null;
   bio: string | null;
   languages: string[];
+  /** Stated, visible vitals, already labelled by the server. */
+  vitals?: PublicVital[];
   intentions: Intention[];
   interests: { slug: string; name: string; shared: boolean }[];
   sharedInterestCount: number;
@@ -143,6 +145,9 @@ export interface OwnProfile {
   ageMin: number;
   ageMax: number;
   maxDistanceKm: number | null;
+  vitals: Vitals;
+  hiddenVitals: VitalKey[];
+  dealbreakers: Dealbreakers;
   isPublished: boolean;
   isDiscoverable: boolean;
   discoveryPaused: boolean;
@@ -184,4 +189,21 @@ export interface Suggestion {
   label: string;
   suggestions: string[];
   note?: string;
+}
+
+export type ChoiceVital = "education" | "religion" | "motherTongue" | "diet" | "drinking" | "smoking" | "children" | "familyPlans";
+export type VitalKey = "height" | "jobTitle" | ChoiceVital;
+export type Vitals = { heightCm: number | null; jobTitle: string | null } & Record<ChoiceVital, string | null>;
+export type Dealbreakers = { heightMinCm?: number; heightMaxCm?: number; includeUnstated: boolean } & Partial<Record<ChoiceVital, string[]>>;
+export interface PublicVital {
+  key: VitalKey;
+  label: string;
+  value: string;
+}
+export interface VitalsMeta {
+  keys: VitalKey[];
+  labels: Record<VitalKey, string>;
+  choices: Record<ChoiceVital, { value: string; label: string }[]>;
+  height: { min: number; max: number };
+  jobTitleMax: number;
 }

@@ -17,6 +17,7 @@ export function completionItems(p: OwnProfile, answeredQuestions: number | null)
     { key: "prompts", label: "Answer two prompts in your own words", done: (p.prompts?.length ?? 0) >= 2, tab: "words" },
     { key: "interests", label: "Choose three or more of the little things", done: p.interests.length >= 3, tab: "little" },
     { key: "languages", label: "Add the languages you speak", done: p.languages.length > 0, tab: "details" },
+    { key: "vitals", label: "Share three things about you, like height or diet", done: Object.values(p.vitals ?? {}).filter((x) => x !== null && x !== "").length >= 3, tab: "about" },
     { key: "city", label: "Set your city", done: !!p.city || p.hasApproxLocation, tab: "details" },
     { key: "intentions", label: "Choose your intentions", done: p.intentions.length > 0, tab: "intentions" },
   ];
